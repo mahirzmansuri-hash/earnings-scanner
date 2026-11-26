@@ -7,6 +7,8 @@ A forensic accounting web app. It scores US public companies on earnings manipul
 High school sophomore. I know basic Python from AP CSP. I'm building this with AI help, but I have to understand everything, because I'll explain it in interviews.
 
 ## How to work with me
+- Do all lookups and checks yourself (SEC filings, 10-Ks, docs, data). Don't send me links to dig through or ask me to find numbers.
+- Teach as you go: treat each step as a short lesson. Say what you checked, what you found (with the real numbers), and why it matters for the project, the finance, or interviews.
 - Explain every file you write in plain words, and why you made each choice.
 - I write the score formulas myself (Beneish, Piotroski, Altman). Don't write them for me. Give me the formula and the inputs, then check my code.
 - Before any big step, tell me the plan in a few lines and wait for my OK.

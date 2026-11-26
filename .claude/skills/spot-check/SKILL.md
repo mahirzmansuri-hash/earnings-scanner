@@ -5,15 +5,16 @@ description: Verify a number from our EDGAR/DuckDB data against the company's ac
 
 # Spot-check a number against the filing
 
-Goal: the user confirms the number with their own eyes in the real filing. Don't just assert it.
+Goal: Claude does the whole check itself, then teaches the result as a short lesson. Don't send the user links to dig through. (User preference, 2026-11-26.)
 
 ## Steps
 1. **Pull our value.** From the raw companyfacts JSON (`data/raw/companyfacts/`) or DuckDB, get: tag, value, unit, `start`/`end`, form, `filed`, `accn`. If several rows cover the same period, show all of them and point out the earliest `filed`.
-2. **Point the user to the filing.**
-   - Filing index URL: `https://www.sec.gov/Archives/edgar/data/<CIK without leading zeros>/<accn without dashes>/`
-   - Name the statement (Statement of Operations, Balance Sheet, Cash Flows), the line item as the filing words it, and the column (the fiscal year).
-   - Remind them about units: tables are usually "in millions" and our data is in raw dollars.
-3. **Have the user report the number.** Don't tell them the expected figure in a way that lets them skip looking.
+2. **Fetch the filing yourself.**
+   - Index: `https://www.sec.gov/Archives/edgar/data/<CIK without leading zeros>/<accn without dashes>/index.json`. The main document is the largest `<ticker>-<date>.htm`.
+   - Send the User-Agent from `src.config.sec_user_agent()`, and never print it.
+   - Strip the HTML, find the statement title (Statement of Operations, Balance Sheet, Cash Flows), and read the line item and the fiscal-year column.
+   - Read the units line ("In millions...") and convert. Our data is in raw dollars.
+3. **Teach it.** Show a small table (our value vs the filing), plus 1-2 things worth noticing in that statement (what makes up the number, a trend, a link to a score input).
 4. **Compare.** They should match exactly after the unit conversion. If not, check:
    - wrong tag (for example `Revenues` vs `RevenueFromContractWithCustomerExcludingAssessedTax`)
    - wrong period (a quarter vs the full year, or `fy` used in place of `end`)
