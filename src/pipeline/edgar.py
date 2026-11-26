@@ -6,6 +6,7 @@ SEC rules we follow:
 """
 import json
 import time
+from pathlib import Path
 
 import requests
 
@@ -28,6 +29,36 @@ def _sec_get(url: str) -> dict:
     _last_request_time = time.time()
     response.raise_for_status()  # stop with an error on 403, 404, etc.
     return response.json()
+
+
+BULK_URL = "https://www.sec.gov/Archives/edgar/daily-index/bulkdata/{name}"
+
+
+def download_bulk_file(name: str, refresh: bool = False) -> Path:
+    """Download one of SEC's big bulk files (e.g. submissions.zip) to data/raw/.
+
+    Streams in 1 MB chunks (never holds the whole file in memory) and writes to
+    a .part file first, renaming only when complete, so a crashed download is
+    never mistaken for a finished one.
+    """
+    path = RAW_DIR / name
+    if path.exists() and not refresh:
+        return path
+
+    part = path.with_suffix(path.suffix + ".part")
+    headers = {"User-Agent": sec_user_agent()}
+    with requests.get(BULK_URL.format(name=name), headers=headers, stream=True, timeout=60) as r:
+        r.raise_for_status()
+        total = int(r.headers.get("Content-Length", 0))
+        done = 0
+        with open(part, "wb") as f:
+            for chunk in r.iter_content(chunk_size=1 << 20):
+                f.write(chunk)
+                done += len(chunk)
+                if total and done % (100 << 20) < (1 << 20):  # progress every ~100 MB
+                    print(f"{name}: {done / 1e9:.2f} / {total / 1e9:.2f} GB", flush=True)
+    part.rename(path)
+    return path
 
 
 def fetch_company_facts(cik: int, refresh: bool = False) -> dict:
