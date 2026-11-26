@@ -20,6 +20,11 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 - Start with `vault/START-HERE.md`, then the latest entry in `vault/build-log.md`. These files are the project memory; don't rely on chat history.
 - End of every session: build log entry, new decisions in `vault/design-notes.md`, new traps in `vault/gotchas.md`, tick phases and checkboxes.
 
+## Project skills (`.claude/skills/`)
+- `/end-session`: explain-back, vault updates, Obsidian note, commit
+- `/spot-check`: verify a number against the real 10-K
+- `/review-my-score`: coach me on the score formulas without writing them
+
 ## My Obsidian brain (linked)
 - Project note: `/Users/mahir/Documents/Obsidian Vault/Mahir's Second Brain/Areas/Earnings Quality Scanner.md`
 - End of every session, update only that note: status, phase checkboxes, and a one-line entry under "Progress log" (date, what we did, what's next). Link to the full build log on GitHub; don't copy it.
