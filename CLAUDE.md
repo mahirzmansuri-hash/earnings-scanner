@@ -16,6 +16,15 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 - After each session, add an entry to the build log: what we did, the decisions, bugs found, and what's next.
 - Pace: 2-3 hours a week. Schedule is in vault/requirements.md.
 
+## Memory (read at the start of every session)
+- Start with `vault/START-HERE.md`, then the latest entry in `vault/build-log.md`. These files are the project memory; don't rely on chat history.
+- End of every session: build log entry, new decisions in `vault/design-notes.md`, new traps in `vault/gotchas.md`, tick phases and checkboxes.
+
+## My Obsidian brain (linked)
+- Project note: `/Users/mahir/Documents/Obsidian Vault/Mahir's Second Brain/Areas/Earnings Quality Scanner.md`
+- End of every session, update only that note: status, phase checkboxes, and a one-line entry under "Progress log" (date, what we did, what's next). Link to the full build log on GitHub; don't copy it.
+- Never edit other notes in my vault without asking. Never copy personal notes from my vault into this repo.
+
 ## Stack
 - Python 3, DuckDB (database), pandas
 - Streamlit (web app), hosted on Streamlit Community Cloud
