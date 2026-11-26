@@ -32,7 +32,7 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 - Altman Z-Score: above 3 is safe, 1.8-3 is the gray zone, below 1.8 is distress
 
 ## Phases
-- [ ] 0. Setup: repo, venv, folder structure, project vault, GitHub
+- [x] 0. Setup: repo, venv, folder structure, project vault, GitHub
 - [ ] 1. EDGAR data pipeline into DuckDB, spot-check 5 companies
 - [ ] 2. Scores (I code them, you review)
 - [ ] 3. Backtest 2012-2025: yearly portfolios by score vs the S&P 500

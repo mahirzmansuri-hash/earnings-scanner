@@ -9,7 +9,7 @@ Acceptance criteria per phase. A phase is done only when every box is ticked.
 - [x] `.env` / `.env.example` for `SEC_USER_AGENT`; `.env` gitignored
 - [x] Local git repo initialized, files staged
 - [x] First commit
-- [ ] Pushed to a GitHub repo
+- [x] Pushed to a GitHub repo
 
 ## Phase 1: EDGAR pipeline
 - [ ] Download companyfacts JSON for all US filers, under 10 req/sec, User-Agent from `.env`
