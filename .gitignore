@@ -1,0 +1,26 @@
+# Secrets: never commit (holds my SEC User-Agent / email)
+.env
+
+# Virtual environment (rebuilt from requirements.txt)
+.venv/
+
+# Data: large and rebuilt from EDGAR. Keep the empty folders.
+data/raw/*
+data/db/*
+!data/raw/.gitkeep
+!data/db/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Mac
+.DS_Store
+
+# Obsidian app settings (if /vault is opened in Obsidian)
+vault/.obsidian/
+
+# Streamlit local secrets
+.streamlit/secrets.toml

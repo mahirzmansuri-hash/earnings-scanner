@@ -1,0 +1,14 @@
+# Pinned so the app runs the same locally and on Streamlit Community Cloud.
+# Install with: pip install -r requirements.txt
+
+# Data pipeline
+requests==2.34.2        # HTTP calls to the SEC EDGAR API
+python-dotenv==1.2.4    # loads SEC_USER_AGENT from .env
+pandas==3.1.1           # tables / data cleaning
+duckdb==2.0.1           # local analytical database
+
+# Web app
+streamlit==1.67.0
+
+# Testing
+pytest==9.2.0
