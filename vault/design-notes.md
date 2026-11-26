@@ -18,3 +18,14 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 
 ## 2026-11-25: Raw data and the database are not committed
 - **Why:** the files are large and can be rebuilt from EDGAR. `data/` is gitignored except the `.gitkeep` placeholders.
+
+## 2026-11-26: Claude does the lookups and teaches
+- **Why:** my time (2-3 hrs/week) goes further learning *why* than hunting through SEC pages. Claude fetches and verifies the filings itself, then explains the results as a lesson.
+- **Trade-off:** I must still be able to explain everything, so every module ends with a quiz.
+
+## 2026-11-26: Two versions of each number
+- **Backtest:** first-filed value (what investors knew then). **Lookup page:** latest-filed value (most accurate today).
+- **Why:** using corrected numbers in a backtest is look-ahead bias. Comparing the two versions also detects restatements, which are a red flag.
+
+## 2026-11-26: Schedule in modules, not weeks
+- **Why:** progress is measured by topics learned and built, not by the calendar. Each module has 3-5 topics and ends with a quiz.

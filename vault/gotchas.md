@@ -13,3 +13,4 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 - **`fy` column doesn't match the period** (confirmed 2026-11-25, Apple) → `fy`/`fp` describe the *filing*, so FY2025 revenue repeated in the FY2026 10-K shows `fy=2026` → identify a period by `start`/`end`, never by `fy`.
 - **Same value appears in several filings** (confirmed 2026-11-25) → each 10-K repeats prior years for comparison → for point-in-time, keep the row with the earliest `filed`.
 - **Survivorship bias** → building the stock universe from today's tickers → build it from every company that filed in each year.
+- **`companyfacts.zip` returns 503/403** (2026-11-26) → SEC may be throttling or restricting the bulk file → fallback: per-company API at 8 req/sec (~20-40 min for every filer). Investigate in Module 2.1.
