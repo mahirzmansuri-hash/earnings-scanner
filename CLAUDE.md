@@ -11,7 +11,10 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 - I write the score formulas myself (Beneish, Piotroski, Altman). Don't write them for me. Give me the formula and the inputs, then check my code.
 - Before any big step, tell me the plan in a few lines and wait for my OK.
 - Keep answers short and direct. No filler.
+- You write the plumbing (pipeline, database, app). I don't need to be a strong coder, but I must understand it.
+- End every session with an explain-back: I explain what we built in my own words, and you correct gaps.
 - After each session, add an entry to the build log: what we did, the decisions, bugs found, and what's next.
+- Pace: 2-3 hours a week. Schedule is in vault/requirements.md.
 
 ## Stack
 - Python 3, DuckDB (database), pandas

@@ -11,6 +11,17 @@ Acceptance criteria per phase. A phase is done only when every box is ticked.
 - [x] First commit
 - [x] Pushed to a GitHub repo
 
+## Schedule (2-3 hours/week, set 2026-11-25)
+| Weeks | Dates | Goal |
+|---|---|---|
+| 1-2 | Nov 30 - Dec 13 | Explore Apple's EDGAR data; build the fetch function |
+| 3-4 | Dec 14 - Dec 27 | Bulk download, including delisted companies |
+| 5-6 | Dec 28 - Jan 10 | DuckDB table and loading (winter break is light) |
+| 7-8 | Jan 11 - Jan 24 | Map tags; keep the first-filed value (point-in-time) |
+| 9-10 | Jan 25 - Feb 7 | Spot-check 5 companies vs 10-K; tests |
+
+Rough targets: Phase 2 Mar, Phase 3 May, Phase 4 Jul, Phase 5 Sep 2027.
+
 ## Phase 1: EDGAR pipeline
 - [ ] Download companyfacts JSON for all US filers, under 10 req/sec, User-Agent from `.env`
 - [ ] Load into DuckDB with the **filed date** on every value (point-in-time)
