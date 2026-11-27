@@ -1,4 +1,4 @@
-# Faultline Roadmap (2026-11-26 → mid-2028)
+# Faultline Roadmap: a high-school research program (Nov 2026 → done by end of junior year, Jun 2028)
 
 ## Vision
 **Faultline: a free, public early-warning system for every US public company.**
@@ -55,6 +55,34 @@ data and the dead companies included. Long term: alerts, an API and a research p
 - Distribution: SEO pages, investing communities, school investment clubs, LinkedIn.
 - Startup tests: who would pay (alerts/API), pricing experiments, competitions.
 - **Outcome #5:** monthly users, newsletter subscribers, paper downloads.
+
+## Research framing (what I present to teachers, professors, internship mentors)
+**Central question:** Can public SEC filings warn investors *in advance* about bankruptcy and
+accounting problems, when tested honestly (point-in-time, dead companies included)?
+- **RQ1:** How often did the classic scores (Altman, Beneish, Piotroski) flag bankruptcies and
+  restatements 12+ months ahead, 2012-2025, and how many false alarms did they raise?
+- **RQ2:** Do warning *events* (auditor changes, late filings, amendments) add early warning?
+- **RQ3:** Can a machine-learning composite beat the classic scores out-of-sample?
+- **RQ4:** Do flagged companies' stocks underperform (where free price data exists)?
+- **RQ5:** Does the *language* of 10-Ks (risk factors, auditor reports) add signal? (AI/NLP)
+
+## Multi-year plan (small increments: 1-2 hour sessions)
+| When | Build (stages above) | Research / people | Deliverable |
+|---|---|---|---|
+| Sophomore yr, winter-spring 2027 | Stages 1-3 | Write the RQ1 results up as a 2-page brief; email 3-5 accounting/finance professors with it and 3 specific questions; log every reply | Track record #1, website v1 |
+| Summer 2027 (internship) | Stage 4 begins | Present Faultline to mentors; ask what practitioners actually check; interview 2-3 practitioners (auditor, analyst, investor) | Interview notes, feedback list |
+| Junior yr fall 2027 | Stage 4 (ML composite) | Paper draft (SSRN); professor review of methods | ML results, paper v1 |
+| Junior yr spring 2028 | Stage 5 (alerts, newsletter, API, growth) | Final paper; present at school / a competition; final user numbers | **Everything finished by Jun 1, 2028** |
+| Summer 2028 | Maintenance only (weekly auto-update) | **Internship search and internship**: Faultline is the portfolio piece | Interviews, internship |
+| Fall 2028 | Maintenance only | College applications | Application materials |
+
+**Hard deadline: Jun 1, 2028 (end of junior year).** Site, paper, results, user numbers and
+professor feedback all exist before the summer-2028 internship search.
+
+- **Research log:** `vault/build-log.md` (what was built) + `vault/research/` (questions, professor
+  emails, interview notes, results). Every result keeps its exact numbers and date.
+- **AI disclosure:** keep an honest record of what Claude built vs what I decided; many
+  competitions and programs ask. Resume wording stays "Built ... using AI-assisted development."
 
 ## Working model
 Claude proposes each next step (what, how, how big, research needed), waits for OK on big

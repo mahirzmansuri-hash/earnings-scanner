@@ -17,7 +17,8 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 - Keep answers short and direct. No filler. Report progress in short blocks.
 - No quizzes or hyper-specific questions. At the end of each stage, give me a 5-line plain-English summary I could say in an interview.
 - After each session, add an entry to the build log: what we did, the decisions, bugs found, and what's next.
-- Timeline: Dec 2026 to mid-2028, in stages (see `vault/roadmap.md`).
+- Timeline: everything done by Jun 1, 2028 (end of junior year), before the summer-2028 internship search (see `vault/roadmap.md`).
+- Style: I mostly accept prompts and vibecode small things I think are strong. Offer clear choices with a recommendation; build what I pick; build my own small ideas when they're good, and say so honestly when they're not.
 
 ## Memory (read at the start of every session)
 - Start with `vault/START-HERE.md`, then the latest entry in `vault/build-log.md`. These files are the project memory; don't rely on chat history.

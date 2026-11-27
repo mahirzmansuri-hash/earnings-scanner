@@ -86,6 +86,9 @@ CONCEPTS: dict[str, dict] = {
         "CommonStockSharesOutstanding",           # balance-sheet date
         "EntityCommonStockSharesOutstanding",     # cover page (dei), a date near the filing
     ]},
+    # Market value held by outside investors on the last day of Q2, from the 10-K cover page (dei).
+    # Free stand-in for market value of equity (Altman X4). Excludes insider shares.
+    "public_float": {"kind": "instant", "tags": ["EntityPublicFloat"]},
 }
 
 # Filled in by arithmetic when no tag exists (applied after tag lookup):

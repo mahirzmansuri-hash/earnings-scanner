@@ -116,13 +116,20 @@ def build_annual(con: duckdb.DuckDBPyConnection) -> None:
 
     # Wide table for the backtest: one column per concept (first-filed values)
     concepts = list(CONCEPTS)
-    cols = ",\n".join(f"MAX(value_first) FILTER (WHERE concept = '{c}') AS {c}" for c in concepts)
+    # Strict point-in-time: the row is dated by the ORIGINAL 10-K for that year (earliest filing),
+    # and keeps only values that were public by then (+7 days for a quick amendment). A value that
+    # first appeared in a later filing is left empty instead of delaying the whole row.
+    cols = ",\n".join(f"MAX(value_first) FILTER (WHERE concept = '{c}' AND filed_first <= original_filed + 7) AS {c}"
+                      for c in concepts)
     con.execute(f"""
     CREATE OR REPLACE TABLE annual_first AS
+    WITH dated AS (
+        SELECT *, MIN(filed_first) OVER (PARTITION BY cik, period_end) AS original_filed FROM annual
+    )
     SELECT cik, period_end,
-           MAX(filed_first) AS available_date,   -- the latest of the first-filed dates = when ALL of it was public
+           MIN(original_filed) AS available_date,   -- the day the original 10-K for this year became public
            {cols}
-    FROM annual GROUP BY cik, period_end
+    FROM dated GROUP BY cik, period_end
     """)
     for target, formula in DERIVED.items():   # fill gaps with arithmetic, e.g. gross_profit = revenue - cogs
         con.execute(f"UPDATE annual_first SET {target} = {formula} WHERE {target} IS NULL")
