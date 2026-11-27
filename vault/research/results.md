@@ -59,3 +59,14 @@ Each entry: date, question (RQ#), method in one line, exact numbers, caveats.
 - **AUC:** Faultline 0.834 vs Altman 0.749. Riskiest 10% caught 40% vs 30%; riskiest 20% 65% vs 51%.
 - Small companies (revenue under $100M; 865 exits): 0.733 vs 0.666. Larger (417 exits): 0.883 vs 0.791.
 - **Reading:** Faultline still wins on the broader outcome, but the gap narrows and Altman does better here (0.75) than on bankruptcy alone (0.71). This supports the caveat: the bankruptcy-only label hid many small-company failures. Report both outcomes.
+
+## 2026-11-27: Final reproducible numbers (supersede earlier entries)
+Fixes: model input had 194 duplicate rows (fiscal-year changes matched two prior years) and no fixed row order, so results moved slightly between runs. Now deduped and ordered; two runs give identical results.
+- **Bankruptcy, 2016-2023:** 25,169 company-years, 539 bankruptcies. AUC Faultline 0.847 vs Altman 0.707. Riskiest 5/10/20%: 35/53/70% vs 5/13/38%. At Altman's 50.3% alarm rate: 92.8% vs 85.5% caught. To catch 85.5%: 36.4% alarm rate.
+- **Ablation:** classic-score parts 0.824; + size & fundamentals 0.844; + filing behaviour & events 0.847; events only 0.646.
+- **Restatement:** 14,421 company-years, 479 notices. AUC 0.738 vs Beneish 0.521. Riskiest 10%: 28% vs 19%. At Beneish's alarm rate: 37.4% vs 25.9%.
+- **Distress exit:** 1,282 events. AUC 0.833 vs 0.748. Riskiest 10%: 40% vs 29%. Under $100M revenue: 0.732 vs 0.666; larger: 0.883 vs 0.791.
+- **By year:** 2016 0.818/0.717; 2017 0.844/0.775; 2018 0.774/0.716; 2019 0.875/0.698; 2020 0.933/0.708; 2021 0.864/0.726; 2022 0.830/0.672; 2023 0.871/0.710.
+- **By size:** <$100M 0.771/0.616; $100M-$1B 0.879/0.809; >$1B 0.903/0.781.
+- **Calibration:** top decile 10.83% predicted vs 9.50% actual; decile 6: 0.71% vs 1.22%.
+- **Top clues:** log assets 0.063, ROA 0.022, log float 0.009, log revenue 0.007, Altman X1 0.007, CFO/assets 0.007, Altman X3 0.006.

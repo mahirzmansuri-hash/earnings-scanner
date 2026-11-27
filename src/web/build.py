@@ -91,7 +91,9 @@ def load(con):
 
 EVENT_WORDS = {"bankruptcy": "Bankruptcy filing (8-K Item 1.03)", "non_reliance": "Restatement notice (8-K Item 4.02)",
                "auditor_change": "Auditor change (8-K Item 4.01)", "late_10k": "Late annual report (NT 10-K)",
-               "amended_10k": "Amended annual report (10-K/A)"}
+               "amended_10k": "Amended annual report (10-K/A)", "change_in_control": "Change in control (8-K Item 5.01)",
+               "deregistration": "Ended SEC registration (Form 15)"}
+RED_FLAG_EVENTS = {"bankruptcy", "non_reliance", "auditor_change", "late_10k"}
 
 
 def red_flags(r, ev_recent):
@@ -156,7 +158,7 @@ def company_page(r, h, evs, accn_map, as_of):
     title = f"{r['name']} ({tick}) bankruptcy and accounting risk" if tick else f"{r['name']} bankruptcy and accounting risk"
     dead = r.status == "inactive"
     recent = [ev for ev in evs.itertuples() if pd.Timestamp(ev.filed) > pd.Timestamp(r.available_date) - pd.Timedelta(days=730)
-              and pd.Timestamp(ev.filed) <= pd.Timestamp(r.available_date) and ev.event != "amended_10k"]
+              and pd.Timestamp(ev.filed) <= pd.Timestamp(r.available_date) and ev.event in RED_FLAG_EVENTS]
     flags = red_flags(r, recent)
     later = evs[(pd.to_datetime(evs["filed"]) > pd.Timestamp(r.available_date)) & evs["event"].isin(["bankruptcy", "non_reliance"])]
     accn = accn_map.get((r.cik, pd.Timestamp(r.period_end)), "")

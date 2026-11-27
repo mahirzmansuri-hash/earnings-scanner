@@ -4,7 +4,7 @@ Mahir, Faultline project (draft, November 2026). Built with AI-assisted developm
 
 ## Abstract
 
-The Altman Z-Score, Piotroski F-Score and Beneish M-Score are taught in accounting and finance courses as early-warning tools, but they are rarely tested on the full set of US companies with the failures included and with only the information that was public at the time. I build a point-in-time panel of 116,121 company-years from SEC XBRL filings (15,686 companies, 10,349 of which later stopped filing) and test the scores against 1,144 companies' bankruptcy filings and 2,904 companies' restatement notices. Altman's distress zone caught 83% of bankruptcies 12 to 24 months ahead but flagged about half of all company-years. A gradient-boosted model using the same ingredients plus size, profitability and filing behaviour, trained only on outcomes known before each test year, raised the ranking accuracy (AUC) for bankruptcy within two years from 0.71 to 0.84 on 25,231 unseen company-years from 2016 to 2023. Flagging the riskiest 10% of companies caught 52% of bankruptcies, against 13% for the lowest Altman scores. The model beat Altman in every test year and every size group. Restatements were much harder to predict: the Beneish M-Score's ranking was close to random (AUC 0.52) and the model reached 0.74.
+The Altman Z-Score, Piotroski F-Score and Beneish M-Score are taught in accounting and finance courses as early-warning tools, but they are rarely tested on the full set of US companies with the failures included and with only the information that was public at the time. I build a point-in-time panel of 116,121 company-years from SEC XBRL filings (15,686 companies, 10,349 of which later stopped filing) and test the scores against 1,144 companies' bankruptcy filings and 2,904 companies' restatement notices. Altman's distress zone caught 83% of bankruptcies 12 to 24 months ahead but flagged about half of all company-years. A gradient-boosted model using the same ingredients plus size, profitability and filing behaviour, trained only on outcomes known before each test year, raised the ranking accuracy (AUC) for bankruptcy within two years from 0.71 to 0.85 on 25,169 unseen company-years from 2016 to 2023. Flagging the riskiest 10% of companies caught 53% of bankruptcies, against 13% for the lowest Altman scores. The model beat Altman in every test year and every size group. Restatements were much harder to predict: the Beneish M-Score's ranking was close to random (AUC 0.52) and the model reached 0.74.
 
 ## 1. Introduction
 
@@ -48,32 +48,32 @@ Banks, insurers and other financial companies (SIC 6000-6799) are excluded from 
 
 **Classic scores alone (2012-2023).** In Altman's distress zone 12 to 24 months before a bankruptcy filing: 83.3% of the 419 bankruptcies that had a score in that window. But 49.2% of all company-years were in the distress zone. Flagged company-years were followed by bankruptcy 2.38% of the time, against 0.45% for the rest (5.3 times as often). Restricted to companies with at least $100 million in revenue, the hit rate was 76.4% and the alarm rate 34.3%. The Piotroski F-Score flagged 40.3% of bankruptcies at a 17.9% alarm rate. The Beneish M-Score flagged 26.1% of 555 restatements at a 13.7% alarm rate.
 
-**Faultline vs Altman (2016-2023, out of sample).** On 25,231 company-years with an Altman score and 542 bankruptcies within two years:
+**Faultline vs Altman (2016-2023, out of sample).** On 25,169 company-years with an Altman score and 539 bankruptcies within two years:
 
 | | Altman Z | Faultline |
 |---|---|---|
-| AUC | 0.71 | 0.84 |
-| Caught in riskiest 5% / 10% / 20% | 5% / 13% / 38% | 34% / 52% / 71% |
-| Caught at Altman's alarm rate (50%) | 85.6% | 93.2% |
-| Alarm rate needed to catch 85.6% | 50.3% | 36.3% |
+| AUC | 0.71 | 0.85 |
+| Caught in riskiest 5% / 10% / 20% | 5% / 13% / 38% | 35% / 53% / 70% |
+| Caught at Altman's alarm rate (50%) | 85.5% | 92.8% |
+| Alarm rate needed to catch 85.5% | 50.3% | 36.4% |
 
-**What drives the gain (question 2).** Using only the components of the three classic scores, the model already reaches an AUC of 0.83, so most of the improvement comes from combining the same ingredients better than the fixed 1968 weights do. Adding size and fundamentals raises it to 0.85. Adding filing behaviour and warning events changes almost nothing (0.85). The events do carry signal on their own (AUC 0.65), but the financial statements already contain most of it.
+**What drives the gain (question 2).** Using only the components of the three classic scores, the model already reaches an AUC of 0.82, so most of the improvement comes from combining the same ingredients better than the fixed 1968 weights do. Adding size and fundamentals raises it to 0.84. Adding filing behaviour and warning events adds little (0.85). The events do carry signal on their own (AUC 0.65), but the financial statements already contain most of it.
 
-**Restatements.** On 14,443 company-years with a Beneish score and 479 restatement notices within two years, the Beneish M-Score's AUC was 0.52 and Faultline's 0.74. Flagging the riskiest 10% caught 19% of restatements with Beneish and 29% with Faultline.
+**Restatements.** On 14,421 company-years with a Beneish score and 479 restatement notices within two years, the Beneish M-Score's AUC was 0.52 and Faultline's 0.74. Flagging the riskiest 10% caught 19% of restatements with Beneish and 28% with Faultline.
 
 **Example.** Sears Holdings entered Altman's distress zone with its 10-K filed in March 2015 and stayed there until its last 10-K in March 2018, when Faultline ranked it riskier than 99% of filers that year. It filed for bankruptcy in October 2018.
 
 ## 5. Robustness
 
-Faultline's AUC beat Altman's in every test year, from 0.80 vs 0.72 (2018) to 0.92 vs 0.71 (2020), and in every size group: revenue under $100 million (0.77 vs 0.62), $100 million to $1 billion (0.88 vs 0.81) and over $1 billion (0.90 vs 0.78).
+Faultline's AUC beat Altman's in every test year, from 0.77 vs 0.72 (2018) to 0.93 vs 0.71 (2020), and in every size group: revenue under $100 million (0.77 vs 0.62), $100 million to $1 billion (0.88 vs 0.81) and over $1 billion (0.90 vs 0.78).
 
-Calibration is good at the top and low in the middle. In the riskiest tenth of company-years the model predicted 10.8% and 9.2% went bankrupt. In the middle tenths it predicted roughly two-thirds of the observed rate (for example 0.77% predicted vs 1.42% observed).
+Calibration is good at the top and low in the middle. In the riskiest tenth of company-years the model predicted 10.8% and 9.5% went bankrupt. In the middle tenths it predicted roughly 60% of the observed rate (for example 0.71% predicted vs 1.22% observed).
 
-The most important inputs, measured by how much AUC falls when one input is shuffled, were company size, return on assets, EBIT to assets, Z'', revenue, operating cash flow to assets and working capital to assets.
+The most important inputs, measured by how much AUC falls when one input is shuffled, were company size (assets), return on assets, public float, revenue, working capital to assets, operating cash flow to assets and EBIT to assets.
 
 ## 6. Limits
 
-- Only formal bankruptcy filings count. Distressed sales and out-of-court restructurings are scored as misses, and companies that stop filing without an 8-K are not counted at all. Small companies often fail this way, which likely explains part of why size is the most important input.
+- The main outcome counts only formal bankruptcy filings. Small companies often stop filing instead, which likely explains part of why size is the most important input. A second outcome, a "distress exit" (bankruptcy, or going dark without a change of control), gives 1,282 events in the test years instead of 539. Faultline still ranks them better than Altman (AUC 0.83 vs 0.75; 0.73 vs 0.67 for companies under $100 million in revenue), but the gap is smaller.
 - About 40% of bankrupt companies had no score in the warning window, usually because they had stopped filing or left out a needed number.
 - Public float leaves out insider shares, so Altman's market-value ratio is understated for closely held companies.
 - One model setting was used without tuning.

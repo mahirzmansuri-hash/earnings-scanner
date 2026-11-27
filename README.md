@@ -10,13 +10,15 @@ Faultline reads every annual report (10-K) filed with the SEC since 2009, includ
 
 ## Main results
 
-Tested out of sample on filings from 2016 to 2023 (25,231 company-years, 542 bankruptcies). For each test year, the model was trained only on companies whose outcome was already known before that year began.
+Tested out of sample on filings from 2016 to 2023 (25,169 company-years, 539 bankruptcies). For each test year, the model was trained only on companies whose outcome was already known before that year began.
 
 | | Altman Z-Score | Faultline |
 |---|---|---|
 | Ranking accuracy (AUC; 0.5 = coin flip) | 0.71 | 0.84 |
-| Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 52% |
+| Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 53% |
 | Share of companies flagged to catch 86% of bankruptcies | 50% | 36% |
+
+Counting companies that stopped filing without being bought as failures too (a "distress exit"), Faultline's AUC is 0.83 against 0.75 for Altman.
 
 For restatements (8-K Item 4.02 notices), Faultline's AUC is 0.74 against 0.52 for the Beneish M-Score. Full tables, method and limits are in [`vault/research/results.md`](vault/research/results.md) and on the site's Track record page.
 

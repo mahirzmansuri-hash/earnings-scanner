@@ -92,6 +92,9 @@ def load(con, event: str = "bankruptcy", end: str = "2023-12-31") -> pd.DataFram
     LEFT JOIN prev p ON p.cik = b.cik AND date_diff('day', p.period_end, b.period_end) BETWEEN 350 AND 380
     LEFT JOIN bk ON bk.cik = b.cik
     JOIN companies co ON co.cik = b.cik
+    -- a fiscal-year change can match two "prior years"; keep the closest one (no duplicate rows)
+    QUALIFY ROW_NUMBER() OVER (PARTITION BY b.cik, b.period_end ORDER BY p.period_end DESC NULLS LAST) = 1
+    ORDER BY b.cik, b.period_end   -- fixed row order, so results are identical on every run
     """).df()
 
 
