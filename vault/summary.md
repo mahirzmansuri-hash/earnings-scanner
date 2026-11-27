@@ -78,7 +78,12 @@
 ## Publishing (Nov 27)
 - Put your first name (Mahir) on the About page. No last name, to keep a minor safer online.
 - Uploaded the finished site to GitHub (a branch called gh-pages, 7,700 files).
-- Last step is yours: turn on GitHub Pages in the repo settings.
+- You turned on GitHub Pages. **The site is live:** https://mahirzmansuri-hash.github.io/earnings-scanner/
+- Checked it live: every page loads, search works (Sears, Apple), screener loads 3,911 active companies.
+- Added a "Loading" message so the screener doesn't look broken on slow phones.
 
 ## Next
+- Auto-update every week (GitHub Actions, free).
+- Pages for banks (classic scores only).
+- A share image so links look good when posted.
 - Auto-update every week.

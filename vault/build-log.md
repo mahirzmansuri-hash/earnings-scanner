@@ -61,3 +61,9 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Result on the site:** 62 of 87 companies that went bankrupt in the last two years were in Faultline's riskiest 20% one to two years earlier.
 - **State:** committed and pushed; site not public.
 - **Next:** decide hosting (GitHub Pages or Cloudflare Pages, free) and weekly auto-update; company pages for banks (classic scores only); share image.
+
+## 2026-11-27 (cont.): Site published
+- **Live:** https://mahirzmansuri-hash.github.io/earnings-scanner/ (GitHub Pages from the `gh-pages` branch, pushed by `scripts/publish_site.sh`; Pages switched on by Mahir).
+- **Checked live:** all page types return 200; search works; screener loads (added a loading message); no console errors.
+- **Note:** URL contains the GitHub username; companies that died before 2016 (e.g. RadioShack) have no page because scores start in 2016.
+- **Next:** weekly auto-update (needs SEC data in CI or a local scheduled run), bank pages, share image, analytics.

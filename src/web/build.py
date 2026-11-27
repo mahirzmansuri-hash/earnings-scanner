@@ -276,7 +276,7 @@ def home(latest, events, results, as_of):
 <h1>Warnings from SEC filings, <span class="hl">tested against what actually happened.</span></h1>
 <p class="dim">Faultline reads every annual report filed with the SEC since 2009, including companies that later went bankrupt,
 scores each one, and checks the scores against real bankruptcies and restatements.</p>
-<div class="search"><input id="q" type="search" placeholder="Search a company or ticker, e.g. Apple or SHLD" aria-label="Search companies" autocomplete="off">
+<div class="search"><input id="q" type="search" placeholder="Search a company or ticker, e.g. Apple or AAPL" aria-label="Search companies" autocomplete="off">
 <div id="res" class="results" hidden></div></div></section>
 <section><h2>Track record</h2><div class="grid3">
 <div class="stat"><span class="v">{top10*100:.0f}%</span>of companies that went bankrupt within two years of a filing were already in Faultline's riskiest 10%. Altman Z-Score's riskiest 10% held {alt10*100:.0f}%.</div>
