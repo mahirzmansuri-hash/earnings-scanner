@@ -198,7 +198,7 @@ def company_page(r, h, evs, accn_map, as_of):
     hh = h[pd.to_datetime(h["available_date"]) >= pd.Timestamp("2016-01-01")]
     parts.append(f'<section><h2>Risk over time</h2>{chart(hh, evs)}')
     rows = "".join(
-        f'<tr><td>{pd.Timestamp(x.available_date).date()}</td><td>{pd.Timestamp(x.period_end).date()}</td>'
+        f'<tr><td class="d">{pd.Timestamp(x.available_date).date()}</td><td class="d">{pd.Timestamp(x.period_end).date()}</td>'
         f'<td class="n">{money(x.revenue)}</td><td class="n">{money(x.net_income)}</td><td class="n">{money(x.cfo)}</td>'
         f'<td class="n">{num(x.z_score)}</td><td class="n">{"" if isnan(x.f_score) else f"{x.f_score:.0f}"}</td>'
         f'<td class="n">{num(x.m_score)}</td><td>{reading(x.bankruptcy_pctile)}</td></tr>'
@@ -257,7 +257,7 @@ def home(latest, events, results, as_of):
     top = recent.sort_values("bankruptcy_risk", ascending=False).head(40)
     rows = table_rows(top, lambda r: (
         f'<tr><td><a href="c/{r.cik}.html">{e(r.name)}</a></td><td class="mono">{e((r.tickers or "").split(" | ")[0]) if isinstance(r.tickers, str) else ""}</td>'
-        f'<td class="dim">{e(txt(r.sic_description)[:34])}</td><td>{pd.Timestamp(r.available_date).date()}</td>'
+        f'<td class="dim">{e(txt(r.sic_description)[:34])}</td><td class="d">{pd.Timestamp(r.available_date).date()}</td>'
         f'<td class="n">{money(r.revenue)}</td><td class="n">{r.bankruptcy_risk*100:.1f}%</td><td class="n">{num(r.z_score)}</td></tr>'))
     # recent bankruptcies: what did the out-of-sample score say 12-24 months before?
     bk = events[(events["event"] == "bankruptcy") & (pd.to_datetime(events["filed"]) >= pd.Timestamp(as_of) - pd.Timedelta(days=730))]
@@ -272,7 +272,7 @@ def home(latest, events, results, as_of):
         if len(w):
             x = w.iloc[-1]
             seen.append((ev.cik, NAMES.get(ev.cik, ""), pd.Timestamp(ev.filed).date(), x.available_date, x.bankruptcy_pctile))
-    seen_rows = "".join(f'<tr><td><a href="c/{c}.html">{e(n)}</a></td><td>{f}</td><td>{pd.Timestamp(a).date()}</td>'
+    seen_rows = "".join(f'<tr><td><a href="c/{c}.html">{e(n)}</a></td><td class="d">{f}</td><td class="d">{pd.Timestamp(a).date()}</td>'
                         f'<td class="n">{p*100:.0f}</td><td>{reading(p)}</td></tr>' for c, n, f, a, p in seen)
     flagged = sum(p >= 0.8 for *_, p in seen)
     body = f"""<section><div class="label">Bankruptcy and accounting risk for {len(latest):,} US public companies</div>
@@ -377,6 +377,35 @@ usually because they stopped filing or left out a needed number. Results come fr
     return page("Track record · Faultline", body, "How often Faultline's scores flagged bankruptcies and restatements in advance, tested out of sample.", active="track-record.html")
 
 
+def new_filings(latest, as_of):
+    """10-Ks filed in the last 30 days, plus the biggest jumps in risk vs each company's previous report."""
+    cut = pd.Timestamp(as_of) - pd.Timedelta(days=30)
+    recent = latest[pd.to_datetime(latest["available_date"]) >= cut].copy()
+    def prev_pct(r):
+        h = HIST[r.cik]
+        h = h[pd.to_datetime(h["available_date"]) < pd.Timestamp(r.available_date)].dropna(subset=["bankruptcy_pctile"])
+        return h["bankruptcy_pctile"].iloc[-1] if len(h) else float("nan")
+    recent["prev"] = [prev_pct(r) for r in recent.itertuples()]
+    recent["jump"] = recent["bankruptcy_pctile"] - recent["prev"]
+    def row(r):
+        tick = r.tickers.split(" | ")[0] if isinstance(r.tickers, str) else ""
+        chg = "" if isnan(r.jump) else f"{r.jump*100:+.0f}"
+        return (f'<tr><td class="d">{pd.Timestamp(r.available_date).date()}</td><td><a href="c/{r.cik}.html">{e(r.name)}</a></td>'
+                f'<td class="mono">{e(tick)}</td><td class="n">{money(r.revenue)}</td><td class="n">{r.bankruptcy_pctile*100:.0f}</td>'
+                f'<td class="n">{chg}</td><td>{reading(r.bankruptcy_pctile)}</td></tr>')
+    head = ('<thead><tr><th>10-K filed</th><th>Company</th><th>Ticker</th><th class="n">Revenue</th><th class="n">Risk percentile</th>'
+            '<th class="n">Change vs last report</th><th>Reading</th></tr></thead>')
+    jumps = recent.dropna(subset=["jump"]).sort_values("jump", ascending=False).head(15)
+    allrows = recent.sort_values(["available_date", "bankruptcy_pctile"], ascending=[False, False])
+    body = f"""<section><h1>New filings</h1><p class="dim">Every annual report filed in the 30 days before {as_of}, scored the day the data
+was updated. Risk percentile compares each company with all companies that filed in the same year; change is in percentile points
+against the company's previous 10-K.</p></section>
+<section><h2>Biggest increases in risk</h2>{'<div class="tbl"><table>' + head + '<tbody>' + "".join(row(r) for r in jumps.itertuples()) + '</tbody></table></div>' if len(jumps) else '<p class="dim">No company with an earlier report filed in this window.</p>'}</section>
+<section><h2>All {len(allrows):,} filings</h2><div class="tbl"><table>{head}<tbody>{"".join(row(r) for r in allrows.itertuples())}</tbody></table></div>
+<p class="note">Research, not investment advice. Updated weekly from SEC EDGAR.</p></section>"""
+    return page("New filings · Faultline", body, "The latest 10-K filings scored for bankruptcy risk, and the biggest jumps in risk.", active="new.html")
+
+
 def methodology():
     body = """<section><h1>Methodology</h1>
 <h2>Data</h2><p>All numbers come from the SEC's free EDGAR XBRL data: about 39 million reported values from 15,686 companies that filed an
@@ -444,13 +473,14 @@ def build():
     (SITE / "data" / "companies.json").write_text(json.dumps(comp, separators=(",", ":"), allow_nan=False))
     shutil.copy(Path(__file__).parent / "assets" / "og.png", SITE / "og.png")  # share image (scripts/make_share_image.py)
     (SITE / "index.html").write_text(home(latest, events, results, as_of))
+    (SITE / "new.html").write_text(new_filings(latest, as_of))
     (SITE / "screener.html").write_text(screener())
     (SITE / "track-record.html").write_text(track_record(results))
     (SITE / "methodology.html").write_text(methodology())
     (SITE / "about.html").write_text(about())
     # sitemap + robots.txt so search engines can find every company page
     from src.web.style import SITE_URL
-    urls = ["", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
+    urls = ["", "new.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
     (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
                                       + "".join(f"<url><loc>{SITE_URL}{u}</loc><lastmod>{as_of}</lastmod></url>" for u in urls) + "</urlset>")
     (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")
