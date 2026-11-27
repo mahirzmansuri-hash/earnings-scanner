@@ -56,6 +56,15 @@ data and the dead companies included. Long term: alerts, an API and a research p
 - Startup tests: who would pay (alerts/API), pricing experiments, competitions.
 - **Outcome #5:** monthly users, newsletter subscribers, paper downloads.
 
+## Stage 2 decision needed (researched 2026-11-27)
+Free full-history daily prices that include delisted stocks don't exist: free tiers cover ~12 months
+(FinzData, MarketParquet) or samples (historicaldata.net); full archives are paid. Options at $0:
+- **A (recommended): cover-page market value.** Every 10-K reports public float (99% coverage, dead companies
+  included). Year-over-year float change divided by share-count change approximates the stock's return.
+  Bankruptcies get an assumed delisting return (e.g. -100%). Crude, but free and survivorship-free; state it as an approximation.
+- **B: free recent-window prices** for the live site only (no historical backtest).
+- **C: skip returns;** the event-based track record (bankruptcy, restatement, distress exit) is the main result.
+
 ## Research framing (what I present to teachers, professors, internship mentors)
 **Central question:** Can public SEC filings warn investors *in advance* about bankruptcy and
 accounting problems, when tested honestly (point-in-time, dead companies included)?
