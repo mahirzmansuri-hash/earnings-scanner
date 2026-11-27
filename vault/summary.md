@@ -131,7 +131,14 @@
 - That's a real research answer: simple warning phrases don't add early warning.
 - Paper, README and results updated.
 
+## Paper PDF (Nov 27)
+- Turned the paper into a clean 6-page PDF.
+- Added Figure 1: how many bankruptcies each score catches as you flag more companies.
+- Faultline's line rises much faster than Altman's.
+- Fixed a few numbers and the intro (now 5 research questions).
+- The PDF is on the website and in the GitHub README.
+
 ## Next
 - Optional for you: click Run workflow once on GitHub to confirm the fixed weekly update (or wait for Sunday).
 - Optional for you: submit the sitemap to Google Search Console.
-- Polish the paper; show it to a teacher.
+- Show the PDF to a teacher for feedback.
