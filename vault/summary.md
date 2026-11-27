@@ -105,7 +105,7 @@
 - Measured what happened to each stock the year after its score came out. No peeking.
 - Bankrupt companies count as -100%. Buyouts are left out.
 - Only companies worth $10M+ (20,648 company-years, 2016-2022).
-- **Riskiest 10%: typical stock fell 14.8%.** Safest half: rose 2.8%.
+- **Riskiest 10%: typical stock fell 14.8%.** Safest half: rose 2.9%.
 - **34% of the riskiest lost half their value or more.** Only 11% of the safest did.
 - **11% of the riskiest were wiped out**, vs 1% of the safest.
 - But the average wasn't lower: a few risky stocks shot up like lottery tickets.

@@ -6,12 +6,32 @@ Every score is out-of-sample: for filings made in year Y, the model is trained o
 whose 24-month outcome was known before Jan 1 of Y. Same rule as the published test, just
 extended to the newest filings. Also stores each row's percentile among companies that
 filed in the same year ("riskier than 97% of companies").
+
+Calibration: raw model scores rank well but their middle values read too low. For filing year Y,
+an isotonic map from raw score to observed rate is fitted on EARLIER years' out-of-sample scores
+whose outcomes were known before Y, then applied to year Y. Rankings don't change; the shown
+percentages get closer to how often companies really failed. 2016 (no earlier years) stays raw.
 """
 import duckdb
 import pandas as pd
+from sklearn.isotonic import IsotonicRegression
 
 from src.config import DB_PATH
-from src.model.composite import load, walk_forward
+from src.model.composite import HORIZON, load, walk_forward
+
+
+def calibrate(wf: pd.DataFrame) -> pd.Series:
+    out = wf["composite"].copy()
+    avail = pd.to_datetime(wf["avail"])
+    for y in sorted(wf["year"].unique()):
+        known = (wf["year"] < y) & (avail + pd.Timedelta(days=HORIZON) < pd.Timestamp(f"{y}-01-01"))
+        if known.sum() < 2000 or wf.loc[known, "label"].sum() < 20:
+            continue
+        iso = IsotonicRegression(out_of_bounds="clip", y_min=0, y_max=1)
+        iso.fit(wf.loc[known, "composite"], wf.loc[known, "label"].astype(float))
+        m = wf["year"] == y
+        out[m] = iso.predict(wf.loc[m, "composite"])
+    return out
 
 
 def main():
@@ -23,13 +43,16 @@ def main():
             df = load(con, event=event, end=str(as_of.date()))
             if event != "bankruptcy":
                 df["already_bankrupt"] = False
-            part = walk_forward(df, years=years, verbose=False)[["cik", "period_end", "available_date", "composite"]]
-            part = part.rename(columns={"composite": col})
+            wf = walk_forward(df, years=years, verbose=False)
+            wf["calibrated"] = calibrate(wf)
+            part = wf[["cik", "period_end", "available_date", "calibrated", "composite"]]
+            part = part.rename(columns={"calibrated": col, "composite": col + "_raw"})
             out = part if out is None else out.merge(part.drop(columns=["available_date"]), on=["cik", "period_end"], how="outer")
             print(f"  {event}: scored {len(part):,} company-years")
         out["year"] = pd.to_datetime(out["available_date"]).dt.year
         for col in ["bankruptcy_risk", "restatement_risk"]:
-            out[col.replace("_risk", "_pctile")] = out.groupby("year")[col].rank(pct=True)
+            # rank by the raw score: calibration groups scores into steps, raw keeps the fine order
+            out[col.replace("_risk", "_pctile")] = out.groupby("year")[col + "_raw"].rank(pct=True)
         con.register("risk_df", out.drop(columns=["year"]))
         con.execute("CREATE OR REPLACE TABLE risk AS SELECT * FROM risk_df")
         con.unregister("risk_df")

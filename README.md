@@ -18,7 +18,7 @@ Tested out of sample on filings from 2016 to 2023 (25,169 company-years, 539 ban
 | Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 53% |
 | Share of companies flagged to catch 86% of bankruptcies | 50% | 36% |
 
-Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -14.8% the following year against +2.8% for its safest half, and 34% of them lost half their value or more against 11%.
+Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -14.8% the following year against +2.9% for its safest half, and 34% of them lost half their value or more against 11%.
 
 Counting companies that stopped filing without being bought as failures too (a "distress exit"), Faultline's AUC is 0.83 against 0.75 for Altman.
 

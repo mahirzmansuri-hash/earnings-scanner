@@ -85,3 +85,8 @@ Fixes: model input had 194 duplicate rows (fiscal-year changes matched two prior
 - **By year (median, riskiest 10% vs safest 50%):** 2016 -0.8/+11.0; 2017 +7.3/+6.8; 2018 -29.3/-4.1; 2019 -18.8/-4.2; 2020 +77.7/+39.7; 2021 -42.4/-22.5; 2022 -29.9/+3.6. Riskiest worse in 5 of 7 years by median (2017 about equal, 2020 rebound rally the exception).
 - **Reading:** the typical flagged company lost value and flagged companies were 3x as likely to lose half; but the average was not lower, because a few flagged stocks rose enormously (lottery-like skew) and share issuance inflates market value. Robust to the stopped-filing assumption (median -14.8% at -50% and -100%; -1.2% at 0%).
 - **Limits:** float is valued once a year mid-year, excludes insider shares, and rises with share issuance; not a tradable strategy test.
+
+## 2026-11-27: Calibrated risk percentages (`src/model/live.py`)
+- For each filing year, raw scores are mapped to observed rates with isotonic regression fitted only on earlier years' out-of-sample scores whose outcomes were known (no look-ahead). Percentiles still come from the raw scores (calibration creates ties).
+- Check, filings 2018-2023, deciles shown vs actual 2-year bankruptcy rate: top 10.78% vs 10.26%; 9th 4.11% vs 3.38%; 6th 1.77% vs 1.83% (before calibration the middle deciles read about 0.6x the actual rate).
+- Stock-outcome table after percentile recompute: safest half median +2.9% (was +2.8%); other rows unchanged.
