@@ -20,3 +20,4 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 - **DuckDB 2.0: `con.sql(...).fetchone()` is gone** → use `con.execute(...).fetchone()`.
 - **DuckDB reads its own table before your DataFrame** (2026-11-27) → `CREATE OR REPLACE TABLE scores AS SELECT * FROM scores` silently rebuilt the table from its OLD self, not the new pandas `scores` → always `con.register("scores_df", df)` under a distinct name.
 - **Row dated by the latest input is late** (2026-11-27) → a value first appearing in a later filing (e.g. COGS) pushed a whole year's date forward (Sears FY2015 dated 2018) → date rows by the original 10-K and drop inputs that weren't in it.
+- **DuckDB 2.0: unread results block the connection** (2026-11-27) → `ResourceInUseException` after a `fetchone()` → open a fresh connection per pipeline step (or use `con.cursor()`).

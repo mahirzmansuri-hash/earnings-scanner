@@ -1,0 +1,51 @@
+# Weekly: pull fresh SEC data, rebuild scores and models, publish the site to GitHub Pages.
+# Needs one repository secret: SEC_USER_AGENT ("Your Name your.email@example.com"), required by SEC.
+name: Weekly update
+
+on:
+  schedule:
+    - cron: "0 12 * * 0"   # Sundays 12:00 UTC (8am Eastern)
+  workflow_dispatch:        # "Run workflow" button for a manual run
+
+permissions:
+  contents: write           # push the built site to the gh-pages branch
+
+concurrency:
+  group: weekly-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      # Keep downloaded company facts between runs, so only companies with new 10-Ks are re-downloaded.
+      - name: Restore cached SEC company facts
+        uses: actions/cache@v4
+        with:
+          path: data/raw/companyfacts
+          key: companyfacts-${{ github.run_id }}
+          restore-keys: companyfacts-
+
+      - name: Update data, models and site
+        env:
+          SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
+        run: python -m src.pipeline.update
+
+      - name: Publish to GitHub Pages
+        env:
+          PUBLISH_REMOTE: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ./scripts/publish_site.sh

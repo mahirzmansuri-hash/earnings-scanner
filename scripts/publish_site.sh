@@ -2,7 +2,7 @@
 # Publish site/ to the gh-pages branch (GitHub Pages serves it).
 # Run from the repo root after `python -m src.web.build`. Overwrites the branch each time.
 set -euo pipefail
-REMOTE=$(git remote get-url origin)
+REMOTE=${PUBLISH_REMOTE:-$(git remote get-url origin)}  # CI passes a token URL
 TMP=$(mktemp -d)
 cp -R site/. "$TMP"
 touch "$TMP/.nojekyll"   # tell GitHub not to run Jekyll on these files
