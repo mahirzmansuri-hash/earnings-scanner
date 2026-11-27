@@ -48,3 +48,9 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Bugs:** DuckDB table-name shadowing (scores/events rebuilt from stale tables); rows dated by the latest input (fixed: date by original 10-K). See [[gotchas]].
 - **State:** 16 tests pass; committed and pushed.
 - **Next:** pick Stage 1 follow-ups (better thresholds / composite, warning events, coverage gap), then a 2-page RQ1 brief for professors.
+
+## 2026-11-27 (cont.): Faultline Composite v1
+- **Did:** installed scikit-learn 1.9.1; `src/model/composite.py` (41 features, walk-forward 2016-2023, `composite` table with out-of-sample risk for every company-year); `src/model/ablation.py` (feature groups, top-X% table).
+- **Results:** AUC 0.847 vs Altman 0.708; flag riskiest 10% -> catch 52% of bankruptcies vs 13% for lowest-Z; same catch rate with 26% fewer alarms. Warning events add ~nothing on top of financials. See `vault/research/results.md`.
+- **State:** committed and pushed. 16 tests pass.
+- **Next:** options: restatement model (Beneish side), case-study pages, 2-page brief for professors, start the website.

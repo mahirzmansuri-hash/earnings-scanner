@@ -12,3 +12,6 @@ streamlit==1.67.0
 
 # Testing
 pytest==9.2.0
+
+# Machine learning (Faultline Composite)
+scikit-learn==1.9.1

@@ -44,3 +44,8 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 - **Rule:** Faultline uses only free data and services. No paid price data.
 - **How:** market value from the 10-K cover page (`dei:EntityPublicFloat`, in 99% of 10-Ks since 2012, dead companies included); track record measured against SEC event filings (bankruptcy 8-K 1.03, non-reliance 8-K 4.02) instead of stock prices; free hosting and GitHub Actions.
 - **Trade-off:** public float excludes insider shares and is dated mid-year; return backtests are limited to free price coverage, with gaps flagged.
+
+## 2026-11-27: Faultline Composite v1 model choice
+- **Model:** gradient-boosted decision trees (scikit-learn `HistGradientBoostingClassifier`). Handles missing values natively (many inputs are missing), captures non-linear effects (a Z of -6 is not 'more distressed' than -2 for tiny shells), fast. Not tuned yet (300 trees, lr 0.05).
+- **Test design:** walk-forward by year with a 24-month label gap, so training never sees an outcome that wasn't known yet. Compare at matched alarm rates, not just accuracy (bankruptcies are ~2% of rows, so accuracy is meaningless).
+- **Why not deep learning:** 78k rows of tabular data; trees are the standard and are explainable.

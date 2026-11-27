@@ -18,3 +18,18 @@ Each entry: date, question (RQ#), method in one line, exact numbers, caveats.
 
 **Findings:** (1) The classic scores do warn: flagged companies are 2-6x more likely to go bankrupt or restate. (2) But the 1968/1999 thresholds raise far too many false alarms: Altman flags ~half of all US company-years (many tiny or loss-making firms). (3) Beneish catches about 1 in 4 restatements. (4) 285 of 704 bankruptcies had no score in the window (company stopped filing, missing inputs): a coverage gap to report.
 **Next questions:** better thresholds / a combined model (RQ3); add warning events (RQ2); size groups.
+
+## 2026-11-27: RQ2 + RQ3 Faultline Composite v1 (bankruptcy within 24 months)
+**Method:** gradient-boosted trees (scikit-learn HistGradientBoosting) on 41 point-in-time features (all Altman/Piotroski/Beneish pieces, size, profitability, leverage, growth, filing delay, warning events in the prior 24 months). Walk-forward: to test year Y, train only on rows whose 24-month outcome was known before Jan 1 of Y. Test years 2016-2023. Compared with Altman on the same rows. Code: `src/model/composite.py`, `src/model/ablation.py`.
+
+| On 25,231 unseen company-years (542 bankruptcies) | Altman Z | Faultline |
+|---|---|---|
+| AUC (ranking quality; 0.5 = coin flip) | 0.708 | **0.847** |
+| Catch rate at Altman's alarm rate (50%) | 85.6% | **93.4%** |
+| Alarm rate needed to catch 85.6% | 50.3% | **37.1%** (26% fewer alarms) |
+| Bankruptcies caught if you flag only the riskiest 10% | 13% | **52%** |
+| ... riskiest 5% / 20% | 5% / 38% | **34% / 71%** |
+
+**Ablation (RQ2):** classic-score ingredients alone AUC 0.831 (the gain over Altman is mostly from *combining* the same ingredients better); + size & fundamentals 0.847; + filing behaviour & warning events 0.848 (adds almost nothing on top); events alone 0.645 (informative, but already captured by the financials).
+**Sanity check:** 2022 top-12 riskiest: 3 filed bankruptcy within 24 months (Lannett, Cyxtera, ShiftPixy); several others were distressed sales/acquisitions or out-of-court restructurings (Redbox, Vivint, Abraxas), which our label (8-K Item 1.03 only) counts as misses, so measured precision is conservative.
+**Caveats:** only formal bankruptcy notices count; companies that stop filing ("go dark") aren't labelled; 2020 COVID year included; one model setting, not tuned.
