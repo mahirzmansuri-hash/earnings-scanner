@@ -14,3 +14,4 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 - **Same value appears in several filings** (confirmed 2026-11-25) → each 10-K repeats prior years for comparison → for point-in-time, keep the row with the earliest `filed`.
 - **Survivorship bias** → building the stock universe from today's tickers → build it from every company that filed in each year.
 - **`companyfacts.zip` returns 503/403** (2026-11-26) → SEC may be throttling or restricting the bulk file → fallback: per-company API at 8 req/sec (~20-40 min for every filer). Investigate in Module 2.1.
+- **Bankrupt companies get renamed** (confirmed 2026-11-26) → after bankruptcy the shell takes a new name: RadioShack = "RS Legacy Corp", Bed Bath & Beyond = "20230930-DK-Butterfly-1, Inc.", JCPenney = "Old COPPER Company, Inc." → always identify companies by CIK, never by name or ticker.

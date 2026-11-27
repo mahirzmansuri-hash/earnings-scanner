@@ -24,3 +24,5 @@ vault/.obsidian/
 
 # Streamlit local secrets
 .streamlit/secrets.toml
+data/processed/*
+!data/processed/.gitkeep
