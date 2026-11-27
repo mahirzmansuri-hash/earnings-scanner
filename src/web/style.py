@@ -70,6 +70,10 @@ FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="
 LOGO = ('<svg width="24" height="16" viewBox="0 0 26 18" aria-hidden="true"><path d="M1 6 H12 M14 12 H25" stroke="var(--brand)" '
         'stroke-width="2.4" fill="none"/><path d="M12 6 L14 12" stroke="var(--pop)" stroke-width="2.4" fill="none"/></svg>')
 
+SITE_URL = "https://mahirzmansuri-hash.github.io/earnings-scanner/"
+FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 18'%3E%3Cpath d='M1 6H12M14 12H25' "
+           "stroke='%231B3A5C' stroke-width='3' fill='none'/%3E%3Cpath d='M12 6L14 12' stroke='%230FB3C8' stroke-width='3'/%3E%3C/svg%3E")
+
 NAV = [("index.html", "Home"), ("screener.html", "Screener"), ("track-record.html", "Track record"),
        ("methodology.html", "Methodology"), ("about.html", "About")]
 
@@ -80,6 +84,9 @@ def page(title: str, body: str, description: str, root: str = "", active: str = 
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title><meta name="description" content="{description}">
 <meta property="og:title" content="{title}"><meta property="og:description" content="{description}">
+<meta property="og:type" content="website"><meta property="og:image" content="{SITE_URL}og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{SITE_URL}og.png">
+<link rel="icon" href="{FAVICON}">
 {FONTS}<style>{CSS}</style></head><body><div class="wrap">
 <header class="mast"><a class="word" href="{root}index.html">{LOGO}Faultline</a><nav class="nav" aria-label="Main">{nav}</nav></header>
 <main>{body}</main>

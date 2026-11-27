@@ -10,6 +10,7 @@ import html
 import json
 import math
 import shutil
+from pathlib import Path
 
 import duckdb
 import pandas as pd
@@ -431,6 +432,7 @@ def build():
              "fs": None if isnan(r.f_score) else int(r.f_score), "m": None if isnan(r.m_score) else round(float(r.m_score), 2),
              "d": str(pd.Timestamp(r.available_date).date())} for r in latest.itertuples()]
     (SITE / "data" / "companies.json").write_text(json.dumps(comp, separators=(",", ":"), allow_nan=False))
+    shutil.copy(Path(__file__).parent / "assets" / "og.png", SITE / "og.png")  # share image (scripts/make_share_image.py)
     (SITE / "index.html").write_text(home(latest, events, results, as_of))
     (SITE / "screener.html").write_text(screener())
     (SITE / "track-record.html").write_text(track_record(results))
