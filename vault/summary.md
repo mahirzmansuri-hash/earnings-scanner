@@ -158,3 +158,13 @@
 - If risk drops, that area was the problem.
 - Example: Sears was pushed up by heavy debt and a 25% sales drop.
 - Added tests. 26 tests pass.
+
+## SEC fraud cases (Nov 27, night)
+- Downloaded the SEC's full list of accounting-fraud cases (3,324 releases).
+- Matched them to our companies by name.
+- Dropped bribery cases and paperwork orders.
+- Read each case to find which years were faked.
+- Built a fraud model. Fraud is much harder than bankruptcy.
+- It beats Beneish a little (0.63 vs 0.58), but it's too weak to accuse named companies.
+- So company pages list SEC cases as facts, with no fraud score.
+- Paper now has 6 research questions (7 pages).

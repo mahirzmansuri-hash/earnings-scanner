@@ -163,6 +163,23 @@ def chart(h: pd.DataFrame, evs: pd.DataFrame) -> str:
 
 
 WHY = {}
+AAER = {}
+
+
+def aaer_section(cik) -> str:
+    """SEC accounting enforcement releases naming this company: facts with links, not a score."""
+    g = AAER.get(cik)
+    if g is None:
+        return ""
+    def yrs(j):
+        y = json.loads(j)
+        return "" if not y else f" The release describes fiscal {y[0]}" + (f" to {y[-1]}" if len(y) > 1 else "") + "."
+    url = lambda u: u if u.startswith("http") else "https://www.sec.gov" + u
+    items = "".join(f'<li><a href="{e(url(x.url))}">AAER-{x.aaer}</a>, {pd.Timestamp(x.date).date()}: the SEC named '
+                    f'{e(x.respondent)} in an accounting enforcement release.{yrs(x.years)}</li>' for x in g.itertuples())
+    return (f'<section><h2>SEC accounting cases</h2><ul>{items}</ul><p class="note">From the SEC\'s list of Accounting and Auditing '
+            'Enforcement Releases, matched by company name. A release can be a settlement without admitting wrongdoing. '
+            'Faultline does not give companies a fraud score: in tests, fraud was too hard to predict from filings to rank named companies.</p></section>')
 
 
 def why_section(r) -> str:
@@ -230,6 +247,7 @@ def company_page(r, h, evs, accn_map, as_of):
     else:
         parts.append('<section><h2>What stands out</h2><p class="dim">None of our warning rules fired on the latest filing.</p></section>')
     parts.append(why_section(r))
+    parts.append(aaer_section(r.cik))
     if len(later):
         lines = "".join(f"<li>{EVENT_WORDS[x.event]} on {pd.Timestamp(x.filed).date()}.</li>" for x in later.itertuples())
         parts.append(f'<section><h2>What happened after this filing</h2><ul>{lines}</ul></section>')
@@ -377,6 +395,7 @@ def screener():
 
 def track_record(results):
     c, a, rs, tr, de = results["composite"], results["ablation"], results["restatement"], results["classic"], results["distress"]
+    fr = results["fraud"]
     rt = results["returns"]["main_dark_minus_50"]
     names = {"faultline_riskiest_10pct": "Faultline riskiest 10%", "faultline_10_to_20pct": "Faultline next 10%",
              "faultline_safest_50pct": "Faultline safest 50%", "altman_distress": "Altman distress zone", "altman_safe": "Altman safe zone"}
@@ -392,7 +411,7 @@ def track_record(results):
     cl = "".join(f'<tr><td>{e(k.replace("__", ", ").replace("_", " "))}</td><td class="n">{v["events_in_period"]:,} ({v["events_with_score"]:,})</td>'
                  f'<td class="n">{v["hit_rate"]*100:.1f}%</td><td class="n">{v["alarm_rate"]*100:.1f}%</td><td class="n">{v["lift"]:.1f}x</td></tr>'
                  for k, v in tr.items())
-    body = f"""<section><h1>Track record</h1><p class="dim">Full write-up: <a href="Faultline-paper.pdf">research paper (PDF, 6 pages)</a>.</p><p>Every number here comes from a test where the model was trained only on years whose
+    body = f"""<section><h1>Track record</h1><p class="dim">Full write-up: <a href="Faultline-paper.pdf">research paper (PDF)</a>.</p><p>Every number here comes from a test where the model was trained only on years whose
 outcomes were already known, then scored years it had never seen ({c['test_years']}). Companies that later failed or stopped filing
 are included. Banks, insurers and other financial companies are left out because these scores were not built for them.</p></section>
 <section><h2>Bankruptcy within two years</h2><p class="dim">{c['company_years']:,} company-years with an Altman score, {c['bankruptcies']} followed by a bankruptcy filing.</p>
@@ -410,6 +429,13 @@ To catch as many as Altman, Faultline needed to flag {c['faultline_same_hit_rate
 <section><h2>The classic scores on their own</h2><p class="dim">Hit rate: share of events where the latest score before it was flagged. Alarm rate: share of all company-years flagged.</p>
 <div class="tbl"><table><thead><tr><th>Test</th><th class="n">Events (with a score)</th><th class="n">Hit rate</th><th class="n">Alarm rate</th><th class="n">Lift</th></tr></thead><tbody>{cl}</tbody></table></div></section>
 <section><h2>What happened to the stock</h2><p class="dim">Free prices for companies that no longer trade are not available, so this uses the market value of outside shareholders' stock reported on each 10-K cover page. The change is measured over a year that starts after the score was public. Bankruptcies count as -100%, companies that stopped filing without being bought as -50%, and buyouts are left out. Companies worth at least $10 million, filings from 2016 to 2022.</p><div class="tbl"><table><thead><tr><th>Group</th><th class="n">Company-years</th><th class="n">Median change</th><th class="n">Lost half or more</th><th class="n">Wiped out</th></tr></thead><tbody>{ret_rows}</tbody></table></div><p>The typical flagged company lost value, and flagged companies were about three times as likely to lose half of it. The average was not lower, because a few flagged stocks rose enormously and new share issues raise market value. This is an approximation, not a trading test.</p></section>
+<section><h2>Accounting fraud</h2><p>The SEC names companies in Accounting and Auditing Enforcement Releases,
+usually years after the fact (a median of six years after the first misstated year). The test covers {fr['real_time']['fraud_companies']} companies'
+cases, {fr['real_time']['fraud_company_years']} misstated company-years ({fr['test_fiscal_years']}). A model that only knew the cases
+announced so far reached an AUC of {fr['real_time']['faultline_auc']:.2f} and its riskiest 10% held {fr['real_time']['faultline_top10']*100:.0f}%
+of fraud years. The Beneish M-Score reached {fr['real_time']['beneish']['auc']:.2f} and {fr['real_time']['beneish']['top10']*100:.0f}%.
+With hindsight (every case known today) the model reached {fr['hindsight_cv']['faultline_auc']:.2f}. That is too weak to label named
+companies, so company pages list SEC cases as facts and show no fraud score.</p></section>
 <section><h2>A wider definition of failure</h2><p>Small companies often stop filing instead of filing for bankruptcy. Counting a company as failed if it filed for bankruptcy or stopped filing without being bought gives {de['distress_exits']:,} events in the test years. Faultline ranked them with an AUC of {de['faultline_auc']:.2f}, against {de['altman_auc']:.2f} for Altman Z.</p></section>
 <section><h2>Limits</h2><p>Only formal bankruptcy filings count, so distressed sales and out-of-court restructurings are scored as misses.
 Companies that simply stop filing are not counted either way. About 40% of bankrupt companies had no score in the warning window,
@@ -473,7 +499,7 @@ small companies in trouble usually stop filing instead of filing for bankruptcy,
 from larger companies.</p>
 <h2>What the scores are not</h2><p>A score is a ranking of how a company's filings compare with the filings of companies that later failed
 or restated. It is not a forecast for any single company and not investment advice. Financial companies are not scored.</p>
-<h2>Paper and code</h2><p>A write-up of the method and results is in the <a href="Faultline-paper.pdf">research paper (PDF, 6 pages)</a>. The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section>"""
+<h2>Paper and code</h2><p>A write-up of the method and results is in the <a href="Faultline-paper.pdf">research paper (PDF)</a>. The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section>"""
     return page("Methodology · Faultline", body, "How Faultline turns SEC filings into bankruptcy and accounting-risk scores.", active="methodology.html")
 
 
@@ -495,11 +521,15 @@ def build():
     with duckdb.connect(str(DB_PATH), read_only=True) as con:
         latest, hist, events, accn, as_of = load(con)
         why = con.execute("SELECT * FROM risk_why").df()
+    cases = pd.read_csv(PROC / "aaer_cases.csv")
+    cases = cases[(cases["kind"] == "accounting") & (cases["n_candidates"] == 1)]   # only unambiguous name matches
+    AAER.update({k: g.sort_values("date") for k, g in cases.groupby("cik")})
     WHY.update({(k[0], pd.Timestamp(k[1])): g for k, g in why.groupby(["cik", "period_end"])})
     results = {k: json.loads((PROC / f).read_text()) for k, f in [
         ("composite", "composite_results.json"), ("ablation", "composite_ablation.json"),
         ("restatement", "restatement_results.json"), ("classic", "track_record.json"),
-        ("distress", "distress_exit_results.json"), ("returns", "returns_results.json")]}
+        ("distress", "distress_exit_results.json"), ("returns", "returns_results.json"),
+        ("fraud", "fraud_results.json")]}
     if SITE.exists():
         shutil.rmtree(SITE)
     (SITE / "c").mkdir(parents=True)

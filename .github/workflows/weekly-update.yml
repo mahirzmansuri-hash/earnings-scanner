@@ -36,6 +36,7 @@ jobs:
           path: |
             data/raw/companyfacts
             data/raw/fulltext
+            data/raw/aaer
           key: companyfacts-${{ github.run_id }}
           restore-keys: companyfacts-
 
@@ -52,6 +53,7 @@ jobs:
           path: |
             data/raw/companyfacts
             data/raw/fulltext
+            data/raw/aaer
           key: companyfacts-${{ github.run_id }}
 
       - name: Publish to GitHub Pages

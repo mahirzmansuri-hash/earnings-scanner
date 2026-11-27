@@ -23,3 +23,9 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 - **DuckDB 2.0: unread results block the connection** (2026-11-27) → `ResourceInUseException` after a `fetchone()` → open a fresh connection per pipeline step (or use `con.cursor()`).
 - **Model results changed between identical runs** (2026-11-27) → (1) SQL without ORDER BY returns rows in varying order, which changes the model's internal validation split; (2) a fiscal-year change made the prior-year join match twice (194 duplicate rows) → always ORDER BY and dedupe joins with QUALIFY.
 - **CI publish failed with exit 126** (2026-11-27) → script shebang was `#!/bin/zsh`; GitHub's Ubuntu runners have no zsh → use `#!/usr/bin/env bash` and call `bash script.sh` in workflows. Also: `actions/cache` only saves when the job succeeds, so a late failure threw away a 45-minute download → use `cache/restore` + `cache/save` with `if: always()`.
+
+## AAER list mixes fraud with bribery and procedure
+- **Symptom:** 3M, HP, Honeywell, Barclays "fraud" cases. **Cause:** FCPA books-and-records cases are AAERs too; so are Rule 12b-25 late-notice and procedural orders. **Fix:** classify each release from its text before using it as a label.
+
+## Respondent names split on commas
+- **Symptom:** "Latch, Inc." became "Latch" + "Inc.". **Fix:** join ", Inc/LLC/Ltd/Corp" before splitting; strip EDGAR state tags like /DE/ from company names.

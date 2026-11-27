@@ -4,7 +4,7 @@ Mahir, Faultline project (draft, November 2026). Built with AI-assisted developm
 
 ## Abstract
 
-The Altman Z-Score, Piotroski F-Score and Beneish M-Score are taught in accounting and finance courses as early-warning tools, but they are rarely tested on the full set of US companies with the failures included and with only the information that was public at the time. I build a point-in-time panel of 116,121 company-years from SEC XBRL filings (15,686 companies, 10,349 of which later stopped filing) and test the scores against 1,144 companies' bankruptcy filings and 2,904 companies' restatement notices. Altman's distress zone caught 83% of bankruptcies 12 to 24 months ahead but flagged about half of all company-years. A gradient-boosted model using the same ingredients plus size, profitability, filing behaviour and warning phrases in the 10-K text, trained only on outcomes known before each test year, raised the ranking accuracy (AUC) for bankruptcy within two years from 0.71 to 0.85 on 25,169 unseen company-years from 2016 to 2023, also ahead of the Ohlson O-Score (0.72) and Zmijewski score (0.74). Flagging the riskiest 10% of companies caught 53% of bankruptcies, against 13% for the lowest Altman scores. The model beat Altman in every test year and every size group. Restatements were much harder to predict: the Beneish M-Score's ranking was close to random (AUC 0.52) and the model reached 0.74.
+The Altman Z-Score, Piotroski F-Score and Beneish M-Score are taught in accounting and finance courses as early-warning tools, but they are rarely tested on the full set of US companies with the failures included and with only the information that was public at the time. I build a point-in-time panel of 116,121 company-years from SEC XBRL filings (15,686 companies, 10,349 of which later stopped filing) and test the scores against 1,144 companies' bankruptcy filings and 2,904 companies' restatement notices. Altman's distress zone caught 83% of bankruptcies 12 to 24 months ahead but flagged about half of all company-years. A gradient-boosted model using the same ingredients plus size, profitability, filing behaviour and warning phrases in the 10-K text, trained only on outcomes known before each test year, raised the ranking accuracy (AUC) for bankruptcy within two years from 0.71 to 0.85 on 25,169 unseen company-years from 2016 to 2023, also ahead of the Ohlson O-Score (0.72) and Zmijewski score (0.74). Flagging the riskiest 10% of companies caught 53% of bankruptcies, against 13% for the lowest Altman scores. The model beat Altman in every test year and every size group. Restatements were much harder to predict: the Beneish M-Score's ranking was close to random (AUC 0.52) and the model reached 0.74. Fraud later charged by the SEC was harder still: trained only on cases already announced, a model reached an AUC of 0.63 against 0.58 for Beneish.
 
 ## 1. Introduction
 
@@ -12,13 +12,14 @@ Altman (1968) built the Z-Score from 66 manufacturing firms. Beneish (1999) buil
 
 Two problems make it hard to know how well they work today. The first is survivorship bias: lists of current companies leave out the ones that failed, which are exactly the cases a warning score should catch. The second is look-ahead bias: databases often store numbers as later corrected, not as first reported, so a test can accidentally use information nobody had at the time.
 
-This study avoids both. It asks five questions:
+This study avoids both. It asks six questions:
 
 1. How often did the classic scores flag bankruptcies and restatements in advance, and how many false alarms did they raise?
 2. Do warning events (auditor changes, late filings, amended reports) add information beyond the financial statements?
 3. Can a model trained on the same public data beat the classic scores on years it has never seen?
 4. Did flagged companies' stock do worse afterwards?
 5. Does the wording of the 10-K add warning signal beyond the numbers?
+6. Can the same data flag the accounting fraud that the SEC later charged?
 
 ## 2. Data
 
@@ -67,6 +68,8 @@ Banks, insurers and other financial companies (SIC 6000-6799) are excluded from 
 
 **Restatements.** On 14,421 company-years with a Beneish score and 479 restatement notices within two years, the Beneish M-Score's AUC was 0.52 and Faultline's 0.74. Flagging the riskiest 10% caught 19% of restatements with Beneish and 29% with Faultline.
 
+**SEC fraud cases (question 6).** The SEC lists every Accounting and Auditing Enforcement Release (AAER), the standard fraud label in research (Dechow et al., 2011). I downloaded all 3,324, matched the company respondents to filers by current and former name, dropped bribery-only (FCPA) and procedural releases, and read the fiscal years each release says were misstated from its text. That gives 411 misstated company-years at non-financial companies, 266 of them in fiscal years 2013 to 2019 (95 companies, out of 37,316 company-years). The SEC took a median of six years from the first misstated year to the release, so a model used in real time learns from few, old cases: 11 known cases when scoring 2013, 182 when scoring 2019. In that real-time test a logistic regression on the same 46 inputs reached an AUC of 0.63, and its riskiest 10% held 24% of fraud years. The Beneish M-Score reached 0.58 and 16% on the rows where it exists, where the model's AUC was no better (0.57) but its riskiest 10% held 26%. With hindsight, using every case known today in five company-separated folds, the model reached 0.69, close to the 0.72 that Bao et al. (2020) report with three decades of commercial data. Faultline's restatement model did not rank fraud at all (0.50). Three model types were fixed in advance and all are reported (real-time AUC 0.60 to 0.63). Because the signal is weak, the website shows each company's SEC cases as facts and does not show a fraud score.
+
 **Stock outcomes.** Free daily prices for companies that no longer trade are not available, so I approximate returns with the public float on 10-K cover pages: the change from the float reported in the year t+1 10-K to the one in the year t+2 10-K, a window that starts after the year-t score was public. Bankruptcies count as -100%, companies that stopped filing without a change of control as -50%, and buyouts are left out. For companies with at least $10 million of public float (20,648 company-years, 2016-2022), Faultline's riskiest 10% had a median change of -13.6% against +2.9% for its safest half; 33.7% lost half their value or more against 11.2%, and 10.8% were wiped out against 1.0%. The average was not lower (about +20% vs +15% with single returns capped at +300%), because a few flagged stocks rose enormously and share issues raise market value. The median gap held in 5 of 7 years; 2020, a broad rebound year, was the clear exception.
 
 **Example.** Sears Holdings entered Altman's distress zone with its 10-K filed in March 2015 and stayed there until its last 10-K in March 2018, when Faultline ranked it riskier than 99% of filers that year. It filed for bankruptcy in October 2018.
@@ -85,16 +88,18 @@ The most important inputs, measured by how much AUC falls when one input is shuf
 - About 40% of bankrupt companies had no score in the warning window, usually because they had stopped filing or left out a needed number.
 - Public float leaves out insider shares, so Altman's market-value ratio is understated for closely held companies.
 - One model setting was used without tuning.
+- Fraud labels come from matching names, so cases that charge only executives, or name a company in a way that does not match its SEC name, are missed; misstated years are read from text with a rule and can be off by a year.
 - These are rankings, not forecasts for single companies, and not investment advice.
 
 ## 7. Conclusion
 
-When tested on all US filers with the failures included and only the information public at the time, the classic scores do warn, but Altman's original cut-offs flag about half of all companies and Beneish's ranking of restatement risk is close to random. A model that combines the same public data, trained only on the past, ranks bankruptcy risk much better in every year and size group. Flagged companies' stock usually lost value, though a few large winners kept the average up. Simple warning phrases in 10-K text added nothing beyond the numbers. The next steps are better price data for a true trading test and reading 10-K text with methods smarter than exact phrases.
+When tested on all US filers with the failures included and only the information public at the time, the classic scores do warn, but Altman's original cut-offs flag about half of all companies and Beneish's ranking of restatement risk is close to random. A model that combines the same public data, trained only on the past, ranks bankruptcy risk much better in every year and size group. Flagged companies' stock usually lost value, though a few large winners kept the average up. Simple warning phrases in 10-K text added nothing beyond the numbers. Accounting fraud remains hard to see from public numbers in time: the SEC's own cases arrive years later, and a model that only knows past cases does only a little better than Beneish. The next steps are better price data for a true trading test and reading 10-K text with methods smarter than exact phrases.
 
 ## References
 
 - Altman, E. I. (1968). Financial ratios, discriminant analysis and the prediction of corporate bankruptcy. *Journal of Finance*, 23(4), 589-609.
 - Altman, E. I., Hartzell, J., & Peck, M. (1995). *Emerging markets corporate bonds: A scoring system.* Salomon Brothers.
+- Bao, Y., Ke, B., Li, B., Yu, Y. J., & Zhang, J. (2020). Detecting accounting fraud in publicly traded U.S. firms using a machine learning approach. *Journal of Accounting Research*, 58(1), 199-235.
 - Beneish, M. D. (1999). The detection of earnings manipulation. *Financial Analysts Journal*, 55(5), 24-36.
 - Dechow, P. M., Ge, W., Larson, C. R., & Sloan, R. G. (2011). Predicting material accounting misstatements. *Contemporary Accounting Research*, 28(1), 17-82.
 - Ohlson, J. A. (1980). Financial ratios and the probabilistic prediction of bankruptcy. *Journal of Accounting Research*, 18(1), 109-131.

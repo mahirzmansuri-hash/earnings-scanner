@@ -18,6 +18,8 @@ Tested out of sample on filings from 2016 to 2023 (25,169 company-years, 539 ban
 | Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 11% | 13% | 53% |
 | Share of companies flagged to catch 86% of bankruptcies | 50% | | | 37% |
 
+Accounting fraud (SEC enforcement releases, fiscal 2013-2019, 266 misstated company-years): much harder. Trained only on cases the SEC had already announced, the model reached an AUC of 0.63 against 0.58 for the Beneish M-Score (0.69 with hindsight). Company pages list SEC cases as facts; there is no fraud score.
+
 Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -13.6% the following year against +2.9% for its safest half, and 34% of them lost half their value or more against 11%.
 
 Counting companies that stopped filing without being bought as failures too (a "distress exit"), Faultline's AUC is 0.84 against 0.75 for Altman.

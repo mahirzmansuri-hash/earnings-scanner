@@ -64,3 +64,9 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 - **What:** per-company effects from re-scoring with one input group set to typical (training medians), in log-odds.
 - **Why:** no new dependency (CI stays simple), 10 understandable groups instead of 46 raw inputs, easy to explain in an interview.
 - **Trade-off:** effects don't add up exactly (groups overlap); SHAP would be additive but harder to explain and needs another library. Labels use strength words (slightly / moderately / strongly), not fake-precise numbers.
+
+## 2026-11-27: Fraud labels from SEC AAERs; no public fraud score
+- **Label:** fiscal years an accounting AAER says were misstated (read from the release text). Bribery-only and procedural releases excluded; companies whose case names no years dropped (unknown label).
+- **Real-time test:** a case counts as known only after its release date. This is the honest setup; most papers use hindsight labels, which we report separately.
+- **Model:** logistic regression on quantile-ranked inputs, chosen among 3 variants fixed in advance (all reported); simpler models do better with ~100 positives.
+- **No fraud score on named companies:** AUC 0.63 would mislabel many honest companies. Company pages show SEC cases as facts with links.

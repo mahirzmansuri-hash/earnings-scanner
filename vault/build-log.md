@@ -110,3 +110,10 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Bugs:** pandas NA in `neg_equity` broke an `if`; "Amended 10-k" capitalization; 3-column table overflowed on phones -> 2 columns with the detail under the area name, short headers.
 - **Quirk (documented on Methodology):** size can "raise" risk for big companies, because small failing companies usually go dark instead of filing for bankruptcy.
 - **Next:** SEC AAER fraud-case labels; quarterly 10-Q signals.
+
+## 2026-11-27 (night): SEC fraud cases (AAER) - RQ6
+- **Did:** `src/pipeline/aaer.py` (SEC AAER index, 3,324 releases, 34 pages; company respondents matched to CIKs by normalised current/former name; release documents read (PDF via pypdfium2, HTML for litigation releases); kinds: accounting / bribery (FCPA) / late-filing notice / procedural; misstated fiscal years read from the text). `src/model/fraud.py` (real-time walk-forward where a case counts only once announced; hindsight 5-fold CV split by company; 3 model types fixed in advance, all reported). Company pages: "SEC accounting cases" (129 pages, unambiguous matches only, facts + links). Track record section, paper RQ6 (+ Bao et al. 2020), README; weekly update + CI cache include it.
+- **Result:** 266 misstated company-years at 95 companies (FY2013-2019). Real-time AUC 0.63 (logistic), top 10% holds 24%; Beneish 0.58 / 16%; on Beneish's rows AUC 0.57 vs 0.58 but top 10% 26% vs 16%. Hindsight 0.69 (Bao et al. 0.72). Restatement model 0.50 on fraud. Median 6 years from first misstated year to release; only 11 known cases when scoring 2013.
+- **Decision:** no fraud score on company pages (too weak to rank named companies); show SEC cases as facts.
+- **Bugs:** name splitter broke "Latch, Inc."; EDGAR "/OR/" state tags; relative litigation-release links; FCPA bribery and Rule 12b-25 releases were being counted as fraud -> filtered.
+- **Next:** quarterly 10-Q signals; or Stage 5 (alerts, newsletter, API).

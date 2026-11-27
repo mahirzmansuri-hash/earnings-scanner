@@ -87,6 +87,8 @@ def main(skip_download: bool = False):
     from src.pipeline.text_signals import build_text_signals
     step("10-K text signals", with_con(build_text_signals))
     step("scores", with_con(build_scores))
+    from src.pipeline import aaer
+    step("SEC fraud cases (AAER)", aaer.main)
 
     from src.backtest import track_record
     from src.model import ablation, composite, distress_exit, live, restatement, robustness
@@ -97,6 +99,8 @@ def main(skip_download: bool = False):
     step("distress-exit test", distress_exit.main)
     step("robustness", robustness.main)
     step("live risk", live.main)
+    from src.model import fraud
+    step("fraud model test", fraud.main)
     from src.backtest import returns
     step("stock outcomes", returns.main)
 
