@@ -43,7 +43,8 @@ FEATURES = [
 ]
 
 
-def load(con) -> pd.DataFrame:
+def load(con, event: str = "bankruptcy") -> pd.DataFrame:
+    """Features + label: did `event` happen within 24 months after the filing?"""
     return con.execute(f"""
     WITH base AS (
         SELECT s.*, s.available_date::DATE AS avail, a.total_assets, a.revenue, a.public_float,
@@ -70,8 +71,9 @@ def load(con) -> pd.DataFrame:
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'late_10k'       AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_late_10k,
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'amended_10k'    AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_amended_10k,
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'non_reliance'   AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_non_reliance,
-        -- label: first bankruptcy notice within 24 months after the filing (not before it)
-        (bk.first_bk > b.avail AND bk.first_bk <= b.avail + {HORIZON}) IS TRUE AS label,
+        -- label: the event happens within 24 months AFTER the filing (not before it)
+        EXISTS (SELECT 1 FROM events e WHERE e.cik = b.cik AND e.event = '{event}'
+                AND e.filed > b.avail AND e.filed <= b.avail + {HORIZON}) AS label,
         (bk.first_bk <= b.avail) IS TRUE AS already_bankrupt
     FROM base b
     LEFT JOIN prev p ON p.cik = b.cik AND date_diff('day', p.period_end, b.period_end) BETWEEN 350 AND 380

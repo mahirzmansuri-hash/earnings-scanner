@@ -33,3 +33,15 @@ Each entry: date, question (RQ#), method in one line, exact numbers, caveats.
 **Ablation (RQ2):** classic-score ingredients alone AUC 0.831 (the gain over Altman is mostly from *combining* the same ingredients better); + size & fundamentals 0.847; + filing behaviour & warning events 0.848 (adds almost nothing on top); events alone 0.645 (informative, but already captured by the financials).
 **Sanity check:** 2022 top-12 riskiest: 3 filed bankruptcy within 24 months (Lannett, Cyxtera, ShiftPixy); several others were distressed sales/acquisitions or out-of-court restructurings (Redbox, Vivint, Abraxas), which our label (8-K Item 1.03 only) counts as misses, so measured precision is conservative.
 **Caveats:** only formal bankruptcy notices count; companies that stop filing ("go dark") aren't labelled; 2020 COVID year included; one model setting, not tuned.
+
+## 2026-11-27: Label update + restatement model (RQ3, accounting side)
+- **Label change:** the bankruptcy label now counts ANY bankruptcy notice within 24 months (was: only the company's first). 1,500 positive company-years (was 1,358). Re-run: Faultline AUC 0.845 (Altman 0.708); at Altman's alarm rate Faultline catches 92.8% vs 85.6%. Conclusions unchanged.
+- **Restatement model** (`src/model/restatement.py`): same 41 features, label = 8-K Item 4.02 within 24 months; walk-forward 2016-2023. On 14,443 company-years with a Beneish score (479 restatements):
+
+| | Beneish M | Faultline |
+|---|---|---|
+| AUC | 0.521 (almost a coin flip) | **0.738** |
+| Catch rate at Beneish's alarm rate (14%) | 25.9% | **36.3%** |
+| Caught if flagging riskiest 10% | 19.4% | **28.6%** |
+
+- **Finding:** restatements are much harder to predict than bankruptcies; Beneish's ranking carries almost no information in 2016-2023, though its yes/no flag still has some lift. On all 40,311 company-years (no Beneish needed), Faultline AUC 0.696.

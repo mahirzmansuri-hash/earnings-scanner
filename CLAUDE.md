@@ -15,6 +15,7 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 - Aim big: public, high-quality, quantifiable outcomes that could scale. Not a weekend project.
 - Before any big step, tell me the plan in a few lines and wait for my OK.
 - Keep answers short and direct. No filler. Report progress in short blocks.
+- End every session (and before credits run out) with a running summary of everything done from the start: small bullets, very short simple sentences. Save it to `vault/summary.md`.
 - No quizzes or hyper-specific questions. At the end of each stage, give me a 5-line plain-English summary I could say in an interview.
 - After each session, add an entry to the build log: what we did, the decisions, bugs found, and what's next.
 - Timeline: everything done by Jun 1, 2028 (end of junior year), before the summer-2028 internship search (see `vault/roadmap.md`).

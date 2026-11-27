@@ -33,3 +33,10 @@ Never edit other notes in that vault. Never copy vault notes into the repo.
 
 ## 5. Report
 In 3-4 lines: what's saved, what's next session's first step, roughly how long it will take.
+
+## Session summary for Mahir (required, last thing in the session)
+Give a running summary of EVERYTHING done so far in the project (start to now), not just this session:
+- small bullet points, very short sentences, simple words
+- grouped by stage; newest session at the bottom
+- each bullet = what was done, in plain English (no code), plus a real number where it helps
+Also save it to `vault/summary.md` (overwrite with the updated full version).
