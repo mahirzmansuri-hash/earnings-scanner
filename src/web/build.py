@@ -326,7 +326,7 @@ def screener():
 <label>Industry<select id="sector"><option value="">All</option></select></label>
 <label>Status<select id="status"><option value="">All</option><option value="active" selected>Still filing</option><option value="inactive">Stopped filing</option></select></label>
 <label>Min revenue ($M)<input id="minrev" type="number" value="0" min="0" step="50" style="width:110px"></label>
-<button id="csv" type="button">Download CSV</button><span id="cnt" class="dim"></span></div>
+<button id="csv" type="button">Download CSV</button><span id="cnt" class="dim">Loading 7,000+ companies…</span></div>
 <div class="tbl"><table><thead><tr><th>Company</th><th>Ticker</th><th>Industry</th><th class="n sort" data-k="r">Revenue</th>
 <th class="n sort" data-k="b">Bankruptcy risk</th><th class="n sort" data-k="bp">Pctile</th><th class="n sort" data-k="rr">Restatement risk</th>
 <th class="n sort" data-k="z">Altman Z</th><th class="n sort" data-k="fs">F</th><th class="n sort" data-k="m">Beneish M</th><th>10-K filed</th></tr></thead>
