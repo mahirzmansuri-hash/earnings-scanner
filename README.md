@@ -12,11 +12,11 @@ Faultline reads every annual report (10-K) filed with the SEC since 2009, includ
 
 Tested out of sample on filings from 2016 to 2023 (25,169 company-years, 539 bankruptcies). For each test year, the model was trained only on companies whose outcome was already known before that year began.
 
-| | Altman Z-Score | Faultline |
-|---|---|---|
-| Ranking accuracy (AUC; 0.5 = coin flip) | 0.71 | 0.84 |
-| Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 53% |
-| Share of companies flagged to catch 86% of bankruptcies | 50% | 37% |
+| | Altman Z (1968) | Ohlson O (1980) | Zmijewski (1984) | Faultline |
+|---|---|---|---|---|
+| Ranking accuracy (AUC; 0.5 = coin flip) | 0.71 | 0.72 | 0.74 | 0.85 |
+| Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 11% | 13% | 53% |
+| Share of companies flagged to catch 86% of bankruptcies | 50% | | | 37% |
 
 Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -13.6% the following year against +2.9% for its safest half, and 34% of them lost half their value or more against 11%.
 

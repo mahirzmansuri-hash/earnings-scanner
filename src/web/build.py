@@ -356,8 +356,10 @@ def track_record(results):
     ab = "".join(f'<tr><td>{e(k)}</td><td class="n">{v["auc_same_rows_as_altman"]:.3f}</td>'
                  + "".join(f'<td class="n">{x*100:.0f}%</td>' for x in v["caught_if_flag_top"].values()) + "</tr>"
                  for k, v in a.items() if "auc_same_rows_as_altman" in v)
-    alt = a["altman_z (lowest first)"]["caught_if_flag_top"]
-    ab += f'<tr><td>Altman Z-Score (lowest first)</td><td class="n">{c["altman"]["auc"]:.3f}</td>' + "".join(f'<td class="n">{x*100:.0f}%</td>' for x in alt.values()) + "</tr>"
+    bench = {"altman_z (lowest first)": "Altman Z-Score (1968)", "ohlson_o (highest first)": "Ohlson O-Score (1980)",
+             "zmijewski (highest first)": "Zmijewski score (1984)"}
+    ab += "".join(f'<tr><td>{v}</td><td class="n">{a[k]["auc"]:.3f}</td>' + "".join(f'<td class="n">{x*100:.0f}%</td>' for x in a[k]["caught_if_flag_top"].values()) + "</tr>"
+                  for k, v in bench.items())
     cl = "".join(f'<tr><td>{e(k.replace("__", ", ").replace("_", " "))}</td><td class="n">{v["events_in_period"]:,} ({v["events_with_score"]:,})</td>'
                  f'<td class="n">{v["hit_rate"]*100:.1f}%</td><td class="n">{v["alarm_rate"]*100:.1f}%</td><td class="n">{v["lift"]:.1f}x</td></tr>'
                  for k, v in tr.items())

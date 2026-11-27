@@ -142,3 +142,11 @@
 - Optional for you: click Run workflow once on GitHub to confirm the fixed weekly update (or wait for Sunday).
 - Optional for you: submit the sitemap to Google Search Console.
 - Show the PDF to a teacher for feedback.
+
+## Tougher benchmarks (Nov 27, evening)
+- Weekly auto-update confirmed working.
+- Paper PDF is live on the site.
+- Tested two more classic bankruptcy formulas: Ohlson (1980) and Zmijewski (1984).
+- Faultline beats all three classics (0.85 vs 0.71 / 0.72 / 0.74).
+- Tried adding trends and industry comparisons. No gain, so we kept the simpler model.
+- Added both results to the site, paper and README.

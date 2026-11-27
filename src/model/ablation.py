@@ -12,6 +12,7 @@ from sklearn.metrics import roc_auc_score
 
 from src.config import DB_PATH, ROOT
 from src.model.composite import FEATURES, load, walk_forward
+from src.model.features import NEW_FEATURES, add_features
 
 OUT_JSON = ROOT / "data" / "processed" / "composite_ablation.json"
 
@@ -26,7 +27,14 @@ GROUPS = {
     "4. + 10-K text signals (full)": SCORES + FUNDAMENTALS + FILING_EVENTS + TEXT,
     "events & filing behaviour only": FILING_EVENTS,
     "10-K text signals only": TEXT,
+    # v2 experiment (Nov 2026): trends, industry context and the O/Zmijewski scores as inputs.
+    # Result: no gain (the trees already rebuild these from the raw ratios), so the live model stays v1.
+    "v2 test: + trends, industry, Ohlson & Zmijewski": FEATURES + NEW_FEATURES,
 }
+# classic formulas to beat, ranked riskiest first; same rows as Altman (where each score exists)
+BENCHMARKS = {"altman_z (lowest first)": ("z_score", True),
+              "ohlson_o (highest first)": ("o_score", False),
+              "zmijewski (highest first)": ("zmijewski", False)}
 
 
 def top_share_caught(rows, score_col, ascending, shares=(0.05, 0.10, 0.20)):
@@ -37,7 +45,7 @@ def top_share_caught(rows, score_col, ascending, shares=(0.05, 0.10, 0.20)):
 
 def main():
     with duckdb.connect(str(DB_PATH), read_only=True) as con:
-        df = load(con)
+        df = add_features(load(con), con)
     out = {}
     for name, feats in GROUPS.items():
         oos = walk_forward(df, feats, verbose=False)
@@ -46,9 +54,11 @@ def main():
                      "caught_if_flag_top": top_share_caught(rows, "composite", ascending=False)}
         print(f"{name:48} AUC {out[name]['auc_same_rows_as_altman']:.3f}  caught in top 5/10/20%: "
               + " / ".join(f"{v:.0%}" for v in out[name]["caught_if_flag_top"].values()))
-    altman = top_share_caught(rows, "z_score", ascending=True)
-    out["altman_z (lowest first)"] = {"caught_if_flag_top": altman}
-    print(f"{'Altman Z (lowest Z first)':48}            caught in top 5/10/20%: " + " / ".join(f"{v:.0%}" for v in altman.values()))
+    for name, (col, asc) in BENCHMARKS.items():
+        r = rows[rows[col].notna()]
+        auc = roc_auc_score(r["label"].astype(int), -r[col] if asc else r[col])
+        out[name] = {"auc": float(auc), "n": int(len(r)), "caught_if_flag_top": top_share_caught(r, col, ascending=asc)}
+        print(f"{name:48} AUC {auc:.3f}  caught in top 5/10/20%: " + " / ".join(f"{v:.0%}" for v in out[name]["caught_if_flag_top"].values()))
     OUT_JSON.write_text(json.dumps(out, indent=2))
 
 

@@ -97,3 +97,9 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Result:** null for prediction (bankruptcy 0.847 unchanged; restatement 0.738 -> 0.737); phrase flags alone 0.63 / 0.61; going-concern phrase doubles the bankruptcy rate (3.2% vs 1.5%). See results.md.
 - **Bug:** SEC full-text search returned HTTP 500 on a page mid-run -> retries with backoff, incomplete months retried next run.
 - **State:** committed, pushed, site republished.
+
+## 2026-11-27 (evening): Paper PDF live + tougher benchmarks
+- **Did:** CI run passed every step (publish fix confirmed); republished with the paper PDF (live, 200). Added `src/model/features.py`: Ohlson O-score (1980), Zmijewski (1984), multi-year trends, industry-relative ratios and industry bankruptcy rate (previous calendar year only). Ablation now reports all three classic formulas + a "v2 test" group. Site track-record table, paper (table, abstract, refs) and README updated; README AUC typo 0.84 -> 0.85 fixed.
+- **Result:** Faultline 0.847 vs Altman 0.707, Ohlson 0.719, Zmijewski 0.743 (riskiest 10% caught: 53% vs 13/11/13%). v2 features: no gain (0.847; 52% vs 53% at top 10%) -> live model stays v1.
+- **Decision:** keep the simpler model; report the null v2 result in the paper.
+- **Next:** per-company "why this score" explanations; SEC AAER fraud cases as true fraud labels; quarterly 10-Q signals.

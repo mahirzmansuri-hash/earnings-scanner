@@ -4,7 +4,7 @@ Mahir, Faultline project (draft, November 2026). Built with AI-assisted developm
 
 ## Abstract
 
-The Altman Z-Score, Piotroski F-Score and Beneish M-Score are taught in accounting and finance courses as early-warning tools, but they are rarely tested on the full set of US companies with the failures included and with only the information that was public at the time. I build a point-in-time panel of 116,121 company-years from SEC XBRL filings (15,686 companies, 10,349 of which later stopped filing) and test the scores against 1,144 companies' bankruptcy filings and 2,904 companies' restatement notices. Altman's distress zone caught 83% of bankruptcies 12 to 24 months ahead but flagged about half of all company-years. A gradient-boosted model using the same ingredients plus size, profitability, filing behaviour and warning phrases in the 10-K text, trained only on outcomes known before each test year, raised the ranking accuracy (AUC) for bankruptcy within two years from 0.71 to 0.85 on 25,169 unseen company-years from 2016 to 2023. Flagging the riskiest 10% of companies caught 53% of bankruptcies, against 13% for the lowest Altman scores. The model beat Altman in every test year and every size group. Restatements were much harder to predict: the Beneish M-Score's ranking was close to random (AUC 0.52) and the model reached 0.74.
+The Altman Z-Score, Piotroski F-Score and Beneish M-Score are taught in accounting and finance courses as early-warning tools, but they are rarely tested on the full set of US companies with the failures included and with only the information that was public at the time. I build a point-in-time panel of 116,121 company-years from SEC XBRL filings (15,686 companies, 10,349 of which later stopped filing) and test the scores against 1,144 companies' bankruptcy filings and 2,904 companies' restatement notices. Altman's distress zone caught 83% of bankruptcies 12 to 24 months ahead but flagged about half of all company-years. A gradient-boosted model using the same ingredients plus size, profitability, filing behaviour and warning phrases in the 10-K text, trained only on outcomes known before each test year, raised the ranking accuracy (AUC) for bankruptcy within two years from 0.71 to 0.85 on 25,169 unseen company-years from 2016 to 2023, also ahead of the Ohlson O-Score (0.72) and Zmijewski score (0.74). Flagging the riskiest 10% of companies caught 53% of bankruptcies, against 13% for the lowest Altman scores. The model beat Altman in every test year and every size group. Restatements were much harder to predict: the Beneish M-Score's ranking was close to random (AUC 0.52) and the model reached 0.74.
 
 ## 1. Introduction
 
@@ -50,16 +50,18 @@ Banks, insurers and other financial companies (SIC 6000-6799) are excluded from 
 
 **Classic scores alone (2012-2023).** In Altman's distress zone 12 to 24 months before a bankruptcy filing: 83.3% of the 419 bankruptcies that had a score in that window. But 49.2% of all company-years were in the distress zone. Flagged company-years were followed by bankruptcy 2.38% of the time, against 0.45% for the rest (5.3 times as often). Restricted to companies with at least $100 million in revenue, the hit rate was 76.4% and the alarm rate 34.3%. The Piotroski F-Score flagged 40.3% of bankruptcies at a 17.9% alarm rate. The Beneish M-Score flagged 26.1% of 555 restatements at a 13.7% alarm rate.
 
-**Faultline vs Altman (2016-2023, out of sample).** On 25,169 company-years with an Altman score and 539 bankruptcies within two years:
+**Faultline vs the classic models (2016-2023, out of sample).** On 25,169 company-years with an Altman score and 539 bankruptcies within two years. The Ohlson O-Score (1980) and Zmijewski score (1984), the two other standard bankruptcy formulas, are computed with their published weights on the same rows (98% have the inputs):
 
-| | Altman Z | Faultline |
-|---|---|---|
-| AUC | 0.71 | 0.85 |
-| Caught in riskiest 5% / 10% / 20% | 5% / 13% / 38% | 37% / 53% / 70% |
-| Caught at Altman's alarm rate (50%) | 85.5% | 92.8% |
-| Alarm rate needed to catch 85.5% | 50.3% | 37.2% |
+| | Altman Z | Ohlson O | Zmijewski | Faultline |
+|---|---|---|---|---|
+| AUC | 0.71 | 0.72 | 0.74 | 0.85 |
+| Caught in riskiest 5% | 5% | 5% | 5% | 37% |
+| Caught in riskiest 10% | 13% | 11% | 13% | 53% |
+| Caught in riskiest 20% | 38% | 34% | 47% | 70% |
+| Caught at Altman's alarm rate (50%) | 85.5% | | | 92.8% |
+| Alarm rate needed to catch 85.5% | 50.3% | | | 37.2% |
 
-**What drives the gain (question 2).** Using only the components of the three classic scores, the model already reaches an AUC of 0.82, so most of the improvement comes from combining the same ingredients better than the fixed 1968 weights do. Adding size and fundamentals raises it to 0.84. Adding filing behaviour and warning events adds little (0.85). The events do carry signal on their own (AUC 0.65), but the financial statements already contain most of it.
+**What drives the gain (question 2).** Using only the components of the three classic scores, the model already reaches an AUC of 0.82, so most of the improvement comes from combining the same ingredients better than the fixed 1968 weights do. Adding size and fundamentals raises it to 0.84. Adding filing behaviour and warning events adds little (0.85). The events do carry signal on their own (AUC 0.65), but the financial statements already contain most of it. I also tried a second version with multi-year trends (two straight years of losses, change in return on assets, leverage and Z), each company's ratios relative to its industry's median the year before, the industry's bankruptcy rate the year before, and the O-Score and Zmijewski score themselves. It did not help (AUC 0.847 either way; riskiest 10% caught 52% vs 53%), most likely because the trees already rebuild these from the raw ratios. The live model keeps the simpler version.
 
 **10-K wording (question 5).** Using SEC's full-text search, I flagged every 10-K containing five warning phrases: "raise substantial doubt" (going concern; 28,157 company-years), "recurring losses from operations" (9,132), "identified a material weakness" (6,147), "internal control over financial reporting was not effective" (12,037) and "have been restated" (5,071). Company-years with the going-concern phrase were followed by bankruptcy 3.2% of the time against 1.5% without it. On their own the five flags reached an AUC of 0.63 for bankruptcy and 0.61 for restatements, but adding them to the model changed nothing (bankruptcy 0.847 before and after; restatement 0.738 vs 0.737). Simple phrase flags are crude: the same words appear in boilerplate and hypothetical risk factors, and what they signal is mostly already in the financial statements.
 
@@ -95,8 +97,10 @@ When tested on all US filers with the failures included and only the information
 - Altman, E. I., Hartzell, J., & Peck, M. (1995). *Emerging markets corporate bonds: A scoring system.* Salomon Brothers.
 - Beneish, M. D. (1999). The detection of earnings manipulation. *Financial Analysts Journal*, 55(5), 24-36.
 - Dechow, P. M., Ge, W., Larson, C. R., & Sloan, R. G. (2011). Predicting material accounting misstatements. *Contemporary Accounting Research*, 28(1), 17-82.
+- Ohlson, J. A. (1980). Financial ratios and the probabilistic prediction of bankruptcy. *Journal of Accounting Research*, 18(1), 109-131.
 - Piotroski, J. D. (2000). Value investing: The use of historical financial statement information to separate winners from losers. *Journal of Accounting Research*, 38, 1-41.
 - Shumway, T. (2001). Forecasting bankruptcy more accurately: A simple hazard model. *Journal of Business*, 74(1), 101-124.
+- Zmijewski, M. E. (1984). Methodological issues related to the estimation of financial distress prediction models. *Journal of Accounting Research*, 22, 59-82.
 - U.S. Securities and Exchange Commission. EDGAR XBRL companyfacts and submissions data, accessed November 2026.
 
 ## Data and code

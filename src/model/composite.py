@@ -64,7 +64,8 @@ def load(con, event: str = "bankruptcy", end: str = "2023-12-31") -> pd.DataFram
     return con.execute(f"""
     WITH base AS (
         SELECT s.*, s.available_date::DATE AS avail, a.total_assets, a.revenue, a.public_float,
-               a.net_income, a.cfo, a.total_liabilities, a.equity
+               a.net_income, a.cfo, a.total_liabilities, a.equity,
+               a.current_assets, a.current_liabilities, a.depreciation
         FROM scores s JOIN annual_first a USING (cik, period_end)
         WHERE NOT s.is_financial AND s.available_date::DATE BETWEEN DATE '2010-01-01' AND DATE '{end}'
     ),
