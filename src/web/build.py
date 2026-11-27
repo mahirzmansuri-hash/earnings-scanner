@@ -338,7 +338,7 @@ def screener():
 
 
 def track_record(results):
-    c, a, rs, tr = results["composite"], results["ablation"], results["restatement"], results["classic"]
+    c, a, rs, tr, de = results["composite"], results["ablation"], results["restatement"], results["classic"], results["distress"]
     ab = "".join(f'<tr><td>{e(k)}</td><td class="n">{v["auc_same_rows_as_altman"]:.3f}</td>'
                  + "".join(f'<td class="n">{x*100:.0f}%</td>' for x in v["caught_if_flag_top"].values()) + "</tr>"
                  for k, v in a.items() if "auc_same_rows_as_altman" in v)
@@ -364,6 +364,7 @@ To catch as many as Altman, Faultline needed to flag {c['faultline_same_hit_rate
 </tbody></table></div><p>Restatements are much harder to see coming than bankruptcies. Beneish's ranking was close to a coin flip in these years.</p></section>
 <section><h2>The classic scores on their own</h2><p class="dim">Hit rate: share of events where the latest score before it was flagged. Alarm rate: share of all company-years flagged.</p>
 <div class="tbl"><table><thead><tr><th>Test</th><th class="n">Events (with a score)</th><th class="n">Hit rate</th><th class="n">Alarm rate</th><th class="n">Lift</th></tr></thead><tbody>{cl}</tbody></table></div></section>
+<section><h2>A wider definition of failure</h2><p>Small companies often stop filing instead of filing for bankruptcy. Counting a company as failed if it filed for bankruptcy or stopped filing without being bought gives {de['distress_exits']:,} events in the test years. Faultline ranked them with an AUC of {de['faultline_auc']:.2f}, against {de['altman_auc']:.2f} for Altman Z.</p></section>
 <section><h2>Limits</h2><p>Only formal bankruptcy filings count, so distressed sales and out-of-court restructurings are scored as misses.
 Companies that simply stop filing are not counted either way. About 40% of bankrupt companies had no score in the warning window,
 usually because they stopped filing or left out a needed number. Results come from one model setting that has not been tuned.</p></section>"""
@@ -389,7 +390,7 @@ bankruptcy filing (8-K Item 1.03) within two years, the other a restatement noti
 each model is trained only on companies whose two-year outcome was known before that year started.</p>
 <h2>What the scores are not</h2><p>A score is a ranking of how a company's filings compare with the filings of companies that later failed
 or restated. It is not a forecast for any single company and not investment advice. Financial companies are not scored.</p>
-<h2>Code</h2><p>The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section>"""
+<h2>Paper and code</h2><p>A write-up of the method and results is in the <a href="https://github.com/mahirzmansuri-hash/earnings-scanner/blob/main/docs/paper.md">research paper draft</a>. The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section>"""
     return page("Methodology · Faultline", body, "How Faultline turns SEC filings into bankruptcy and accounting-risk scores.", active="methodology.html")
 
 
@@ -412,7 +413,8 @@ def build():
         latest, hist, events, accn, as_of = load(con)
     results = {k: json.loads((PROC / f).read_text()) for k, f in [
         ("composite", "composite_results.json"), ("ablation", "composite_ablation.json"),
-        ("restatement", "restatement_results.json"), ("classic", "track_record.json")]}
+        ("restatement", "restatement_results.json"), ("classic", "track_record.json"),
+        ("distress", "distress_exit_results.json")]}
     if SITE.exists():
         shutil.rmtree(SITE)
     (SITE / "c").mkdir(parents=True)

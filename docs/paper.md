@@ -73,7 +73,7 @@ The most important inputs, measured by how much AUC falls when one input is shuf
 
 ## 6. Limits
 
-- The main outcome counts only formal bankruptcy filings. Small companies often stop filing instead, which likely explains part of why size is the most important input. A second outcome, a "distress exit" (bankruptcy, or going dark without a change of control), gives 1,282 events in the test years instead of 539. Faultline still ranks them better than Altman (AUC 0.83 vs 0.75; 0.73 vs 0.67 for companies under $100 million in revenue), but the gap is smaller.
+- The main outcome counts only formal bankruptcy filings. Small companies often stop filing instead, which likely explains part of why size is the most important input. A second outcome, a "distress exit" (bankruptcy, or going dark without a change of control), gives 1,278 events in the test years instead of 539. Faultline still ranks them better than Altman (AUC 0.83 vs 0.75; 0.73 vs 0.67 for companies under $100 million in revenue), but the gap is smaller.
 - About 40% of bankrupt companies had no score in the warning window, usually because they had stopped filing or left out a needed number.
 - Public float leaves out insider shares, so Altman's market-value ratio is understated for closely held companies.
 - One model setting was used without tuning.

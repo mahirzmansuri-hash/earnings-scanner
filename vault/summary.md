@@ -88,7 +88,20 @@
 - Set up GitHub to run it every Sunday for free, even when your Mac is off.
 - Waiting on you: allow your GitHub token to change workflows, and add your SEC name/email as a secret.
 
+## Overnight work (Nov 27, while you slept)
+- Wrote a **README** for GitHub: what Faultline is, results, how to run it.
+- **Robustness:** Faultline beats Altman in all 8 test years and for small, mid and big companies.
+- Found that size matters most, partly because tiny companies quietly stop filing instead of declaring bankruptcy.
+- So added a second test: "failed" = bankruptcy OR stopped filing without being bought.
+- Faultline still wins there: **0.83 vs 0.75**.
+- Fixed a subtle bug: results changed slightly on every run (duplicate rows). Now identical every time.
+- Final main result: riskiest 10% catches **53%** of bankruptcies vs Altman's **13%** (AUC 0.85 vs 0.71).
+- Wrote the **research paper draft** (`docs/paper.md`), linked from the site.
+- Made a **share image** so links look good on LinkedIn or in texts, plus a small tab icon.
+- Tests went from 16 to **24**, all passing.
+
 ## Next
+- Check the first automatic GitHub run, then republish with tonight's changes.
 - Pages for banks (classic scores only).
 - A share image so links look good when posted.
 - Auto-update every week.

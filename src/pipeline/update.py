@@ -87,11 +87,13 @@ def main(skip_download: bool = False):
     step("scores", with_con(build_scores))
 
     from src.backtest import track_record
-    from src.model import ablation, composite, live, restatement
+    from src.model import ablation, composite, distress_exit, live, restatement, robustness
     step("track record", track_record.run)
     step("bankruptcy model test", composite.main)
     step("ablation", ablation.main)
     step("restatement model test", restatement.main)
+    step("distress-exit test", distress_exit.main)
+    step("robustness", robustness.main)
     step("live risk", live.main)
 
     from src.web.build import build

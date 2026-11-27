@@ -56,10 +56,10 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 ## Stages (details in vault/roadmap.md)
 - [x] 0. Setup
 - [x] 1. EDGAR data pipeline: 15,686 companies, 39M facts, 5/5 spot-checks
-- [ ] Stage 1: Score engine + first track record (bankruptcies, restatements), Dec 2026 - Jan 2027
+- [x] Stage 1: Score engine + first track record (done Nov 27, 2026)
 - [ ] Stage 2: Price data + return backtest, Feb - Mar 2027
-- [ ] Stage 3: Public website v1, Apr - Jun 2027
-- [ ] Stage 4: ML composite + research paper, Jul - Oct 2027
+- [x] Stage 3: Public website v1, live with weekly auto-update (done early, Nov 27, 2026)
+- [ ] Stage 4: ML composite + research paper (models, robustness and paper draft done Nov 27; paper polish + professor/teacher review left)
 - [ ] Stage 5: Alerts, newsletter, API, growth, Nov 2027 - mid 2028
 
 ## App pages

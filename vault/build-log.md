@@ -73,3 +73,10 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Blocked:** push rejected: the saved fine-grained token lacks the Workflows permission. Commit 6cc8ffb is local only.
 - **Mahir to do:** (1) token: Workflows = Read and write; (2) repo secret `SEC_USER_AGENT`; then push + first manual run (first run downloads everything, ~45 min).
 - **Note:** GitHub pauses scheduled workflows in public repos after 60 days with no repo activity; re-enable from the Actions tab if that happens.
+
+## 2026-11-27 (overnight, autonomous)
+- **Did:** README; `src/model/robustness.py` (by year, by size, calibration, permutation importance); new events (8-K 5.01 change in control, Form 15 deregistration); `src/model/distress_exit.py` (second outcome); `docs/paper.md` draft; share image (`scripts/make_share_image.py` -> `src/web/assets/og.png`) + favicon + og/twitter meta; `tests/test_scores.py` (24 tests pass); paper link and distress-exit section on the site; update.py runs the new steps.
+- **Bugs:** model input had 194 duplicate rows + no fixed order -> results drifted between runs; fixed (QUALIFY + ORDER BY), all numbers re-run and synced. New event types broke the site's red flags -> only warning events are shown.
+- **Final numbers:** see last entry of `vault/research/results.md`.
+- **State:** committed and pushed. First GitHub Actions run in progress; site to be republished after it finishes.
+- **Next:** verify the CI run; republish; paper polish; Stage 2 (free price data) research.
