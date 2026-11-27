@@ -1,31 +1,32 @@
-# Earnings Quality Scanner
+# Faultline (Earnings Quality Scanner)
 
 ## What this is
-A forensic accounting web app. It scores US public companies on earnings manipulation and financial distress using SEC filings, then backtests whether the scores predicted stock returns. Personal project for my resume and college apps (finance/accounting major, CS minor).
+A public early-warning system for every US public company: it scores manipulation, distress and strength from SEC filings, tracks warning events, and measures how often its warnings came true (point-in-time, dead companies included). A year-plus project meant to be used publicly at scale, possibly a startup. Full plan: `vault/roadmap.md`. For my resume and college apps (finance/accounting major, CS minor).
 
 ## About me
-High school sophomore. I know basic Python from AP CSP. I'm building this with AI help, but I have to understand everything, because I'll explain it in interviews.
+High school sophomore. I know basic Python from AP CSP. I'm building this with AI help. I need a broad, interview-level understanding of what we built and how I used AI to build it, not line-by-line detail.
 
 ## How to work with me
 - Do all lookups and checks yourself (SEC filings, 10-Ks, docs, data). Don't send me links to dig through or ask me to find numbers.
 - Teach as you go: treat each step as a short lesson. Say what you checked, what you found (with the real numbers), and why it matters for the project, the finance, or interviews.
 - Explain every file you write in plain words, and why you made each choice.
-- I write the score formulas myself (Beneish, Piotroski, Altman). Don't write them for me. Give me the formula and the inputs, then check my code.
+- You write everything, including the score formulas. No coding homework for me.
+- Drive the project: at each point, propose the next step: what it is, how it works, how big it gets, what research it needs. Do the research yourself and spend credits where they add real value.
+- Aim big: public, high-quality, quantifiable outcomes that could scale. Not a weekend project.
 - Before any big step, tell me the plan in a few lines and wait for my OK.
-- Keep answers short and direct. No filler.
-- You write the plumbing (pipeline, database, app). I don't need to be a strong coder, but I must understand it.
-- End every session with an explain-back: I explain what we built in my own words, and you correct gaps.
+- Keep answers short and direct. No filler. Report progress in short blocks.
+- No quizzes or hyper-specific questions. At the end of each stage, give me a 5-line plain-English summary I could say in an interview.
 - After each session, add an entry to the build log: what we did, the decisions, bugs found, and what's next.
-- Pace: 2-3 hours a week. Schedule is in vault/requirements.md.
+- Timeline: Dec 2026 to mid-2028, in stages (see `vault/roadmap.md`).
 
 ## Memory (read at the start of every session)
 - Start with `vault/START-HERE.md`, then the latest entry in `vault/build-log.md`. These files are the project memory; don't rely on chat history.
 - End of every session: build log entry, new decisions in `vault/design-notes.md`, new traps in `vault/gotchas.md`, tick phases and checkboxes.
 
 ## Project skills (`.claude/skills/`)
-- `/end-session`: explain-back, vault updates, Obsidian note, commit
+- `/end-session`: interview summary, vault updates, Obsidian note, commit
 - `/spot-check`: verify a number against the real 10-K
-- `/review-my-score`: coach me on the score formulas without writing them
+- `/review-my-score`: retired (Claude now writes the scores)
 
 ## My Obsidian brain (linked)
 - Project note: `/Users/mahir/Documents/Obsidian Vault/Mahir's Second Brain/Areas/Earnings Quality Scanner.md`
@@ -34,9 +35,9 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 
 ## Stack
 - Python 3, DuckDB (database), pandas
-- Streamlit (web app), hosted on Streamlit Community Cloud
+- Website: static site, one page per company, free hosting (decided in Stage 3; Streamlit only for internal tools)
 - GitHub for code; GitHub Actions for weekly data updates
-- Later: scikit-learn (ML layer)
+- Later: scikit-learn (ML layer), LLM text signals
 
 ## Data rules (do not break)
 - Financials come from the SEC EDGAR API (companyfacts / XBRL). Send a User-Agent header with my name and email, and stay under 10 requests per second.
@@ -50,18 +51,19 @@ High school sophomore. I know basic Python from AP CSP. I'm building this with A
 - Piotroski F-Score: 9 binary tests, scored 0-9
 - Altman Z-Score: above 3 is safe, 1.8-3 is the gray zone, below 1.8 is distress
 
-## Phases
-- [x] 0. Setup: repo, venv, folder structure, project vault, GitHub
-- [ ] 1. EDGAR data pipeline into DuckDB, spot-check 5 companies
-- [ ] 2. Scores (I code them, you review)
-- [ ] 3. Backtest 2012-2025: yearly portfolios by score vs the S&P 500
-- [ ] 4. Streamlit app: Lookup, Screener, Research, Methodology pages, then deploy
-- [ ] 5. Write-up (2 pages), ML model vs the classic scores, real users
+## Stages (details in vault/roadmap.md)
+- [x] 0. Setup
+- [x] 1. EDGAR data pipeline: 15,686 companies, 39M facts, 5/5 spot-checks
+- [ ] Stage 1: Score engine + first track record (bankruptcies, restatements), Dec 2026 - Jan 2027
+- [ ] Stage 2: Price data + return backtest, Feb - Mar 2027
+- [ ] Stage 3: Public website v1, Apr - Jun 2027
+- [ ] Stage 4: ML composite + research paper, Jul - Oct 2027
+- [ ] Stage 5: Alerts, newsletter, API, growth, Nov 2027 - mid 2028
 
 ## App pages
 1. Lookup: enter a ticker and get the 3 scores (color coded), red flags in plain English, and 10-year trend charts
 2. Screener: filter all companies by score, sector, and size; export to CSV
-3. Research: backtest charts and case studies (Wirecard, Luckin Coffee, SVB)
+3. Research: track record and backtest charts; case studies must be 10-K filers (e.g. Sears, Bed Bath & Beyond, GE, Kraft Heinz; SVB as a 'where scores fail' bank case)
 4. Methodology: formulas, data sources, limits
 
 ## Resume wording
