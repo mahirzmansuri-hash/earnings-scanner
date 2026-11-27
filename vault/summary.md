@@ -178,3 +178,12 @@
 - Company pages now show the latest 10-Q update.
 - Fixed results that changed slightly between runs (random tie-breaks).
 - Paper now has 7 research questions.
+
+## Alerts (Stage 5 starts, Nov 27, night)
+- New Alerts page: what changed in the last 90 days.
+- Alerts fire when risk jumps, a company enters the riskiest 5%, or a warning filing appears.
+- Anyone can star companies (watchlist, saved in their browser).
+- Every company has its own RSS feed. There is a main feed too.
+- A weekly digest page is written automatically. It's our future newsletter.
+- Example: this week Car-Mart went bankrupt; we had it riskier than 90% of companies.
+- Email sending needs a free account from you (next).

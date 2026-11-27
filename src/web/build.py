@@ -17,6 +17,7 @@ import pandas as pd
 
 from src.config import DB_PATH, ROOT
 from src.web.style import page
+from src.web.alerts import KINDS_MAIN, alerts_json, alerts_page, atom, build_alerts, watch_box, week_digest
 
 SITE = ROOT / "site"
 PROC = ROOT / "data" / "processed"
@@ -163,6 +164,7 @@ def chart(h: pd.DataFrame, evs: pd.DataFrame) -> str:
 
 
 WHY = {}
+ALERT_COUNT = {}
 RISK_Q = {}
 
 
@@ -237,6 +239,7 @@ def company_page(r, h, evs, accn_map, as_of):
         parts.append(f'<p class="banner">This company stopped filing annual reports. Its last 10-K was filed on {pd.Timestamp(r.last_10k).date()}. '
                      'The scores below are from that last report.</p>')
     parts.append('</section>')
+    parts.append(watch_box(int(r.cik), ALERT_COUNT.get(r.cik, 0)))
     bw, bc = band(r.bankruptcy_pctile)
     rw, rc = band(r.restatement_pctile)
     parts.append(f"""<section><div class="label">From the 10-K filed {pd.Timestamp(r.available_date).date()}
@@ -544,14 +547,60 @@ HIST: dict = {}
 NAMES: dict = {}
 
 
+def write_alerts(alerts, timeline, latest, as_of):
+    """Alerts page, feeds (main + one per company) and the weekly digests (src/web/alerts.py)."""
+    from src.web.style import SITE_URL
+    as_of = pd.Timestamp(as_of)
+    (SITE / "alerts.html").write_text(alerts_page(alerts, as_of.date(), page))
+    (SITE / "data" / "alerts.json").write_text(alerts_json(alerts, as_of))
+    main = alerts[alerts["kind"].map(lambda k: KINDS_MAIN[k]) & (alerts["date"] >= as_of - pd.Timedelta(days=90))].head(300)
+    (SITE / "feed.xml").write_text(atom("Faultline alerts", f"{SITE_URL}feed.xml", f"{SITE_URL}alerts.html", main, SITE_URL, as_of.date()))
+    by = {k: g.head(50) for k, g in alerts.groupby("cik")}
+    for r in latest.itertuples():
+        g = by.get(r.cik, alerts.iloc[0:0])
+        (SITE / "c" / f"{r.cik}.xml").write_text(atom(f"Faultline alerts: {r.name}", f"{SITE_URL}c/{r.cik}.xml",
+                                                      f"{SITE_URL}c/{r.cik}.html", g, SITE_URL, as_of.date()))
+    # weekly digests for the last 12 weeks (rebuilt each run from the same data, so the archive is stable)
+    tl = {k: g for k, g in timeline.groupby("cik")}
+    def risk_before(cik, d):
+        g = tl.get(cik)
+        if g is None:
+            return None
+        g = g[pd.to_datetime(g["d"]) < d]
+        return g["p"].iloc[-1] if len(g) else None
+    (SITE / "digest").mkdir()
+    items = []
+    for i in range(12):
+        end = as_of - pd.Timedelta(days=7 * i)
+        body, md = week_digest(alerts, end, risk_before)
+        start = (end - pd.Timedelta(days=6)).date()
+        name = f"{end.date()}.html"
+        (SITE / "digest" / name).write_text(page(f"Faultline weekly, {start} to {end.date()}",
+            f'<section><div class="label">Weekly digest</div><h1>{start} to {end.date()}</h1>{body}'
+            '<p class="note">Built from SEC filings. Research, not investment advice. <a href="index.html">All weeks</a> · '
+            '<a href="../feed.xml">RSS</a></p></section>', f"Faultline weekly digest for {start} to {end.date()}.", root="../", active="alerts.html"))
+        items.append(f'<li><a href="{name}">{start} to {end.date()}</a></li>')
+        if i == 0:
+            (PROC / "digest_latest.md").write_text(md)    # the text a newsletter email would send
+    (SITE / "digest" / "index.html").write_text(page("Weekly digest · Faultline",
+        '<section><h1>Weekly digest</h1><p>Every week: new bankruptcy filings (and what Faultline said before them), companies that '
+        f'entered the riskiest 5%, the biggest risk jumps, restatement notices, new going-concern wording and SEC accounting cases.</p><ul>{"".join(items)}</ul></section>',
+        "Faultline's weekly summary of bankruptcy-risk changes and warning filings.", root="../", active="alerts.html"))
+    print(f"alerts: {len(alerts):,} since 2016, {int((alerts['date'] >= as_of - pd.Timedelta(days=90)).sum()):,} in the last 90 days")
+
+
 def build():
     with duckdb.connect(str(DB_PATH), read_only=True) as con:
         latest, hist, events, accn, as_of = load(con)
         why = con.execute("SELECT * FROM risk_why").df()
-        rq = con.execute("SELECT * FROM risk_q").df()
+        rq = con.execute("SELECT * FROM risk_q QUALIFY ROW_NUMBER() OVER (PARTITION BY cik ORDER BY available_date DESC, accn DESC) = 1").df()
+        cases_all = pd.read_csv(PROC / "aaer_cases.csv")
+        alerts = build_alerts(con, cases_all, latest)
+        timeline = con.execute("""SELECT cik, available_date::DATE AS d, bankruptcy_pctile AS p FROM risk WHERE bankruptcy_pctile IS NOT NULL
+                                  UNION ALL SELECT cik, available_date::DATE, q_pctile FROM risk_q WHERE q_pctile IS NOT NULL ORDER BY cik, d""").df()
     RISK_Q.update({r.cik: r for r in rq.itertuples()})
-    cases = pd.read_csv(PROC / "aaer_cases.csv")
-    cases = cases[(cases["kind"] == "accounting") & (cases["n_candidates"] == 1)]   # only unambiguous name matches
+    ALERT_COUNT.update(alerts["cik"].value_counts().to_dict())
+    cases = cases_all[(cases_all["kind"] == "accounting") & (cases_all["n_candidates"] == 1)]   # only unambiguous name matches
     AAER.update({k: g.sort_values("date") for k, g in cases.groupby("cik")})
     WHY.update({(k[0], pd.Timestamp(k[1])): g for k, g in why.groupby(["cik", "period_end"])})
     results = {k: json.loads((PROC / f).read_text()) for k, f in [
@@ -571,6 +620,7 @@ def build():
     for r in latest.itertuples():
         r = pd.Series(r._asdict())
         (SITE / "c" / f"{r.cik}.html").write_text(company_page(r, HIST[r.cik], ev_by.get(r.cik, empty_ev), accn_map, as_of))
+    write_alerts(alerts, timeline, latest, as_of)
     comp = [{"c": int(r.cik), "n": r.name, "t": r.tickers if isinstance(r.tickers, str) else "",
              "f": r.former_names if isinstance(r.former_names, str) else "", "i": txt(r.sic_description), "s": r.status,
              "r": None if isnan(r.revenue) else float(r.revenue), "b": round(float(r.bankruptcy_risk), 4),
@@ -592,7 +642,7 @@ def build():
     (SITE / "about.html").write_text(about())
     # sitemap + robots.txt so search engines can find every company page
     from src.web.style import SITE_URL
-    urls = ["", "new.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
+    urls = ["", "new.html", "alerts.html", "digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
     (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
                                       + "".join(f"<url><loc>{SITE_URL}{u}</loc><lastmod>{as_of}</lastmod></url>" for u in urls) + "</urlset>")
     (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")

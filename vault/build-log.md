@@ -124,3 +124,10 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Result:** 99,507 10-Q dates (2016-2023, 6,984 companies). AUC 0.81 (last 10-K) -> 0.83 (fresh 10-Q) -> 0.84 (both); riskiest 10% 46% -> 51%. Gain grows with 10-K age (0.807/0.812 under 4 months; 0.847/0.875 over 8). Bankrupt companies warned: 326 vs 270 of 464, median 517 vs 472 days before filing.
 - **Bugs:** results drifted between runs -> amended 10-Qs duplicated quarters, and DuckDB arg_min/arg_max ties + unsorted pandas merges picked arbitrary values. Fixed with original-only rows and explicit tie-breakers; two builds now hash identical. Date subtraction broke on TIMESTAMP columns (caught by the new test) -> date_diff.
 - **Next:** Stage 5 (alerts when a company's risk jumps, newsletter, API), or show the combined 10-K+10-Q score.
+
+## 2026-11-27 (night, cont.): Stage 5 begins - alerts
+- **Did:** `src/web/alerts.py`: alert engine (entered riskiest 5%, risk jump of 20+ percentile points into the top 20% along each company's 10-K + 10-Q timeline, 8-K 1.03 / 4.02 / 4.01, NT 10-K, new going-concern wording, SEC AAER cases). Site: Alerts page (last 90 days, type filter, watchlist filter), watchlist button on every company page (browser localStorage), Atom feeds (main `feed.xml` + `c/<cik>.xml` for all 7,693 companies), weekly digest pages for the last 12 weeks (`digest/`), `data/processed/digest_latest.md` (newsletter text). `risk_q` now keeps every 10-Q (142,260) so 10-Q jumps can be found. Nav "Alerts"; sitemap. `tests/test_alerts.py` (29 tests pass).
+- **Numbers:** 25,838 alerts since 2016; 238 in the last 90 days. This week's digest: America's Car-Mart filed for bankruptcy; Faultline's last score before it was riskier than 90% of filers.
+- **Checks:** all 7,693 company feeds parse as XML; watchlist add/filter tested in the browser; alerts table folded to 3 columns for phones.
+- **Waiting on Mahir:** email delivery (free newsletter account, e.g. Buttondown or Substack) - the digest text is ready.
+- **Next:** email delivery; marketing plan (Reddit, Show HN, Search Console, school investing clubs).

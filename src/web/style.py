@@ -60,6 +60,8 @@ footer{border-top:1px solid var(--rule);margin-top:40px;padding:20px 0 40px;font
 .filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:end}
 .filters label{display:grid;gap:4px;font-size:.78rem;color:var(--ink-2)}
 button{font:inherit;border:1px solid var(--brand);background:var(--brand);color:var(--paper);padding:7px 12px;border-radius:2px;cursor:pointer}
+.btn{font:500 .85rem var(--sans);color:var(--ink);background:var(--paper);border:1px solid var(--ink);border-radius:2px;padding:7px 12px;cursor:pointer}.btn:hover{background:var(--surface)}
+.watchbox{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:12px 0}
 td.ind{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} td.d{white-space:nowrap} .filters select{max-width:240px}
 th.sort{cursor:pointer} th.sort:hover{color:var(--ink)}
 """
@@ -75,7 +77,7 @@ SITE_URL = "https://mahirzmansuri-hash.github.io/earnings-scanner/"
 FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 18'%3E%3Cpath d='M1 6H12M14 12H25' "
            "stroke='%231B3A5C' stroke-width='3' fill='none'/%3E%3Cpath d='M12 6L14 12' stroke='%230FB3C8' stroke-width='3'/%3E%3C/svg%3E")
 
-NAV = [("index.html", "Home"), ("new.html", "New filings"), ("screener.html", "Screener"), ("track-record.html", "Track record"),
+NAV = [("index.html", "Home"), ("new.html", "New filings"), ("alerts.html", "Alerts"), ("screener.html", "Screener"), ("track-record.html", "Track record"),
        ("methodology.html", "Methodology"), ("about.html", "About")]
 
 
@@ -88,6 +90,7 @@ def page(title: str, body: str, description: str, root: str = "", active: str = 
 <meta property="og:type" content="website"><meta property="og:image" content="{SITE_URL}og.png">
 <meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="{SITE_URL}og.png">
 <link rel="icon" href="{FAVICON}">
+<link rel="alternate" type="application/atom+xml" title="Faultline alerts" href="{SITE_URL}feed.xml">
 {FONTS}<style>{CSS}</style></head><body><div class="wrap">
 <header class="mast"><a class="word" href="{root}index.html">{LOGO}Faultline</a><nav class="nav" aria-label="Main">{nav}</nav></header>
 <main>{body}</main>

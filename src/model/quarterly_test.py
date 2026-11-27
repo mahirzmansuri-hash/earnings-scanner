@@ -103,7 +103,7 @@ def lead_times(rows: pd.DataFrame) -> dict:
 
 def live():
     """Site scores: every 10-Q since 2016 scored out of sample, calibrated like the annual model (src/model/live.py).
-    Table risk_q keeps each company's latest 10-Q, with its percentile among 10-Qs filed that year."""
+    Table risk_q keeps every scored 10-Q, with its percentile among 10-Qs filed that year."""
     from src.model.live import calibrate
     with duckdb.connect(str(DB_PATH)) as con:
         as_of = pd.Timestamp(con.execute("SELECT MAX(available_date) FROM quarterly").fetchone()[0])
@@ -111,12 +111,12 @@ def live():
         wf = walk_forward(q, years=range(2016, as_of.year + 1), verbose=False)
         wf["q_risk"] = calibrate(wf)
         wf["q_pctile"] = wf.groupby("year")["composite"].rank(pct=True)
-        latest = wf.sort_values("avail").groupby("cik").tail(1)
-        out = latest[["cik", "accn", "period_end", "available_date", "q_risk", "composite", "q_pctile"]].rename(columns={"composite": "q_risk_raw"})
+        # every 10-Q since 2016 (alerts compare each one with the company's previous filing); pages use the latest
+        out = wf[["cik", "accn", "period_end", "available_date", "q_risk", "composite", "q_pctile"]].rename(columns={"composite": "q_risk_raw"})
         con.register("rq_df", out)
         con.execute("CREATE OR REPLACE TABLE risk_q AS SELECT * FROM rq_df")
         con.unregister("rq_df")
-    print(f"risk_q: latest 10-Q scored for {len(out):,} companies (10-Qs to {as_of.date()})")
+    print(f"risk_q: {len(out):,} 10-Qs scored for {out['cik'].nunique():,} companies (10-Qs to {as_of.date()})")
 
 
 def main():

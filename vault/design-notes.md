@@ -74,3 +74,8 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 ## 2026-11-27: Quarterly scores as an update, not a replacement
 - 10-Q rows get their own model (same 46 inputs from TTM numbers; days_to_file follows 10-Q deadlines). The page keeps the 10-K score and adds the 10-Q update when newer. Averaging both ranks best (0.84) but is harder to explain; left for later.
 - Public float is only on 10-K covers, so Altman's market value in a 10-Q row is up to a year old.
+
+## 2026-11-27: Alerts as feeds + watchlist first, email later
+- **What:** alerts are dated facts (score crossings, filings) built during the site build, so no new pipeline step or server. Watchlist lives in the browser (no accounts, no personal data). RSS/Atom feeds per company let anyone follow a company today; any feed-to-email service can turn them into emails.
+- **Why:** $0 and no backend; email needs a provider account and a secret, which is Mahir's call.
+- **Thresholds:** riskiest 5% crossing, or +20 percentile points into the top 20%; auditor changes and late notices are "watch" level and stay out of the main feed to keep it quiet.
