@@ -80,3 +80,8 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Final numbers:** see last entry of `vault/research/results.md`.
 - **State:** committed and pushed. First GitHub Actions run in progress; site to be republished after it finishes.
 - **Next:** verify the CI run; republish; paper polish; Stage 2 (free price data) research.
+
+## 2026-11-27 (overnight, cont.): First CI run
+- **Result:** run #1 (43m 50s): all data, model and site steps succeeded on GitHub's servers; "Publish to GitHub Pages" failed (exit 126: zsh shebang on Linux). Cache not saved because the job failed.
+- **Fix:** bash shebang + `bash scripts/publish_site.sh`; cache restore/save split with `if: always()`. Pushed (2f399a1). Published tonight's site from the Mac with the bash script (works).
+- **Next:** Sunday's scheduled run will confirm the fix (it will re-download everything once, since no cache was saved). A manual "Run workflow" click would confirm sooner.

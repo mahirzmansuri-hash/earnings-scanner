@@ -101,7 +101,9 @@
 - Tests went from 16 to **24**, all passing.
 
 ## Next
-- Check the first automatic GitHub run, then republish with tonight's changes.
+- The first automatic GitHub run did all the work (44 min) but failed at the last step: it used a Mac-only shell. Fixed.
+- Republished the site from your Mac with tonight's changes.
+- Sunday's automatic run will confirm the fix (or click Run workflow once to check sooner).
 - Pages for banks (classic scores only).
 - A share image so links look good when posted.
 - Auto-update every week.
