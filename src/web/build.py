@@ -374,7 +374,7 @@ annual report since 2009, including 10,349 that later stopped filing. A list of 
 makes any warning score look worse than it is.</p>
 <h2>Point in time</h2><p>Each year's numbers are taken from that year's original 10-K, dated by the day it was filed. Later corrections
 are kept separately and never used in tests. A number that first appeared in a later filing is left out of that year.</p>
-<h2>Cleaning</h2><p>Companies tag the same item in different ways. Faultline maps 22 items to their XBRL tags. When one filing reports two
+<h2>Cleaning</h2><p>Companies tag the same item in different ways. Faultline maps 21 items to their XBRL tags. When one filing reports two
 different revenue figures, it keeps the one where revenue minus cost of goods equals gross profit. Five companies were checked by hand
 against their 10-Ks (Apple, Sears, General Mills, SVB, Conagra), and all matched.</p>
 <h2>Classic scores</h2><p>Altman Z-Score (1968) uses five ratios to measure bankruptcy risk; market value comes from the public float

@@ -45,3 +45,10 @@ Each entry: date, question (RQ#), method in one line, exact numbers, caveats.
 | Caught if flagging riskiest 10% | 19.4% | **28.6%** |
 
 - **Finding:** restatements are much harder to predict than bankruptcies; Beneish's ranking carries almost no information in 2016-2023, though its yes/no flag still has some lift. On all 40,311 company-years (no Beneish needed), Faultline AUC 0.696.
+
+## 2026-11-27: Robustness of the bankruptcy model (`src/model/robustness.py`)
+- **Every test year:** Faultline AUC beats Altman in all 8 years: 2016 0.819 vs 0.717; 2017 0.824 vs 0.775; 2018 0.802 vs 0.718; 2019 0.866 vs 0.698; 2020 0.920 vs 0.708; 2021 0.851 vs 0.726; 2022 0.829 vs 0.672; 2023 0.867 vs 0.710.
+- **Every size group:** revenue under $100M 0.772 vs 0.615 (10,301 company-years, 250 bankruptcies); $100M-$1B 0.875 vs 0.809 (6,694, 174); over $1B 0.902 vs 0.781 (8,236, 118).
+- **Calibration (deciles, predicted vs actual):** top decile 10.84% vs 9.15%; deciles 4-9 under-predict (e.g. decile 6: 0.77% vs 1.42%). Ranking is reliable; the middle probabilities read about 1.5x too low.
+- **Most important clues** (permutation importance, model trained on outcomes known before 2021, tested on 2021-2023; AUC drop when shuffled): company size (log assets) 0.058, ROA 0.019, Altman X3 (EBIT/assets) 0.013, Z'' 0.011, log revenue 0.009, cash flow/assets 0.008, Altman X1 (working capital) 0.007, log public float 0.007.
+- **Caveat:** size is the top clue partly because small companies often stop filing instead of filing a formal bankruptcy 8-K, so the label under-counts small-company failures. Next: add "stopped filing within 24 months" as a second outcome.
