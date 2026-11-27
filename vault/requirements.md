@@ -21,37 +21,37 @@ Each module has topics. Each topic is a short lesson plus a build step. A module
 - [x] 1.4 Comparative columns and restatements (why values repeat)
 - [x] 1.5 Spot-check 1/5: AAPL FY2025 revenue
 
-### Module 2: The full company universe (target ~Dec 13)
-- [ ] 2.1 Getting every company: bulk files vs one-by-one API (`companyfacts.zip` returned 503/403 on 2026-11-26; `submissions.zip` is 1.58 GB and works)
-- [ ] 2.2 Survivorship bias: what it is and why dead companies matter
-- [ ] 2.3 Build the company list: CIK, name, ticker(s), sector (SIC), status, including delisted
-- [ ] 2.4 Download facts for every company (resumable, polite)
-- [ ] 2.5 When XBRL data starts (~2009-2011) and why the backtest starts in 2012
+### Module 2: The full company universe (DONE 2026-11-26)
+- [x] 2.1 Getting every company: bulk files vs one-by-one API (`companyfacts.zip` returned 503/403 on 2026-11-26; `submissions.zip` is 1.58 GB and works)
+- [x] 2.2 Survivorship bias: what it is and why dead companies matter
+- [x] 2.3 Build the company list: CIK, name, ticker(s), sector (SIC), status, including delisted
+- [x] 2.4 Download facts for every company (resumable, polite)
+- [x] 2.5 When XBRL data starts (~2009-2011) and why the backtest starts in 2012
 
-### Module 3: The database (target ~Dec 27, light over break)
-- [ ] 3.1 What a database is; SQL basics
-- [ ] 3.2 Table design: companies, facts
-- [ ] 3.3 Load the raw JSON into DuckDB
-- [ ] 3.4 First queries: one company's history, counts by year
+### Module 3: The database (DONE 2026-11-26)
+- [x] 3.1 What a database is; SQL basics
+- [x] 3.2 Table design: companies, facts
+- [x] 3.3 Load the raw JSON into DuckDB
+- [x] 3.4 First queries: one company's history, counts by year
 
-### Module 4: Clean point-in-time data (target ~Jan 17)
-- [ ] 4.1 Tag mapping: the same item under different tag names
-- [ ] 4.2 Annual vs quarterly facts
-- [ ] 4.3 First-filed values for the backtest, latest values for Lookup
-- [ ] 4.4 Detecting restatements automatically (a red-flag feature)
+### Module 4: Clean point-in-time data (4.1-4.3 done 2026-11-26)
+- [x] 4.1 Tag mapping: the same item under different tag names
+- [x] 4.2 Annual vs quarterly facts
+- [x] 4.3 First-filed values for the backtest, latest values for Lookup
+- [ ] 4.4 Detecting restatements automatically (a red-flag feature). Partly: `revised` flag exists; still need 10-K/A + 8-K Item 4.02 to separate restatements from recasts
 
-### Module 5: Verify and test (target ~Feb 7)
-- [ ] 5.1 Spot-checks 2-5 (including one delisted company and one non-December fiscal year)
-- [ ] 5.2 pytest tests for the pipeline
+### Module 5: Verify and test (5.1-5.2 done 2026-11-26)
+- [x] 5.1 Spot-checks 2-5 (including one delisted company and one non-December fiscal year)
+- [x] 5.2 pytest tests for the pipeline
 - [ ] 5.3 Phase 1 wrap-up
 
 Rough targets: Phase 2 Mar, Phase 3 May, Phase 4 Jul, Phase 5 Sep 2027.
 
 ## Phase 1: EDGAR pipeline
-- [ ] Download companyfacts JSON for all US filers, under 10 req/sec, User-Agent from `.env`
-- [ ] Load into DuckDB with the **filed date** on every value (point-in-time)
-- [ ] Delisted and bankrupt companies kept
-- [ ] 5 companies spot-checked by hand against their 10-K
+- [x] Download companyfacts JSON for all US filers, under 10 req/sec, User-Agent from `.env`
+- [x] Load into DuckDB with the **filed date** on every value (point-in-time)
+- [x] Delisted and bankrupt companies kept
+- [x] 5 companies spot-checked by hand against their 10-K
 
 ## Phase 2: Scores (I write the formulas)
 - [ ] Beneish M-Score (8 ratios), Piotroski F-Score (9 tests), Altman Z-Score
