@@ -142,6 +142,7 @@ def alerts_json(a: pd.DataFrame, as_of) -> str:
 
 
 def alerts_page(a: pd.DataFrame, as_of, page) -> str:
+    from src.web.style import subscribe_box
     recent = a[a["date"] >= pd.Timestamp(as_of) - pd.Timedelta(days=90)]
     counts = recent["kind"].value_counts()
     opts = "".join(f'<option value="{k}">{v[0]} ({counts.get(k, 0):,})</option>' for k, v in KINDS.items())
@@ -149,7 +150,7 @@ def alerts_page(a: pd.DataFrame, as_of, page) -> str:
 entered the riskiest 5% with a new 10-K or 10-Q, and warning filings (bankruptcy, restatement notices, auditor changes, late
 annual reports, new going-concern wording, SEC accounting cases). Data as of {as_of}.</p>
 <p class="dim">Follow along: <a href="feed.xml">main alerts feed (RSS)</a>, a feed on every company page, or the
-<a href="digest/index.html">weekly digest</a>. Add companies to your watchlist from their pages to filter this list.</p>
+<a href="digest/index.html">weekly digest</a>. Add companies to your watchlist from their pages to filter this list.</p>{subscribe_box()}
 <div class="controls"><label>Type <select id="akind"><option value="">All types ({len(recent):,})</option>{opts}</select></label>
 <label><input type="checkbox" id="awatch"> Watchlist only</label> <span id="acount" class="dim"></span></div>
 <div class="tbl"><table><thead><tr><th>Date</th><th>Company</th><th>Alert</th></tr></thead>
@@ -170,7 +171,17 @@ def atom(title: str, self_url: str, alt_url: str, rows: pd.DataFrame, site_url: 
             + "".join(entry(r) for r in rows.itertuples()) + "</feed>")
 
 
+def _who(r) -> str:
+    return f"{r.name}{f' ({r.ticker})' if r.ticker else ''}"
+
+
+def _md(t: str) -> str:
+    """Escape characters that would break a Markdown link label."""
+    return t.replace("[", "(").replace("]", ")")
+
+
 def week_digest(a: pd.DataFrame, end: pd.Timestamp, risk_before) -> tuple[str, str]:
+    from src.web.style import SITE_URL
     """(html body, markdown) for the 7 days ending `end`. risk_before(cik, date) -> last percentile before that date."""
     start = end - pd.Timedelta(days=6)
     w = a[(a["date"] >= start) & (a["date"] <= end)]
@@ -182,7 +193,7 @@ def week_digest(a: pd.DataFrame, end: pd.Timestamp, risk_before) -> tuple[str, s
             if with_prior:
                 p = risk_before(r.cik, r.date)
                 prior = f" Faultline's last score before it: riskier than {_pct(p)} of filers." if p == p and p is not None else " No earlier Faultline score."
-            items.append((r, f"{r.name}{f' ({r.ticker})' if r.ticker else ''}: {r.text}{prior}"))
+            items.append((r, f"{_who(r)}: {r.text}{prior}"))
         return items, int((w["kind"] == kind).sum())
     secs = [("Bankruptcy filings", "bankruptcy", True), ("Entered the riskiest 5%", "entered_high", False),
             ("Biggest risk jumps", "risk_jump", False), ("Restatement notices", "non_reliance", False),
@@ -197,5 +208,5 @@ def week_digest(a: pd.DataFrame, end: pd.Timestamp, risk_before) -> tuple[str, s
             continue
         more = f" (showing {len(items)} of {n})" if n > len(items) else ""
         hb.append(f"<h2>{name}{more}</h2><ul>" + "".join(f'<li><a href="../c/{r.cik}.html">{e(t)}</a></li>' for r, t in items) + "</ul>")
-        md.append(f"## {name}{more}\n" + "".join(f"- {t}\n" for _, t in items))
+        md.append(f"## {name}{more}\n" + "".join(f"- [{_md(_who(r))}]({SITE_URL}c/{r.cik}.html): {t[len(_who(r)) + 2:]}\n" for r, t in items))
     return "".join(hb), "\n".join(md)

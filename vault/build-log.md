@@ -131,3 +131,10 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Checks:** all 7,693 company feeds parse as XML; watchlist add/filter tested in the browser; alerts table folded to 3 columns for phones.
 - **Waiting on Mahir:** email delivery (free newsletter account, e.g. Buttondown or Substack) - the digest text is ready.
 - **Next:** email delivery; marketing plan (Reddit, Show HN, Search Console, school investing clubs).
+
+## 2026-11-27 (night, cont.): Digest email via Buttondown (code ready, account pending)
+- **Did:** `src/web/newsletter.py` turns `digest_latest.md` into a Buttondown email (subject from the title line, footer with site links + "not investment advice"). Skips cleanly with no `BUTTONDOWN_API_KEY`; never prints the key; won't create a second email with the same subject. Status set explicitly: `draft` by default, `send` only if `FL_DIGEST_MODE=send`. Digest markdown now links every company to its page. Optional sign-up form (`NEWSLETTER_USER` in `src/web/style.py`, hidden while empty) on Alerts + digest index. Weekly workflow step after publish (continue-on-error). `.env.example` placeholders. `tests/test_newsletter.py` (32 tests pass).
+- **Decision:** Buttondown over Substack (free to 100 subscribers, API, Markdown). Drafts first, auto-send later.
+- **Unverified:** Buttondown docs pages we fetched didn't show the status values or the embed form snippet; used the standard `embed-subscribe/<username>` + `email` field. Confirm against Buttondown's embed generator when the account exists.
+- **Waiting on Mahir:** create the Buttondown account, add repo secret `BUTTONDOWN_API_KEY`, tell Claude the username.
+- **Next:** turn on sign-up box, first draft email, then marketing plan.

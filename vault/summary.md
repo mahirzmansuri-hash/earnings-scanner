@@ -187,3 +187,12 @@
 - A weekly digest page is written automatically. It's our future newsletter.
 - Example: this week Car-Mart went bankrupt; we had it riskier than 90% of companies.
 - Email sending needs a free account from you (next).
+
+## Digest email (Nov 27, night)
+- Picked Buttondown. Free up to 100 subscribers.
+- New code emails the weekly digest.
+- It makes a draft first. You press send.
+- Later it can send on its own.
+- Each company in the email links to its page.
+- A sign-up box appears once your account exists.
+- Needs you: make the account, add the API key to GitHub.

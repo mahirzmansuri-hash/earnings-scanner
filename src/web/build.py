@@ -549,7 +549,7 @@ NAMES: dict = {}
 
 def write_alerts(alerts, timeline, latest, as_of):
     """Alerts page, feeds (main + one per company) and the weekly digests (src/web/alerts.py)."""
-    from src.web.style import SITE_URL
+    from src.web.style import SITE_URL, subscribe_box
     as_of = pd.Timestamp(as_of)
     (SITE / "alerts.html").write_text(alerts_page(alerts, as_of.date(), page))
     (SITE / "data" / "alerts.json").write_text(alerts_json(alerts, as_of))
@@ -584,7 +584,7 @@ def write_alerts(alerts, timeline, latest, as_of):
             (PROC / "digest_latest.md").write_text(md)    # the text a newsletter email would send
     (SITE / "digest" / "index.html").write_text(page("Weekly digest · Faultline",
         '<section><h1>Weekly digest</h1><p>Every week: new bankruptcy filings (and what Faultline said before them), companies that '
-        f'entered the riskiest 5%, the biggest risk jumps, restatement notices, new going-concern wording and SEC accounting cases.</p><ul>{"".join(items)}</ul></section>',
+        f'entered the riskiest 5%, the biggest risk jumps, restatement notices, new going-concern wording and SEC accounting cases.</p>{subscribe_box()}<ul>{"".join(items)}</ul></section>',
         "Faultline's weekly summary of bankruptcy-risk changes and warning filings.", root="../", active="alerts.html"))
     print(f"alerts: {len(alerts):,} since 2016, {int((alerts['date'] >= as_of - pd.Timedelta(days=90)).sum()):,} in the last 90 days")
 

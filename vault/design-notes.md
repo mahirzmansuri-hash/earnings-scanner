@@ -79,3 +79,8 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 - **What:** alerts are dated facts (score crossings, filings) built during the site build, so no new pipeline step or server. Watchlist lives in the browser (no accounts, no personal data). RSS/Atom feeds per company let anyone follow a company today; any feed-to-email service can turn them into emails.
 - **Why:** $0 and no backend; email needs a provider account and a secret, which is Mahir's call.
 - **Thresholds:** riskiest 5% crossing, or +20 percentile points into the top 20%; auditor changes and late notices are "watch" level and stay out of the main feed to keep it quiet.
+
+## 2026-11-27: Digest email = Buttondown, drafts first
+- **What:** the weekly GitHub run creates the digest as a Buttondown draft; switch to auto-send with repo variable `FL_DIGEST_MODE=send`.
+- **Why:** free to 100 subscribers, has an API (Substack has none), takes Markdown. Drafts first so a human checks the first few emails about named companies.
+- **Trade-off:** a manual click each week until auto-send is on. Status is always set explicitly so a provider default can't send by surprise.

@@ -1,5 +1,6 @@
 # Weekly: pull fresh SEC data, rebuild scores and models, publish the site to GitHub Pages.
 # Needs one repository secret: SEC_USER_AGENT ("Your Name your.email@example.com"), required by SEC.
+# Optional: secret BUTTONDOWN_API_KEY and variable FL_DIGEST_MODE for the weekly digest email (src/web/newsletter.py).
 name: Weekly update
 
 on:
@@ -63,3 +64,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           bash scripts/publish_site.sh
+
+      # Weekly digest email via Buttondown. Does nothing until the BUTTONDOWN_API_KEY secret exists.
+      # Repository variable FL_DIGEST_MODE: "draft" (default, you press send in Buttondown) or "send" (fully automatic).
+      - name: Email the weekly digest
+        continue-on-error: true
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+          FL_DIGEST_MODE: ${{ vars.FL_DIGEST_MODE }}
+        run: python -m src.web.newsletter

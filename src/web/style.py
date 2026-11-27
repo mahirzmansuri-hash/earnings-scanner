@@ -77,6 +77,20 @@ SITE_URL = "https://mahirzmansuri-hash.github.io/earnings-scanner/"
 FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 18'%3E%3Cpath d='M1 6H12M14 12H25' "
            "stroke='%231B3A5C' stroke-width='3' fill='none'/%3E%3Cpath d='M12 6L14 12' stroke='%230FB3C8' stroke-width='3'/%3E%3C/svg%3E")
 
+# Buttondown newsletter username (public, not a secret). Empty = no sign-up box anywhere on the site.
+NEWSLETTER_USER = ""
+
+
+def subscribe_box() -> str:
+    """Email sign-up for the weekly digest. A plain HTML form posting to Buttondown (no scripts, no tracking)."""
+    if not NEWSLETTER_USER:
+        return ""
+    return (f'<form class="watchbox" action="https://buttondown.com/api/emails/embed-subscribe/{NEWSLETTER_USER}" method="post">'
+            '<label for="bd-email">Get the weekly digest by email</label>'
+            '<input type="email" name="email" id="bd-email" placeholder="you@example.com" required>'
+            '<button type="submit">Subscribe</button><span class="dim">Free. One email a week. Unsubscribe any time.</span></form>')
+
+
 NAV = [("index.html", "Home"), ("new.html", "New filings"), ("alerts.html", "Alerts"), ("screener.html", "Screener"), ("track-record.html", "Track record"),
        ("methodology.html", "Methodology"), ("about.html", "About")]
 
