@@ -69,9 +69,9 @@ accounting problems, when tested honestly (point-in-time, dead companies include
 ## Multi-year plan (small increments: 1-2 hour sessions)
 | When | Build (stages above) | Research / people | Deliverable |
 |---|---|---|---|
-| Sophomore yr, winter-spring 2027 | Stages 1-3 | Write the RQ1 results up as a 2-page brief; email 3-5 accounting/finance professors with it and 3 specific questions; log every reply | Track record #1, website v1 |
+| Sophomore yr, winter-spring 2027 | Stages 1-3 | Show results to a teacher at school (econ/math/CS) for a fairness check; no professor outreach yet (hard as a 10th grader). The website's Methodology page + results log become the write-up | Track record #1, website v1 |
 | Summer 2027 (internship) | Stage 4 begins | Present Faultline to mentors; ask what practitioners actually check; interview 2-3 practitioners (auditor, analyst, investor) | Interview notes, feedback list |
-| Junior yr fall 2027 | Stage 4 (ML composite) | Paper draft (SSRN); professor review of methods | ML results, paper v1 |
+| Junior yr fall 2027 | Stage 4 (ML composite) | Paper draft (SSRN); optional: email 3-5 professors with the live site + paper | ML results, paper v1 |
 | Junior yr spring 2028 | Stage 5 (alerts, newsletter, API, growth) | Final paper; present at school / a competition; final user numbers | **Everything finished by Jun 1, 2028** |
 | Summer 2028 | Maintenance only (weekly auto-update) | **Internship search and internship**: Faultline is the portfolio piece | Interviews, internship |
 | Fall 2028 | Maintenance only | College applications | Application materials |

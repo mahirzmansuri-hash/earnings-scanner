@@ -64,5 +64,5 @@
 - Finding: auditor changes and late filings add almost nothing on top of the financials.
 
 ## Next
-- 2-page brief for professors.
+- Skipped the professor brief for now (hard as a 10th grader). A school teacher can check it instead.
 - Public website (built and previewed first; goes live only with your OK).
