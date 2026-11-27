@@ -442,6 +442,12 @@ def build():
     (SITE / "track-record.html").write_text(track_record(results))
     (SITE / "methodology.html").write_text(methodology())
     (SITE / "about.html").write_text(about())
+    # sitemap + robots.txt so search engines can find every company page
+    from src.web.style import SITE_URL
+    urls = ["", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
+    (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+                                      + "".join(f"<url><loc>{SITE_URL}{u}</loc><lastmod>{as_of}</lastmod></url>" for u in urls) + "</urlset>")
+    (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")
     size = sum(p.stat().st_size for p in SITE.rglob("*") if p.is_file())
     print(f"site/: {len(latest):,} company pages, {size/1e6:.0f} MB")
 
