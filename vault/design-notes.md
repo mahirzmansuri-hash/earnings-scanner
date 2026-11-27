@@ -39,3 +39,8 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 - **Signature visuals:** point-in-time slider, Beneish ratio table vs Beneish (1999) group means, Screener table, Z-Score chart with distress zones.
 - **Why:** looks like professional research, not a template. It sets the project apart from data-extraction dashboards because it judges the numbers and proves the judgment with a backtest. Concept board: https://claude.ai/artifact/KqXTTugqFM6opLPiQYc8TY (private).
 - **Case studies must be 10-K filers:** Luckin Coffee (20-F filer) is out. Candidates to verify: GE, Kraft Heinz, MiMedx (accounting), Sears, Bed Bath & Beyond, Rite Aid (bankruptcy).
+
+## 2026-11-26: Budget is $0
+- **Rule:** Faultline uses only free data and services. No paid price data.
+- **How:** market value from the 10-K cover page (`dei:EntityPublicFloat`, in 99% of 10-Ks since 2012, dead companies included); track record measured against SEC event filings (bankruptcy 8-K 1.03, non-reliance 8-K 4.02) instead of stock prices; free hosting and GitHub Actions.
+- **Trade-off:** public float excludes insider shares and is dated mid-year; return backtests are limited to free price coverage, with gaps flagged.

@@ -5,7 +5,7 @@
 It reads every SEC filing since 2009, scores each company on manipulation, distress and
 financial strength, watches for warning events (auditor changes, restatements, late filings,
 bankruptcy notices), and **proves how often its warnings came true**, with point-in-time
-data and the dead companies included. Long term: alerts, an API and a research paper; possible startup.
+data and the dead companies included. Long term: alerts, an API and a research paper; possible startup. **Budget: $0.** Free data (SEC), free hosting, free automation (GitHub Actions).
 
 ## Why it can matter (positioning)
 - The classic scores already exist behind paywalls: GuruFocus shows M/F/Z scores on plans of
@@ -29,11 +29,16 @@ data and the dead companies included. Long term: alerts, an API and a research p
 - Event table from submissions: bankruptcy, restatement, auditor change, late filing, with filing dates.
 - **Outcome #1:** "Of the N companies that filed for bankruptcy, X% were in Altman's distress zone
   12+ months earlier; false alarm rate Y%." Same for Beneish vs restatements. No paid data needed.
-### Stage 2: Market data + return backtest (Feb - Mar 2027)
-- Pick a survivorship-free price source (candidates: EODHD ~$199/yr historical incl. delisted;
-  Sharadar via Nasdaq Data Link; Norgate ~$630/yr, Windows-only). Needs a budget decision.
-- Classic Z with market value; yearly portfolios by score vs the S&P 500, 2012-2025.
-- **Outcome #2:** return spread of flagged vs clean companies, with delisting returns handled.
+### Stage 2: Market value + free return backtest (Feb - Mar 2027)
+- **Zero cost.** Market value from the 10-K cover page (`dei:EntityPublicFloat`): reported in
+  89,989 of 90,667 10-Ks since 2012 (99%), 12,609 companies incl. 7,410 dead ones. It is the
+  market value held by outside investors on the last day of Q2, so it slightly understates
+  total market value (insider shares excluded); good enough for Altman X4 and size groups.
+- Returns from free sources only (e.g. free daily price downloads for listed stocks); every
+  missing delisted price is flagged, never silently dropped. The main track record (Stage 1:
+  flagged before bankruptcy / restatement) needs no prices at all.
+- **Outcome #2:** classic Altman Z for every company; return comparison where free prices exist,
+  with the coverage gap stated openly.
 ### Stage 3: Public website v1 (Apr - Jun 2027)
 - Static site, one page per company (~13k pages, indexable by Google), screener, methodology,
   research page with the track record. Weekly auto-update with GitHub Actions. Free hosting.
