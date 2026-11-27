@@ -6,7 +6,7 @@ Bankruptcy and accounting-risk scores for US public companies, built from free S
 
 ## What it does
 
-Faultline reads every annual report (10-K) filed with the SEC since 2009, including the reports of companies that later went bankrupt or stopped filing. For each company and year it computes the three classic forensic accounting scores (Altman Z, Piotroski F, Beneish M) and two machine-learning risk scores: the chance of a bankruptcy filing within two years, and the chance of a restatement notice within two years. Then it checks those scores against real outcomes.
+Faultline reads every annual report (10-K) filed with the SEC since 2009, including the reports of companies that later went bankrupt or stopped filing. For each company and year it computes the three classic forensic accounting scores (Altman Z, Piotroski F, Beneish M) and two machine-learning risk scores: the chance of a bankruptcy filing within two years, and the chance of a restatement notice within two years. Then it checks those scores against real outcomes. Each company page also explains its score: which areas (debt, cash flow, profits, warning signs and so on) push its bankruptcy risk up or down, measured by re-scoring the filing with each area set to typical values.
 
 ## Main results
 

@@ -162,6 +162,34 @@ def chart(h: pd.DataFrame, evs: pd.DataFrame) -> str:
             'outcomes known before that year.</p>')
 
 
+WHY = {}
+
+
+def why_section(r) -> str:
+    """'Why this score': which areas push this company's bankruptcy risk up or down (src/model/explain.py)."""
+    g = WHY.get((r.cik, pd.Timestamp(r.period_end)))
+    if g is None:
+        return ""
+    up = g[g["effect"] >= 0.1].sort_values("effect", ascending=False).head(4)
+    down = g[g["effect"] <= -0.1].sort_values("effect").head(3)
+    if not len(up) and not len(down):
+        return ('<section><h2>Why this score</h2><p class="dim">No area of the filing moves the risk much '
+                'away from a typical company\'s.</p></section>')
+    top = max(g["effect"].abs().max(), 1e-9)
+    strength = lambda x: "Strongly" if abs(x) >= 1 else "Moderately" if abs(x) >= 0.4 else "Slightly"
+    def row(x):
+        c = "--risk" if x.effect > 0 else "--safe"
+        word = f'{strength(x.effect)} {"raises" if x.effect > 0 else "lowers"}'
+        return (f'<tr><td>{e(x.label)}<span class="sub">{e(x.detail)}</span></td><td class="why"><span class="read" style="--c:var({c})">{word}</span>'
+                f'<span class="bar"><span style="width:{abs(x.effect) / top * 100:.0f}%;background:var({c})"></span></span></td></tr>')
+    rows = "".join(row(x) for x in pd.concat([up, down]).itertuples())
+    return f"""<section><h2>Why this score</h2><p class="dim">What pushes this company's bankruptcy risk up or down compared
+with a typical company. For each area, the model re-scores the filing with that area set to typical values and measures the change.</p>
+<div class="tbl"><table><thead><tr><th>Area</th><th>Effect</th></tr></thead><tbody>{rows}</tbody></table></div>
+<p class="note">Areas overlap (a loss hurts both profits and cash flow), so effects show what matters most, not exact shares.
+"Typical" is the median company in the years the model learned from. <a href="../methodology.html#why">How this works</a>.</p></section>"""
+
+
 def company_page(r, h, evs, accn_map, as_of):
     tick = r.tickers.split(" | ")[0] if isinstance(r.tickers, str) else ""
     title = f"{r['name']} ({tick}) bankruptcy and accounting risk" if tick else f"{r['name']} bankruptcy and accounting risk"
@@ -201,6 +229,7 @@ def company_page(r, h, evs, accn_map, as_of):
         parts.append(f'<section><h2>What stands out</h2><ul class="flags">{items}</ul></section>')
     else:
         parts.append('<section><h2>What stands out</h2><p class="dim">None of our warning rules fired on the latest filing.</p></section>')
+    parts.append(why_section(r))
     if len(later):
         lines = "".join(f"<li>{EVENT_WORDS[x.event]} on {pd.Timestamp(x.filed).date()}.</li>" for x in later.itertuples())
         parts.append(f'<section><h2>What happened after this filing</h2><ul>{lines}</ul></section>')
@@ -435,6 +464,13 @@ profitability, debt, growth, how long the 10-K took to file, recent auditor chan
 10-K uses five warning phrases (found with SEC's full-text search). The phrases did not improve the models, but they are shown on company pages. One predicts a
 bankruptcy filing (8-K Item 1.03) within two years, the other a restatement notice (8-K Item 4.02). For filings made in a given year,
 each model is trained only on companies whose two-year outcome was known before that year started.</p>
+<h2 id="why">Why this score</h2><p>Each company page breaks its bankruptcy risk into ten areas: debt and financing, retained
+earnings, profits, cash flow, short-term cash, sales, company size, accounting patterns, the classic scores, and warning signs in
+filings. For each area, the same model that scored the filing scores it again with that area's values replaced by a typical
+company's (the median of the years the model learned from). If the risk falls, the area was pushing it up. The areas overlap, so the
+effects do not add up exactly. One result can look odd: larger companies sometimes get a size effect that raises risk. That is because
+small companies in trouble usually stop filing instead of filing for bankruptcy, so most formal bankruptcy filings in the data come
+from larger companies.</p>
 <h2>What the scores are not</h2><p>A score is a ranking of how a company's filings compare with the filings of companies that later failed
 or restated. It is not a forecast for any single company and not investment advice. Financial companies are not scored.</p>
 <h2>Paper and code</h2><p>A write-up of the method and results is in the <a href="Faultline-paper.pdf">research paper (PDF, 6 pages)</a>. The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section>"""
@@ -458,6 +494,8 @@ NAMES: dict = {}
 def build():
     with duckdb.connect(str(DB_PATH), read_only=True) as con:
         latest, hist, events, accn, as_of = load(con)
+        why = con.execute("SELECT * FROM risk_why").df()
+    WHY.update({(k[0], pd.Timestamp(k[1])): g for k, g in why.groupby(["cik", "period_end"])})
     results = {k: json.loads((PROC / f).read_text()) for k, f in [
         ("composite", "composite_results.json"), ("ablation", "composite_ablation.json"),
         ("restatement", "restatement_results.json"), ("classic", "track_record.json"),

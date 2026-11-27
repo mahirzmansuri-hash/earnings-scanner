@@ -103,3 +103,10 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Result:** Faultline 0.847 vs Altman 0.707, Ohlson 0.719, Zmijewski 0.743 (riskiest 10% caught: 53% vs 13/11/13%). v2 features: no gain (0.847; 52% vs 53% at top 10%) -> live model stays v1.
 - **Decision:** keep the simpler model; report the null v2 result in the paper.
 - **Next:** per-company "why this score" explanations; SEC AAER fraud cases as true fraud labels; quarterly 10-Q signals.
+
+## 2026-11-27 (evening, cont.): Why-this-score breakdown
+- **Did:** `src/model/explain.py` (swap test / occlusion: 46 inputs in 10 plain-English groups; each group set to the training median, effect = change in log-odds). `walk_forward(models={})` keeps each year's model so the explanation uses the exact model that scored the filing. `live.py` writes table `risk_why` for each company's latest filing (7,693). Company pages: "Why this score" table (area, the company's number vs typical, strength word + bar). Methodology section `#why`; README line; `tests/test_explain.py` (26 tests pass).
+- **Checks:** Sears 2018: classic scores, debt (liabilities 151% of assets), losses, sales -25% push risk up. Apple: profits and Z pull it down. Bed Bath 2022: debt 97% of assets; its Altman Z/Z'' looked fine only because buybacks left retained earnings at 188% of assets.
+- **Bugs:** pandas NA in `neg_equity` broke an `if`; "Amended 10-k" capitalization; 3-column table overflowed on phones -> 2 columns with the detail under the area name, short headers.
+- **Quirk (documented on Methodology):** size can "raise" risk for big companies, because small failing companies usually go dark instead of filing for bankruptcy.
+- **Next:** SEC AAER fraud-case labels; quarterly 10-Q signals.

@@ -103,7 +103,10 @@ def load(con, event: str = "bankruptcy", end: str = "2023-12-31") -> pd.DataFram
     """).df()
 
 
-def walk_forward(df: pd.DataFrame, features: list[str] = FEATURES, verbose: bool = True, years=TEST_YEARS) -> pd.DataFrame:
+def walk_forward(df: pd.DataFrame, features: list[str] = FEATURES, verbose: bool = True, years=TEST_YEARS,
+                 models: dict | None = None) -> pd.DataFrame:
+    """Train one model per test year on past outcomes only. Pass `models={}` to keep each year's
+    model and its training medians (used by src/model/explain.py)."""
     df = df[~df["already_bankrupt"]].copy()  # can't "predict" a bankruptcy that already happened
     df["year"] = pd.to_datetime(df["avail"]).dt.year
     df["composite"] = np.nan
@@ -114,6 +117,8 @@ def walk_forward(df: pd.DataFrame, features: list[str] = FEATURES, verbose: bool
                                                l2_regularization=1.0, random_state=0)
         model.fit(train[features].astype(float), train["label"].astype(int))
         df.loc[test, "composite"] = model.predict_proba(df.loc[test, features].astype(float))[:, 1]
+        if models is not None:
+            models[y] = (model, train[features].astype(float).median())
         if verbose: print(f"  test {y}: trained on {len(train):,} rows ({int(train['label'].sum())} bankruptcies), "
               f"scored {int(test.sum()):,}")
     return df[df["year"].isin(years)]

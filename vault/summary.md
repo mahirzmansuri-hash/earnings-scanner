@@ -150,3 +150,11 @@
 - Faultline beats all three classics (0.85 vs 0.71 / 0.72 / 0.74).
 - Tried adding trends and industry comparisons. No gain, so we kept the simpler model.
 - Added both results to the site, paper and README.
+
+## Why-this-score (Nov 27, evening)
+- Every company page now explains its risk.
+- It shows which areas push risk up or down: debt, cash flow, profits, and more.
+- How: swap one area for a typical company's numbers and re-score.
+- If risk drops, that area was the problem.
+- Example: Sears was pushed up by heavy debt and a 25% sales drop.
+- Added tests. 26 tests pass.

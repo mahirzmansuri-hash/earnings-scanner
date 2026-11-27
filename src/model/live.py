@@ -18,6 +18,7 @@ from sklearn.isotonic import IsotonicRegression
 
 from src.config import DB_PATH
 from src.model.composite import HORIZON, load, walk_forward
+from src.model.explain import explain
 
 
 def calibrate(wf: pd.DataFrame) -> pd.Series:
@@ -43,7 +44,16 @@ def main():
             df = load(con, event=event, end=str(as_of.date()))
             if event != "bankruptcy":
                 df["already_bankrupt"] = False
-            wf = walk_forward(df, years=years, verbose=False)
+            models = {}
+            wf = walk_forward(df, years=years, verbose=False, models=models)
+            if event == "bankruptcy":
+                # why-this-score breakdown for each company's latest filing (shown on its page)
+                latest = wf.sort_values("avail").groupby("cik").tail(1)
+                why = explain(latest, models)
+                con.register("why_df", why)
+                con.execute("CREATE OR REPLACE TABLE risk_why AS SELECT * FROM why_df")
+                con.unregister("why_df")
+                print(f"  explained {len(latest):,} latest filings ({len(why):,} group effects)")
             wf["calibrated"] = calibrate(wf)
             part = wf[["cik", "period_end", "available_date", "calibrated", "composite"]]
             part = part.rename(columns={"calibrated": col, "composite": col + "_raw"})

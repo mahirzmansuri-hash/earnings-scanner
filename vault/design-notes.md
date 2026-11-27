@@ -59,3 +59,8 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 - **What:** compare against Ohlson O (1980) and Zmijewski (1984) with published weights; Ohlson's price-level deflator skipped (same for every company in a year), FFO ~ net income + depreciation.
 - **Why:** beating only a 1968 formula is a weak claim; these are the standard academic baselines.
 - **v2 features** (trends, industry-relative, industry bankruptcy rate, O/Zmijewski as inputs) gave no gain, so the live model stays at 46 inputs. Trade-off: simpler model, same accuracy; the code stays for later tests.
+
+## 2026-11-27: Explanations by group swap test, not SHAP
+- **What:** per-company effects from re-scoring with one input group set to typical (training medians), in log-odds.
+- **Why:** no new dependency (CI stays simple), 10 understandable groups instead of 46 raw inputs, easy to explain in an interview.
+- **Trade-off:** effects don't add up exactly (groups overlap); SHAP would be additive but harder to explain and needs another library. Labels use strength words (slightly / moderately / strongly), not fake-precise numbers.
