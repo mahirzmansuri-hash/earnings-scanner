@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 # Publish site/ to the gh-pages branch (GitHub Pages serves it).
 # Run from the repo root after `python -m src.web.build`. Overwrites the branch each time.
 set -euo pipefail

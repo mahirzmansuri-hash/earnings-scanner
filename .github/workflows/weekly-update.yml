@@ -31,7 +31,7 @@ jobs:
 
       # Keep downloaded company facts between runs, so only companies with new 10-Ks are re-downloaded.
       - name: Restore cached SEC company facts
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: data/raw/companyfacts
           key: companyfacts-${{ github.run_id }}
@@ -42,10 +42,18 @@ jobs:
           SEC_USER_AGENT: ${{ secrets.SEC_USER_AGENT }}
         run: python -m src.pipeline.update
 
+      # Save the facts cache even if a later step fails, so the next run doesn't re-download everything.
+      - name: Save SEC company facts cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/raw/companyfacts
+          key: companyfacts-${{ github.run_id }}
+
       - name: Publish to GitHub Pages
         env:
           PUBLISH_REMOTE: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          ./scripts/publish_site.sh
+          bash scripts/publish_site.sh
