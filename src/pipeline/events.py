@@ -11,6 +11,8 @@ non_reliance          8-K Item 4.02      "don't rely on our past financial state
 auditor_change        8-K Item 4.01      the auditor resigned or was dismissed
 late_10k              NT 10-K            the company said its annual report would be late
 amended_10k           10-K/A             the annual report was amended after filing
+change_in_control     8-K Item 5.01      someone took control (usually a completed buyout)
+deregistration        Form 15            the company ended its SEC registration (stops filing)
 """
 import json
 import zipfile
@@ -22,8 +24,9 @@ from src.config import DB_PATH
 from src.pipeline.universe import OUTPUT_CSV, SUBMISSIONS_ZIP
 
 START = "2009-01-01"
-ITEM_EVENTS = {"1.03": "bankruptcy", "4.02": "non_reliance", "4.01": "auditor_change"}
-FORM_EVENTS = {"NT 10-K": "late_10k", "10-K/A": "amended_10k"}
+ITEM_EVENTS = {"1.03": "bankruptcy", "4.02": "non_reliance", "4.01": "auditor_change", "5.01": "change_in_control"}
+FORM_EVENTS = {"NT 10-K": "late_10k", "10-K/A": "amended_10k",
+               "15-12G": "deregistration", "15-12B": "deregistration", "15-15D": "deregistration"}
 
 
 def _events_for(cik: int, filings: dict) -> list[tuple]:

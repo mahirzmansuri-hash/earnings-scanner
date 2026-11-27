@@ -44,7 +44,21 @@ FEATURES = [
 
 
 def load(con, event: str = "bankruptcy", end: str = "2023-12-31") -> pd.DataFrame:
-    """Features + label: did `event` happen within 24 months after the filing?"""
+    """Features + label: did `event` happen within 24 months after the filing?
+
+    event = 'distress_exit' means: a bankruptcy filing within 24 months, OR this was the
+    company's last 10-K and it stopped filing without a change of control (no 8-K Item 5.01
+    from a year before to three years after), i.e. it went dark rather than being bought.
+    """
+    in_window = lambda ev: (f"EXISTS (SELECT 1 FROM events e WHERE e.cik = b.cik AND e.event = '{ev}' "
+                            f"AND e.filed > b.avail AND e.filed <= b.avail + {HORIZON})")
+    if event == "distress_exit":
+        label_sql = f"""({in_window('bankruptcy')} OR (
+            co.status = 'inactive' AND abs(date_diff('day', co.last_10k::DATE, b.avail)) <= 45
+            AND NOT EXISTS (SELECT 1 FROM events e WHERE e.cik = b.cik AND e.event = 'change_in_control'
+                            AND e.filed BETWEEN b.avail - 365 AND b.avail + 1095)))"""
+    else:
+        label_sql = in_window(event)
     return con.execute(f"""
     WITH base AS (
         SELECT s.*, s.available_date::DATE AS avail, a.total_assets, a.revenue, a.public_float,
@@ -72,12 +86,12 @@ def load(con, event: str = "bankruptcy", end: str = "2023-12-31") -> pd.DataFram
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'amended_10k'    AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_amended_10k,
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'non_reliance'   AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_non_reliance,
         -- label: the event happens within 24 months AFTER the filing (not before it)
-        EXISTS (SELECT 1 FROM events e WHERE e.cik = b.cik AND e.event = '{event}'
-                AND e.filed > b.avail AND e.filed <= b.avail + {HORIZON}) AS label,
+        {label_sql} AS label,
         (bk.first_bk <= b.avail) IS TRUE AS already_bankrupt
     FROM base b
     LEFT JOIN prev p ON p.cik = b.cik AND date_diff('day', p.period_end, b.period_end) BETWEEN 350 AND 380
     LEFT JOIN bk ON bk.cik = b.cik
+    JOIN companies co ON co.cik = b.cik
     """).df()
 
 

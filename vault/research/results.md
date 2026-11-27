@@ -52,3 +52,10 @@ Each entry: date, question (RQ#), method in one line, exact numbers, caveats.
 - **Calibration (deciles, predicted vs actual):** top decile 10.84% vs 9.15%; deciles 4-9 under-predict (e.g. decile 6: 0.77% vs 1.42%). Ranking is reliable; the middle probabilities read about 1.5x too low.
 - **Most important clues** (permutation importance, model trained on outcomes known before 2021, tested on 2021-2023; AUC drop when shuffled): company size (log assets) 0.058, ROA 0.019, Altman X3 (EBIT/assets) 0.013, Z'' 0.011, log revenue 0.009, cash flow/assets 0.008, Altman X1 (working capital) 0.007, log public float 0.007.
 - **Caveat:** size is the top clue partly because small companies often stop filing instead of filing a formal bankruptcy 8-K, so the label under-counts small-company failures. Next: add "stopped filing within 24 months" as a second outcome.
+
+## 2026-11-27: Second outcome: "distress exit" (`src/model/distress_exit.py`)
+**Why:** small companies often stop filing instead of filing a bankruptcy 8-K. **Label:** bankruptcy 8-K within 24 months, OR this was the company's last 10-K and it stopped filing without a change of control (no 8-K Item 5.01 from 1 year before to 3 years after). New events: change in control (7,043 companies), Form 15 deregistration (8,025).
+- Positives: 5,112 company-years overall; 1,282 in the 2016-2023 test (vs 542 bankruptcies).
+- **AUC:** Faultline 0.834 vs Altman 0.749. Riskiest 10% caught 40% vs 30%; riskiest 20% 65% vs 51%.
+- Small companies (revenue under $100M; 865 exits): 0.733 vs 0.666. Larger (417 exits): 0.883 vs 0.791.
+- **Reading:** Faultline still wins on the broader outcome, but the gap narrows and Altman does better here (0.75) than on bankruptcy alone (0.71). This supports the caveat: the bankruptcy-only label hid many small-company failures. Report both outcomes.
