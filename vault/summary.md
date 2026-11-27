@@ -63,6 +63,18 @@
 - A second model for accounting problems beats Beneish (0.74 vs 0.52 ranking score).
 - Finding: auditor changes and late filings add almost nothing on top of the financials.
 
+## Website v1 (Nov 27)
+- Made sure every risk score is fair: each year is scored by a model that never saw that year's outcome.
+- Built the website on your Mac. It's not public yet.
+- **7,693 company pages.** Each shows risk, the 3 scores, red flags in plain words, and a chart.
+- Home page shows recent bankruptcies and whether Faultline saw them coming.
+- **62 of 87 recent bankruptcies were already in Faultline's riskiest 20%,** 1-2 years early.
+- Misses are shown too, so it's honest.
+- A screener filters all companies and downloads a spreadsheet.
+- Pages for the track record, methodology and about.
+- Designed to not look AI-made: no flashy hero, no fake reviews, real numbers with sources.
+- Works on phones.
+
 ## Next
-- Skipped the professor brief for now (hard as a 10th grader). A school teacher can check it instead.
-- Public website (built and previewed first; goes live only with your OK).
+- Put the site online for free (GitHub Pages or Cloudflare). Needs your OK first.
+- Auto-update every week.

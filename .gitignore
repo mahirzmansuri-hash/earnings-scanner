@@ -26,3 +26,4 @@ vault/.obsidian/
 .streamlit/secrets.toml
 data/processed/*
 !data/processed/.gitkeep
+site/

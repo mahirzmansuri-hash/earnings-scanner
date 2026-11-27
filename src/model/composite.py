@@ -43,14 +43,14 @@ FEATURES = [
 ]
 
 
-def load(con, event: str = "bankruptcy") -> pd.DataFrame:
+def load(con, event: str = "bankruptcy", end: str = "2023-12-31") -> pd.DataFrame:
     """Features + label: did `event` happen within 24 months after the filing?"""
     return con.execute(f"""
     WITH base AS (
         SELECT s.*, s.available_date::DATE AS avail, a.total_assets, a.revenue, a.public_float,
                a.net_income, a.cfo, a.total_liabilities, a.equity
         FROM scores s JOIN annual_first a USING (cik, period_end)
-        WHERE NOT s.is_financial AND s.available_date::DATE BETWEEN DATE '2010-01-01' AND DATE '2023-12-31'
+        WHERE NOT s.is_financial AND s.available_date::DATE BETWEEN DATE '2010-01-01' AND DATE '{end}'
     ),
     prev AS (
         SELECT cik, period_end, revenue AS revenue_prev FROM annual_first
@@ -81,11 +81,11 @@ def load(con, event: str = "bankruptcy") -> pd.DataFrame:
     """).df()
 
 
-def walk_forward(df: pd.DataFrame, features: list[str] = FEATURES, verbose: bool = True) -> pd.DataFrame:
+def walk_forward(df: pd.DataFrame, features: list[str] = FEATURES, verbose: bool = True, years=TEST_YEARS) -> pd.DataFrame:
     df = df[~df["already_bankrupt"]].copy()  # can't "predict" a bankruptcy that already happened
     df["year"] = pd.to_datetime(df["avail"]).dt.year
     df["composite"] = np.nan
-    for y in TEST_YEARS:
+    for y in years:
         train = df[pd.to_datetime(df["avail"]) + pd.Timedelta(days=HORIZON) < pd.Timestamp(f"{y}-01-01")]
         test = df["year"] == y
         model = HistGradientBoostingClassifier(max_iter=300, learning_rate=0.05, max_leaf_nodes=15,
@@ -94,7 +94,7 @@ def walk_forward(df: pd.DataFrame, features: list[str] = FEATURES, verbose: bool
         df.loc[test, "composite"] = model.predict_proba(df.loc[test, features].astype(float))[:, 1]
         if verbose: print(f"  test {y}: trained on {len(train):,} rows ({int(train['label'].sum())} bankruptcies), "
               f"scored {int(test.sum()):,}")
-    return df[df["year"].isin(TEST_YEARS)]
+    return df[df["year"].isin(years)]
 
 
 def compare(oos: pd.DataFrame) -> dict:

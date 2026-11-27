@@ -54,3 +54,10 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Results:** AUC 0.847 vs Altman 0.708; flag riskiest 10% -> catch 52% of bankruptcies vs 13% for lowest-Z; same catch rate with 26% fewer alarms. Warning events add ~nothing on top of financials. See `vault/research/results.md`.
 - **State:** committed and pushed. 16 tests pass.
 - **Next:** options: restatement model (Beneish side), case-study pages, 2-page brief for professors, start the website.
+
+## 2026-11-27 (cont.): Restatement model + website v1
+- **Did:** restatement model (AUC 0.74 vs Beneish 0.52); `src/model/live.py` (out-of-sample risk for every filing 2016-2026, with same-year percentiles); `src/web/` static site generator; local preview via `.claude/launch.json`. Dropped the professor brief (teacher check instead).
+- **Bugs:** a "final model" would have shown in-sample scores for early-2024 filings, replaced by walk-forward for every year; NaN in screener JSON (now `allow_nan=False`); NaN-safe escaping; overlapping chart labels; misleading accrual sentence for loss-makers.
+- **Result on the site:** 62 of 87 companies that went bankrupt in the last two years were in Faultline's riskiest 20% one to two years earlier.
+- **State:** committed and pushed; site not public.
+- **Next:** decide hosting (GitHub Pages or Cloudflare Pages, free) and weekly auto-update; company pages for banks (classic scores only); share image.
