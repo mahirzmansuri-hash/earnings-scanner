@@ -61,6 +61,8 @@ Banks, insurers and other financial companies (SIC 6000-6799) are excluded from 
 
 **Restatements.** On 14,421 company-years with a Beneish score and 479 restatement notices within two years, the Beneish M-Score's AUC was 0.52 and Faultline's 0.74. Flagging the riskiest 10% caught 19% of restatements with Beneish and 28% with Faultline.
 
+**Stock outcomes.** Free daily prices for companies that no longer trade are not available, so I approximate returns with the public float on 10-K cover pages: the change from the float reported in the year t+1 10-K to the one in the year t+2 10-K, a window that starts after the year-t score was public. Bankruptcies count as -100%, companies that stopped filing without a change of control as -50%, and buyouts are left out. For companies with at least $10 million of public float (20,648 company-years, 2016-2022), Faultline's riskiest 10% had a median change of -14.8% against +2.8% for its safest half; 33.5% lost half their value or more against 11.1%, and 10.9% were wiped out against 1.0%. The average was not lower (about +20% vs +15% with single returns capped at +300%), because a few flagged stocks rose enormously and share issues raise market value. The median gap held in 5 of 7 years; 2020, a broad rebound year, was the clear exception.
+
 **Example.** Sears Holdings entered Altman's distress zone with its 10-K filed in March 2015 and stayed there until its last 10-K in March 2018, when Faultline ranked it riskier than 99% of filers that year. It filed for bankruptcy in October 2018.
 
 ## 5. Robustness
@@ -81,7 +83,7 @@ The most important inputs, measured by how much AUC falls when one input is shuf
 
 ## 7. Conclusion
 
-When tested on all US filers with the failures included and only the information public at the time, the classic scores do warn, but Altman's original cut-offs flag about half of all companies and Beneish's ranking of restatement risk is close to random. A model that combines the same public data, trained only on the past, ranks bankruptcy risk much better in every year and size group. The next steps are to count companies that stop filing as a second outcome, to test whether the scores predict stock returns, and to add the text of 10-K filings.
+When tested on all US filers with the failures included and only the information public at the time, the classic scores do warn, but Altman's original cut-offs flag about half of all companies and Beneish's ranking of restatement risk is close to random. A model that combines the same public data, trained only on the past, ranks bankruptcy risk much better in every year and size group. Flagged companies' stock usually lost value, though a few large winners kept the average up. The next steps are better price data for a true trading test and adding the text of 10-K filings.
 
 ## References
 

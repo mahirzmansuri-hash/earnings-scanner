@@ -339,6 +339,11 @@ def screener():
 
 def track_record(results):
     c, a, rs, tr, de = results["composite"], results["ablation"], results["restatement"], results["classic"], results["distress"]
+    rt = results["returns"]["main_dark_minus_50"]
+    names = {"faultline_riskiest_10pct": "Faultline riskiest 10%", "faultline_10_to_20pct": "Faultline next 10%",
+             "faultline_safest_50pct": "Faultline safest 50%", "altman_distress": "Altman distress zone", "altman_safe": "Altman safe zone"}
+    ret_rows = "".join(f'<tr><td>{v}</td><td class="n">{rt[k]["n"]:,}</td><td class="n">{rt[k]["median"]*100:+.1f}%</td>'
+                       f'<td class="n">{rt[k]["share_lost_half"]*100:.0f}%</td><td class="n">{rt[k]["share_wiped_out"]*100:.1f}%</td></tr>' for k, v in names.items())
     ab = "".join(f'<tr><td>{e(k)}</td><td class="n">{v["auc_same_rows_as_altman"]:.3f}</td>'
                  + "".join(f'<td class="n">{x*100:.0f}%</td>' for x in v["caught_if_flag_top"].values()) + "</tr>"
                  for k, v in a.items() if "auc_same_rows_as_altman" in v)
@@ -364,6 +369,7 @@ To catch as many as Altman, Faultline needed to flag {c['faultline_same_hit_rate
 </tbody></table></div><p>Restatements are much harder to see coming than bankruptcies. Beneish's ranking was close to a coin flip in these years.</p></section>
 <section><h2>The classic scores on their own</h2><p class="dim">Hit rate: share of events where the latest score before it was flagged. Alarm rate: share of all company-years flagged.</p>
 <div class="tbl"><table><thead><tr><th>Test</th><th class="n">Events (with a score)</th><th class="n">Hit rate</th><th class="n">Alarm rate</th><th class="n">Lift</th></tr></thead><tbody>{cl}</tbody></table></div></section>
+<section><h2>What happened to the stock</h2><p class="dim">Free prices for companies that no longer trade are not available, so this uses the market value of outside shareholders' stock reported on each 10-K cover page. The change is measured over a year that starts after the score was public. Bankruptcies count as -100%, companies that stopped filing without being bought as -50%, and buyouts are left out. Companies worth at least $10 million, filings from 2016 to 2022.</p><div class="tbl"><table><thead><tr><th>Group</th><th class="n">Company-years</th><th class="n">Median change</th><th class="n">Lost half or more</th><th class="n">Wiped out</th></tr></thead><tbody>{ret_rows}</tbody></table></div><p>The typical flagged company lost value, and flagged companies were about three times as likely to lose half of it. The average was not lower, because a few flagged stocks rose enormously and new share issues raise market value. This is an approximation, not a trading test.</p></section>
 <section><h2>A wider definition of failure</h2><p>Small companies often stop filing instead of filing for bankruptcy. Counting a company as failed if it filed for bankruptcy or stopped filing without being bought gives {de['distress_exits']:,} events in the test years. Faultline ranked them with an AUC of {de['faultline_auc']:.2f}, against {de['altman_auc']:.2f} for Altman Z.</p></section>
 <section><h2>Limits</h2><p>Only formal bankruptcy filings count, so distressed sales and out-of-court restructurings are scored as misses.
 Companies that simply stop filing are not counted either way. About 40% of bankrupt companies had no score in the warning window,
@@ -414,7 +420,7 @@ def build():
     results = {k: json.loads((PROC / f).read_text()) for k, f in [
         ("composite", "composite_results.json"), ("ablation", "composite_ablation.json"),
         ("restatement", "restatement_results.json"), ("classic", "track_record.json"),
-        ("distress", "distress_exit_results.json")]}
+        ("distress", "distress_exit_results.json"), ("returns", "returns_results.json")]}
     if SITE.exists():
         shutil.rmtree(SITE)
     (SITE / "c").mkdir(parents=True)

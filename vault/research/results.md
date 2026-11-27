@@ -70,3 +70,18 @@ Fixes: model input had 194 duplicate rows (fiscal-year changes matched two prior
 - **By size:** <$100M 0.771/0.616; $100M-$1B 0.879/0.809; >$1B 0.903/0.781.
 - **Calibration:** top decile 10.83% predicted vs 9.50% actual; decile 6: 0.71% vs 1.22%.
 - **Top clues:** log assets 0.063, ROA 0.022, log float 0.009, log revenue 0.007, Altman X1 0.007, CFO/assets 0.007, Altman X3 0.006.
+
+## 2026-11-27: RQ4 stock outcomes (Stage 2, option A, $0) (`src/backtest/returns.py`)
+**Method:** market value of outside shareholders' stock from 10-K cover pages (public float). Return = float in the t+2 10-K / float in the t+1 10-K - 1, a window that starts 3-6 months after the year-t score was public. Missing because of bankruptcy within 3 years -> -100%; stopped filing without buyout -> -50% (also tested -100% and 0%); buyouts left out. Only companies with >= $10M public float when the score came out. Filings 2016-2022; 22,966 company-years, 20,648 with an outcome (19,574 measured, 391 bankrupt, 683 stopped filing; 2,318 left out).
+
+| Group | n | Median | Lost half+ | Wiped out (<= -95%) | Mean (capped +300%) |
+|---|---|---|---|---|---|
+| Faultline riskiest 10% | 2,257 | -14.8% | 33.5% | 10.9% | +19.6% |
+| Faultline 10-20% | 1,825 | -7.2% | 27.2% | 4.4% | +22.5% |
+| Faultline safest 50% | 11,592 | +2.8% | 11.1% | 1.0% | +15.2% |
+| Altman distress | 6,505 | -4.4% | 24.4% | 4.8% | +19.8% |
+| Altman safe | 6,626 | +3.2% | 11.5% | 1.5% | +14.9% |
+
+- **By year (median, riskiest 10% vs safest 50%):** 2016 -0.8/+11.0; 2017 +7.3/+6.8; 2018 -29.3/-4.1; 2019 -18.8/-4.2; 2020 +77.7/+39.7; 2021 -42.4/-22.5; 2022 -29.9/+3.6. Riskiest worse in 5 of 7 years by median (2017 about equal, 2020 rebound rally the exception).
+- **Reading:** the typical flagged company lost value and flagged companies were 3x as likely to lose half; but the average was not lower, because a few flagged stocks rose enormously (lottery-like skew) and share issuance inflates market value. Robust to the stopped-filing assumption (median -14.8% at -50% and -100%; -1.2% at 0%).
+- **Limits:** float is valued once a year mid-year, excludes insider shares, and rises with share issuance; not a tradable strategy test.

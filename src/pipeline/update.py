@@ -95,6 +95,8 @@ def main(skip_download: bool = False):
     step("distress-exit test", distress_exit.main)
     step("robustness", robustness.main)
     step("live risk", live.main)
+    from src.backtest import returns
+    step("stock outcomes", returns.main)
 
     from src.web.build import build
     step("build site", build)
