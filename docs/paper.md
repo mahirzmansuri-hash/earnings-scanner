@@ -12,11 +12,13 @@ Altman (1968) built the Z-Score from 66 manufacturing firms. Beneish (1999) buil
 
 Two problems make it hard to know how well they work today. The first is survivorship bias: lists of current companies leave out the ones that failed, which are exactly the cases a warning score should catch. The second is look-ahead bias: databases often store numbers as later corrected, not as first reported, so a test can accidentally use information nobody had at the time.
 
-This study avoids both. It asks three questions:
+This study avoids both. It asks five questions:
 
 1. How often did the classic scores flag bankruptcies and restatements in advance, and how many false alarms did they raise?
 2. Do warning events (auditor changes, late filings, amended reports) add information beyond the financial statements?
 3. Can a model trained on the same public data beat the classic scores on years it has never seen?
+4. Did flagged companies' stock do worse afterwards?
+5. Does the wording of the 10-K add warning signal beyond the numbers?
 
 ## 2. Data
 
@@ -61,7 +63,7 @@ Banks, insurers and other financial companies (SIC 6000-6799) are excluded from 
 
 **10-K wording (question 5).** Using SEC's full-text search, I flagged every 10-K containing five warning phrases: "raise substantial doubt" (going concern; 28,157 company-years), "recurring losses from operations" (9,132), "identified a material weakness" (6,147), "internal control over financial reporting was not effective" (12,037) and "have been restated" (5,071). Company-years with the going-concern phrase were followed by bankruptcy 3.2% of the time against 1.5% without it. On their own the five flags reached an AUC of 0.63 for bankruptcy and 0.61 for restatements, but adding them to the model changed nothing (bankruptcy 0.847 before and after; restatement 0.738 vs 0.737). Simple phrase flags are crude: the same words appear in boilerplate and hypothetical risk factors, and what they signal is mostly already in the financial statements.
 
-**Restatements.** On 14,421 company-years with a Beneish score and 479 restatement notices within two years, the Beneish M-Score's AUC was 0.52 and Faultline's 0.74. Flagging the riskiest 10% caught 19% of restatements with Beneish and 28% with Faultline.
+**Restatements.** On 14,421 company-years with a Beneish score and 479 restatement notices within two years, the Beneish M-Score's AUC was 0.52 and Faultline's 0.74. Flagging the riskiest 10% caught 19% of restatements with Beneish and 29% with Faultline.
 
 **Stock outcomes.** Free daily prices for companies that no longer trade are not available, so I approximate returns with the public float on 10-K cover pages: the change from the float reported in the year t+1 10-K to the one in the year t+2 10-K, a window that starts after the year-t score was public. Bankruptcies count as -100%, companies that stopped filing without a change of control as -50%, and buyouts are left out. For companies with at least $10 million of public float (20,648 company-years, 2016-2022), Faultline's riskiest 10% had a median change of -13.6% against +2.9% for its safest half; 33.7% lost half their value or more against 11.2%, and 10.8% were wiped out against 1.0%. The average was not lower (about +20% vs +15% with single returns capped at +300%), because a few flagged stocks rose enormously and share issues raise market value. The median gap held in 5 of 7 years; 2020, a broad rebound year, was the clear exception.
 
@@ -69,11 +71,11 @@ Banks, insurers and other financial companies (SIC 6000-6799) are excluded from 
 
 ## 5. Robustness
 
-Faultline's AUC beat Altman's in every test year, from 0.77 vs 0.72 (2018) to 0.93 vs 0.71 (2020), and in every size group: revenue under $100 million (0.77 vs 0.62), $100 million to $1 billion (0.88 vs 0.81) and over $1 billion (0.90 vs 0.78).
+Faultline's AUC beat Altman's in every test year, from 0.78 vs 0.72 (2018) to 0.93 vs 0.71 (2020), and in every size group: revenue under $100 million (0.77 vs 0.62), $100 million to $1 billion (0.88 vs 0.81) and over $1 billion (0.90 vs 0.78).
 
-Calibration is good at the top and low in the middle. In the riskiest tenth of company-years the model predicted 10.8% and 9.5% went bankrupt. In the middle tenths it predicted roughly 60% of the observed rate (for example 0.71% predicted vs 1.22% observed).
+The raw model's probabilities are good at the top and low in the middle. In the riskiest tenth of company-years it predicted 11.5% and 9.8% went bankrupt; in the middle tenths it predicted roughly half to two-thirds of the observed rate (for example 0.68% predicted vs 1.25% observed). The website therefore shows recalibrated probabilities: for each filing year, raw scores are mapped to observed rates using only earlier years' out-of-sample results.
 
-The most important inputs, measured by how much AUC falls when one input is shuffled, were company size (assets), return on assets, public float, revenue, working capital to assets, operating cash flow to assets and EBIT to assets.
+The most important inputs, measured by how much AUC falls when one input is shuffled, were company size (assets), return on assets, revenue, public float, Z'', the going-concern phrase and the F-Score. The model does use the going-concern phrase, but removing all text flags leaves accuracy unchanged, because the financial statements carry the same information.
 
 ## 6. Limits
 

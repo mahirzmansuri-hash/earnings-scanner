@@ -99,3 +99,5 @@ Fixes: model input had 194 duplicate rows (fiscal-year changes matched two prior
 - **Restatement model:** without text 0.738, with 0.737; text alone 0.608.
 - **Answer to RQ5:** simple phrase flags carry signal on their own but add nothing once the financials are in (crude matching: boilerplate, hypotheticals; overlap with numbers and past events).
 - **Re-synced numbers with text in the model:** alarm rate to catch 85.5% = 37.2%; distress exit AUC 0.838 vs 0.748; stock outcomes riskiest 10% median -13.6%, lost half 33.7%, wiped out 10.8% (safest half +2.9%, 11.2%, 1.0%).
+
+- **Robustness with text in the model:** by year 2016 0.82/0.72, 2017 0.86/0.78, 2018 0.78/0.72, 2019 0.87/0.70, 2020 0.93/0.71, 2021 0.86/0.73, 2022 0.83/0.67, 2023 0.87/0.71; raw calibration top decile 11.47% vs 9.76%, decile 6 0.68% vs 1.25%; top clues: log assets, ROA, log revenue, log float, Z'', going-concern phrase, F-Score.

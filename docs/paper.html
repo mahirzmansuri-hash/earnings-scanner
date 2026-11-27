@@ -1,0 +1,110 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Faultline paper</title><style>
+@page { size: Letter; margin: 0.9in 0.95in 0.9in; @bottom-center { content: counter(page); font: 9pt Helvetica, Arial, sans-serif; color: #525A63; } }
+body { font: 10.5pt/1.5 Georgia, 'Times New Roman', serif; color: #15191E; }
+h1 { font: 600 19pt/1.2 Georgia, serif; margin: 0 0 6pt; letter-spacing: -0.01em; }
+h1 + p { font: 9.5pt Helvetica, Arial, sans-serif; color: #525A63; margin-bottom: 18pt; padding-bottom: 10pt; border-bottom: 1px solid #D9DCDF; }
+h2 { font: 600 12.5pt Georgia, serif; margin: 18pt 0 6pt; break-after: avoid; }
+p { margin: 0 0 8pt; text-align: left; orphans: 3; widows: 3; }
+ul, ol { margin: 0 0 8pt 18pt; padding: 0; } li { margin-bottom: 3pt; }
+table { border-collapse: collapse; width: 100%; margin: 8pt 0 12pt; font: 9pt/1.35 Helvetica, Arial, sans-serif; break-inside: avoid; font-variant-numeric: tabular-nums; }
+th { text-align: left; border-bottom: 1px solid #15191E; padding: 4pt 6pt; font-weight: 600; }
+td { border-bottom: 1px solid #D9DCDF; padding: 4pt 6pt; }
+td:not(:first-child), th:not(:first-child) { text-align: right; }
+figure { margin: 10pt 0 14pt; break-inside: avoid; }
+figcaption { font: 8.5pt/1.4 Helvetica, Arial, sans-serif; color: #525A63; margin-top: 4pt; }
+code { font: 8.5pt Menlo, monospace; }
+a { color: #1B3A5C; text-decoration: none; }
+h2:first-of-type { margin-top: 6pt; }
+</style></head><body><h1>Can public filings warn of bankruptcy? An out-of-sample test of classic forensic scores and a machine-learning composite, 2016-2023</h1>
+<p>Mahir, Faultline project (draft, November 2026). Built with AI-assisted development.</p>
+<h2>Abstract</h2>
+<p>The Altman Z-Score, Piotroski F-Score and Beneish M-Score are taught in accounting and finance courses as early-warning tools, but they are rarely tested on the full set of US companies with the failures included and with only the information that was public at the time. I build a point-in-time panel of 116,121 company-years from SEC XBRL filings (15,686 companies, 10,349 of which later stopped filing) and test the scores against 1,144 companies' bankruptcy filings and 2,904 companies' restatement notices. Altman's distress zone caught 83% of bankruptcies 12 to 24 months ahead but flagged about half of all company-years. A gradient-boosted model using the same ingredients plus size, profitability, filing behaviour and warning phrases in the 10-K text, trained only on outcomes known before each test year, raised the ranking accuracy (AUC) for bankruptcy within two years from 0.71 to 0.85 on 25,169 unseen company-years from 2016 to 2023. Flagging the riskiest 10% of companies caught 53% of bankruptcies, against 13% for the lowest Altman scores. The model beat Altman in every test year and every size group. Restatements were much harder to predict: the Beneish M-Score's ranking was close to random (AUC 0.52) and the model reached 0.74.</p>
+<h2>1. Introduction</h2>
+<p>Altman (1968) built the Z-Score from 66 manufacturing firms. Beneish (1999) built the M-Score from 74 companies caught manipulating earnings. Piotroski (2000) built the F-Score to separate strong and weak value stocks. All three are still used, and all three were fitted on small samples from decades ago.</p>
+<p>Two problems make it hard to know how well they work today. The first is survivorship bias: lists of current companies leave out the ones that failed, which are exactly the cases a warning score should catch. The second is look-ahead bias: databases often store numbers as later corrected, not as first reported, so a test can accidentally use information nobody had at the time.</p>
+<p>This study avoids both. It asks five questions:</p>
+<ol>
+<li>How often did the classic scores flag bankruptcies and restatements in advance, and how many false alarms did they raise?</li>
+<li>Do warning events (auditor changes, late filings, amended reports) add information beyond the financial statements?</li>
+<li>Can a model trained on the same public data beat the classic scores on years it has never seen?</li>
+<li>Did flagged companies' stock do worse afterwards?</li>
+<li>Does the wording of the 10-K add warning signal beyond the numbers?</li>
+</ol>
+<h2>2. Data</h2>
+<p><strong>Companies.</strong> SEC's bulk submissions file lists every entity that has filed with the SEC. I keep entities with at least one 10-K filed since 2009 and drop asset-backed trusts (SIC 6189), blank-check companies (SIC 6770) and entities with no industry code. This leaves 15,686 companies. Of these, 10,349 had not filed a 10-K in the 18 months before November 2026, meaning they failed, were acquired or went private.</p>
+<p><strong>Financial data.</strong> For each company I download its XBRL "companyfacts" from SEC (13,480 companies have data; 2,206 have none, mostly companies that stopped filing before XBRL reached small companies in 2011). I keep about 39 million values from annual reports. Each value keeps the date it was filed.</p>
+<p><strong>Point-in-time values.</strong> Each company-year uses the numbers from that year's original 10-K, dated by its filing date. Values that first appeared in a later filing are left out. Companies tag the same item in different ways, so a mapping turns 21 accounting items into consistent inputs. In 14.2% of filings, two revenue tags disagree; I keep the value where revenue minus cost of goods sold equals gross profit, which passes for 97.5% of the company-years where it can be checked. Five companies (Apple, Sears, General Mills, SVB, Conagra) were checked by hand against their 10-Ks and all matched.</p>
+<p><strong>XBRL coverage.</strong> Only 0.4% of 10-Ks filed in 2009 had XBRL data, rising to 21.7% in 2011 and 91.1% in 2012. Tests therefore start in 2012.</p>
+<p><strong>Market value.</strong> Altman's Z-Score needs the market value of equity. I use the public float reported on each 10-K's cover page, which is free and available for 99% of 10-Ks since 2012 but leaves out shares held by insiders.</p>
+<p><strong>Outcomes.</strong> From the same SEC data I collect bankruptcy filings (8-K Item 1.03; 1,144 companies), restatement notices (8-K Item 4.02, "non-reliance on previously issued financial statements"; 2,904 companies), auditor changes (8-K Item 4.01; 7,509), late annual reports (Form NT 10-K; 6,774) and amended annual reports (10-K/A; 8,860).</p>
+<p>Banks, insurers and other financial companies (SIC 6000-6799) are excluded from all tests because the scores were not designed for them.</p>
+<h2>3. Method</h2>
+<p><strong>Classic scores.</strong> I compute the Altman Z-Score, Altman's Z'' (which replaces market value with book equity), the Piotroski F-Score and the Beneish M-Score for each company-year, using the original thresholds: Z below 1.8 is distress, F of 3 or less is weak, and M above -1.78 suggests manipulation.</p>
+<p><strong>Faultline models.</strong> Two gradient-boosted tree models (scikit-learn's HistGradientBoostingClassifier) use 46 inputs per company-year: every component of the three scores, company size, return on assets, cash flow, leverage, revenue growth, the number of days between year end and the 10-K filing, counts of warning events in the prior 24 months, and five 0/1 flags for warning phrases in the 10-K text. One model predicts a bankruptcy filing within 24 months after the 10-K; the other predicts a restatement notice in the same window.</p>
+<p><strong>Walk-forward testing.</strong> To score filings made in year Y, a model is trained only on company-years whose 24-month outcome was known before January 1 of Y. Test years are 2016 to 2023, the last years whose outcomes are fully known. No test-year information reaches training.</p>
+<p><strong>Measures.</strong> AUC is the probability that a randomly chosen company that went bankrupt is ranked riskier than one that did not (0.5 is random, 1 is perfect). I also report the share of events caught when flagging the riskiest 5%, 10% or 20% of companies, and comparisons at a matched alarm rate. Because bankruptcies are about 2% of company-years, plain accuracy is not useful.</p>
+<h2>4. Results</h2>
+<p><strong>Classic scores alone (2012-2023).</strong> In Altman's distress zone 12 to 24 months before a bankruptcy filing: 83.3% of the 419 bankruptcies that had a score in that window. But 49.2% of all company-years were in the distress zone. Flagged company-years were followed by bankruptcy 2.38% of the time, against 0.45% for the rest (5.3 times as often). Restricted to companies with at least $100 million in revenue, the hit rate was 76.4% and the alarm rate 34.3%. The Piotroski F-Score flagged 40.3% of bankruptcies at a 17.9% alarm rate. The Beneish M-Score flagged 26.1% of 555 restatements at a 13.7% alarm rate.</p>
+<p><strong>Faultline vs Altman (2016-2023, out of sample).</strong> On 25,169 company-years with an Altman score and 539 bankruptcies within two years:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Altman Z</th>
+<th>Faultline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AUC</td>
+<td>0.71</td>
+<td>0.85</td>
+</tr>
+<tr>
+<td>Caught in riskiest 5% / 10% / 20%</td>
+<td>5% / 13% / 38%</td>
+<td>37% / 53% / 70%</td>
+</tr>
+<tr>
+<td>Caught at Altman's alarm rate (50%)</td>
+<td>85.5%</td>
+<td>92.8%</td>
+</tr>
+<tr>
+<td>Alarm rate needed to catch 85.5%</td>
+<td>50.3%</td>
+<td>37.2%</td>
+</tr>
+</tbody>
+</table>
+<figure><svg viewBox="0 0 560 330" width="100%" style="font:11px Helvetica,Arial,sans-serif;fill:#525A63"><line x1="52" x2="544" y1="286" y2="286" stroke="#D9DCDF"/><text x="44" y="290" text-anchor="end">0%</text><text x="52" y="304" text-anchor="middle">0%</text><line x1="52" x2="544" y1="218.0" y2="218.0" stroke="#D9DCDF"/><text x="44" y="222.0" text-anchor="end">25%</text><text x="175.0" y="304" text-anchor="middle">25%</text><line x1="52" x2="544" y1="150.0" y2="150.0" stroke="#D9DCDF"/><text x="44" y="154.0" text-anchor="end">50%</text><text x="298.0" y="304" text-anchor="middle">50%</text><line x1="52" x2="544" y1="82.0" y2="82.0" stroke="#D9DCDF"/><text x="44" y="86.0" text-anchor="end">75%</text><text x="421.0" y="304" text-anchor="middle">75%</text><line x1="52" x2="544" y1="14" y2="14" stroke="#D9DCDF"/><text x="44" y="18" text-anchor="end">100%</text><text x="544" y="304" text-anchor="middle">100%</text><line x1="52" y1="286" x2="544" y2="14" stroke="#9AA2AA" stroke-dasharray="4 4"/><line x1="101.2" x2="101.2" y1="286" y2="14" stroke="#0FB3C8" stroke-dasharray="2 3"/><polyline points="52.0,286.0 56.9,284.0 61.9,283.0 66.8,281.0 71.7,274.9 76.6,271.4 81.5,268.8 86.4,264.8 91.4,260.3 96.3,255.2 101.2,251.2 106.1,245.1 111.1,239.6 116.0,234.5 120.9,227.0 125.8,216.9 130.7,209.3 135.6,205.8 140.6,198.7 145.5,191.6 150.4,183.6 155.3,177.0 160.2,171.4 165.2,160.8 170.1,153.8 175.0,146.7 179.9,140.7 184.8,130.1 189.8,120.0 194.7,113.9 199.6,106.9 204.5,99.8 209.4,97.3 214.4,94.2 219.3,89.7 224.2,87.2 229.1,83.1 234.0,79.1 239.0,76.6 243.9,74.1 248.8,72.0 253.7,71.0 258.6,68.0 263.6,67.5 268.5,65.5 273.4,62.4 278.3,60.9 283.2,59.4 288.2,58.4 293.1,55.4 298.0,53.4 302.9,52.4 307.8,52.4 312.8,50.8 317.7,49.3 322.6,47.8 327.5,46.8 332.4,45.3 337.4,44.3 342.3,44.3 347.2,42.3 352.1,41.8 357.0,41.8 362.0,40.7 366.9,39.2 371.8,39.2 376.7,37.7 381.6,36.7 386.6,35.2 391.5,34.7 396.4,34.2 401.3,32.7 406.2,32.2 411.2,32.2 416.1,32.2 421.0,32.2 425.9,31.2 430.8,29.6 435.8,29.6 440.7,29.6 445.6,28.6 450.5,28.6 455.4,27.6 460.4,26.1 465.3,25.1 470.2,25.1 475.1,24.1 480.0,23.6 484.9,22.6 489.9,22.1 494.8,21.6 499.7,21.6 504.6,21.1 509.6,20.6 514.5,20.6 519.4,20.1 524.3,19.6 529.2,19.0 534.1,18.0 539.1,16.0 544.0,14.0" fill="none" stroke="#9A6212" stroke-width="2"/><polyline points="52.0,286.0 56.9,247.6 61.9,225.9 66.8,213.3 71.7,197.7 76.6,185.6 81.5,174.5 86.4,162.4 91.4,154.3 96.3,149.2 101.2,140.7 106.1,134.6 111.1,128.0 116.0,121.5 120.9,116.9 125.8,111.9 130.7,109.9 135.6,106.9 140.6,103.3 145.5,99.8 150.4,96.8 155.3,92.2 160.2,87.7 165.2,84.1 170.1,80.6 175.0,78.1 179.9,75.6 184.8,72.0 189.8,69.0 194.7,66.0 199.6,64.5 204.5,62.4 209.4,59.4 214.4,57.9 219.3,57.9 224.2,57.4 229.1,55.4 234.0,54.4 239.0,52.4 243.9,49.3 248.8,47.3 253.7,46.8 258.6,46.3 263.6,43.8 268.5,42.8 273.4,40.7 278.3,39.7 283.2,38.2 288.2,36.7 293.1,35.7 298.0,33.7 302.9,32.2 307.8,30.7 312.8,29.1 317.7,28.6 322.6,27.1 327.5,26.6 332.4,25.6 337.4,25.1 342.3,23.6 347.2,23.6 352.1,23.1 357.0,23.1 362.0,22.6 366.9,21.1 371.8,21.1 376.7,20.1 381.6,19.0 386.6,18.0 391.5,17.5 396.4,17.0 401.3,16.5 406.2,16.5 411.2,16.5 416.1,16.5 421.0,16.5 425.9,16.5 430.8,15.5 435.8,15.0 440.7,15.0 445.6,15.0 450.5,15.0 455.4,15.0 460.4,14.5 465.3,14.5 470.2,14.5 475.1,14.5 480.0,14.5 484.9,14.5 489.9,14.5 494.8,14.5 499.7,14.5 504.6,14.5 509.6,14.5 514.5,14.5 519.4,14.5 524.3,14.0 529.2,14.0 534.1,14.0 539.1,14.0 544.0,14.0" fill="none" stroke="#1B3A5C" stroke-width="2.4"/><text x="115.96000000000001" y="144.66419294990723" style="fill:#1B3A5C;font-weight:600">Faultline: 53% at 10%</text><text x="115.96000000000001" y="255.1799628942486" style="fill:#9A6212;font-weight:600">Altman Z: 13% at 10%</text><text x="357.04" y="150.0" style="fill:#525A63">random ranking</text><text x="298.0" y="326" text-anchor="middle">Share of companies flagged (riskiest first)</text><text transform="rotate(-90)" x="-150.0" y="13" text-anchor="middle">Share of bankruptcies caught</text></svg><figcaption><b>Figure 1.</b> Out-of-sample capture curves, 2016-2023 (25,169 company-years, 539 bankruptcies within two years). Companies are ranked from riskiest to safest by each score; the curve shows what share of later bankruptcies falls within the flagged share. The dashed diagonal is a random ranking.</figcaption></figure><p><strong>What drives the gain (question 2).</strong> Using only the components of the three classic scores, the model already reaches an AUC of 0.82, so most of the improvement comes from combining the same ingredients better than the fixed 1968 weights do. Adding size and fundamentals raises it to 0.84. Adding filing behaviour and warning events adds little (0.85). The events do carry signal on their own (AUC 0.65), but the financial statements already contain most of it.</p>
+<p><strong>10-K wording (question 5).</strong> Using SEC's full-text search, I flagged every 10-K containing five warning phrases: "raise substantial doubt" (going concern; 28,157 company-years), "recurring losses from operations" (9,132), "identified a material weakness" (6,147), "internal control over financial reporting was not effective" (12,037) and "have been restated" (5,071). Company-years with the going-concern phrase were followed by bankruptcy 3.2% of the time against 1.5% without it. On their own the five flags reached an AUC of 0.63 for bankruptcy and 0.61 for restatements, but adding them to the model changed nothing (bankruptcy 0.847 before and after; restatement 0.738 vs 0.737). Simple phrase flags are crude: the same words appear in boilerplate and hypothetical risk factors, and what they signal is mostly already in the financial statements.</p>
+<p><strong>Restatements.</strong> On 14,421 company-years with a Beneish score and 479 restatement notices within two years, the Beneish M-Score's AUC was 0.52 and Faultline's 0.74. Flagging the riskiest 10% caught 19% of restatements with Beneish and 29% with Faultline.</p>
+<p><strong>Stock outcomes.</strong> Free daily prices for companies that no longer trade are not available, so I approximate returns with the public float on 10-K cover pages: the change from the float reported in the year t+1 10-K to the one in the year t+2 10-K, a window that starts after the year-t score was public. Bankruptcies count as -100%, companies that stopped filing without a change of control as -50%, and buyouts are left out. For companies with at least $10 million of public float (20,648 company-years, 2016-2022), Faultline's riskiest 10% had a median change of -13.6% against +2.9% for its safest half; 33.7% lost half their value or more against 11.2%, and 10.8% were wiped out against 1.0%. The average was not lower (about +20% vs +15% with single returns capped at +300%), because a few flagged stocks rose enormously and share issues raise market value. The median gap held in 5 of 7 years; 2020, a broad rebound year, was the clear exception.</p>
+<p><strong>Example.</strong> Sears Holdings entered Altman's distress zone with its 10-K filed in March 2015 and stayed there until its last 10-K in March 2018, when Faultline ranked it riskier than 99% of filers that year. It filed for bankruptcy in October 2018.</p>
+<h2>5. Robustness</h2>
+<p>Faultline's AUC beat Altman's in every test year, from 0.78 vs 0.72 (2018) to 0.93 vs 0.71 (2020), and in every size group: revenue under $100 million (0.77 vs 0.62), $100 million to $1 billion (0.88 vs 0.81) and over $1 billion (0.90 vs 0.78).</p>
+<p>The raw model's probabilities are good at the top and low in the middle. In the riskiest tenth of company-years it predicted 11.5% and 9.8% went bankrupt; in the middle tenths it predicted roughly half to two-thirds of the observed rate (for example 0.68% predicted vs 1.25% observed). The website therefore shows recalibrated probabilities: for each filing year, raw scores are mapped to observed rates using only earlier years' out-of-sample results.</p>
+<p>The most important inputs, measured by how much AUC falls when one input is shuffled, were company size (assets), return on assets, revenue, public float, Z'', the going-concern phrase and the F-Score. The model does use the going-concern phrase, but removing all text flags leaves accuracy unchanged, because the financial statements carry the same information.</p>
+<h2>6. Limits</h2>
+<ul>
+<li>The main outcome counts only formal bankruptcy filings. Small companies often stop filing instead, which likely explains part of why size is the most important input. A second outcome, a "distress exit" (bankruptcy, or going dark without a change of control), gives 1,278 events in the test years instead of 539. Faultline still ranks them better than Altman (AUC 0.84 vs 0.75; 0.73 vs 0.67 for companies under $100 million in revenue), but the gap is smaller.</li>
+<li>About 40% of bankrupt companies had no score in the warning window, usually because they had stopped filing or left out a needed number.</li>
+<li>Public float leaves out insider shares, so Altman's market-value ratio is understated for closely held companies.</li>
+<li>One model setting was used without tuning.</li>
+<li>These are rankings, not forecasts for single companies, and not investment advice.</li>
+</ul>
+<h2>7. Conclusion</h2>
+<p>When tested on all US filers with the failures included and only the information public at the time, the classic scores do warn, but Altman's original cut-offs flag about half of all companies and Beneish's ranking of restatement risk is close to random. A model that combines the same public data, trained only on the past, ranks bankruptcy risk much better in every year and size group. Flagged companies' stock usually lost value, though a few large winners kept the average up. Simple warning phrases in 10-K text added nothing beyond the numbers. The next steps are better price data for a true trading test and reading 10-K text with methods smarter than exact phrases.</p>
+<h2>References</h2>
+<ul>
+<li>Altman, E. I. (1968). Financial ratios, discriminant analysis and the prediction of corporate bankruptcy. <em>Journal of Finance</em>, 23(4), 589-609.</li>
+<li>Altman, E. I., Hartzell, J., &amp; Peck, M. (1995). <em>Emerging markets corporate bonds: A scoring system.</em> Salomon Brothers.</li>
+<li>Beneish, M. D. (1999). The detection of earnings manipulation. <em>Financial Analysts Journal</em>, 55(5), 24-36.</li>
+<li>Dechow, P. M., Ge, W., Larson, C. R., &amp; Sloan, R. G. (2011). Predicting material accounting misstatements. <em>Contemporary Accounting Research</em>, 28(1), 17-82.</li>
+<li>Piotroski, J. D. (2000). Value investing: The use of historical financial statement information to separate winners from losers. <em>Journal of Accounting Research</em>, 38, 1-41.</li>
+<li>Shumway, T. (2001). Forecasting bankruptcy more accurately: A simple hazard model. <em>Journal of Business</em>, 74(1), 101-124.</li>
+<li>U.S. Securities and Exchange Commission. EDGAR XBRL companyfacts and submissions data, accessed November 2026.</li>
+</ul>
+<h2>Data and code</h2>
+<p>All code is at https://github.com/mahirzmansuri-hash/earnings-scanner. Results tables are in <code>vault/research/results.md</code>. The live site is https://mahirzmansuri-hash.github.io/earnings-scanner/.</p></body></html>

@@ -361,7 +361,7 @@ def track_record(results):
     cl = "".join(f'<tr><td>{e(k.replace("__", ", ").replace("_", " "))}</td><td class="n">{v["events_in_period"]:,} ({v["events_with_score"]:,})</td>'
                  f'<td class="n">{v["hit_rate"]*100:.1f}%</td><td class="n">{v["alarm_rate"]*100:.1f}%</td><td class="n">{v["lift"]:.1f}x</td></tr>'
                  for k, v in tr.items())
-    body = f"""<section><h1>Track record</h1><p>Every number here comes from a test where the model was trained only on years whose
+    body = f"""<section><h1>Track record</h1><p class="dim">Full write-up: <a href="Faultline-paper.pdf">research paper (PDF, 6 pages)</a>.</p><p>Every number here comes from a test where the model was trained only on years whose
 outcomes were already known, then scored years it had never seen ({c['test_years']}). Companies that later failed or stopped filing
 are included. Banks, insurers and other financial companies are left out because these scores were not built for them.</p></section>
 <section><h2>Bankruptcy within two years</h2><p class="dim">{c['company_years']:,} company-years with an Altman score, {c['bankruptcies']} followed by a bankruptcy filing.</p>
@@ -435,7 +435,7 @@ bankruptcy filing (8-K Item 1.03) within two years, the other a restatement noti
 each model is trained only on companies whose two-year outcome was known before that year started.</p>
 <h2>What the scores are not</h2><p>A score is a ranking of how a company's filings compare with the filings of companies that later failed
 or restated. It is not a forecast for any single company and not investment advice. Financial companies are not scored.</p>
-<h2>Paper and code</h2><p>A write-up of the method and results is in the <a href="https://github.com/mahirzmansuri-hash/earnings-scanner/blob/main/docs/paper.md">research paper draft</a>. The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section>"""
+<h2>Paper and code</h2><p>A write-up of the method and results is in the <a href="Faultline-paper.pdf">research paper (PDF, 6 pages)</a>. The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section>"""
     return page("Methodology · Faultline", body, "How Faultline turns SEC filings into bankruptcy and accounting-risk scores.", active="methodology.html")
 
 
@@ -482,6 +482,9 @@ def build():
              "d": str(pd.Timestamp(r.available_date).date())} for r in latest.itertuples()]
     (SITE / "data" / "companies.json").write_text(json.dumps(comp, separators=(",", ":"), allow_nan=False))
     shutil.copy(Path(__file__).parent / "assets" / "og.png", SITE / "og.png")  # share image (scripts/make_share_image.py)
+    paper_pdf = ROOT / "docs" / "Faultline-paper.pdf"   # made by scripts/make_paper_pdf.py
+    if paper_pdf.exists():
+        shutil.copy(paper_pdf, SITE / "Faultline-paper.pdf")
     (SITE / "index.html").write_text(home(latest, events, results, as_of))
     (SITE / "new.html").write_text(new_filings(latest, as_of))
     (SITE / "screener.html").write_text(screener())

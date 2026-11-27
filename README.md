@@ -24,7 +24,7 @@ Counting companies that stopped filing without being bought as failures too (a "
 
 Warning phrases in the 10-K text (going-concern doubt, material weaknesses, restatements; found with SEC full-text search) did not improve either model once the financial data was in.
 
-For restatements (8-K Item 4.02 notices), Faultline's AUC is 0.74 against 0.52 for the Beneish M-Score. Full tables, method and limits are in [`vault/research/results.md`](vault/research/results.md) and on the site's Track record page.
+For restatements (8-K Item 4.02 notices), Faultline's AUC is 0.74 against 0.52 for the Beneish M-Score. Full write-up: [research paper (PDF)](docs/Faultline-paper.pdf). Tables, method and limits are also in [`vault/research/results.md`](vault/research/results.md) and on the site's Track record page.
 
 ## How it works
 
