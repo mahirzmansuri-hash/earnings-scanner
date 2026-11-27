@@ -117,3 +117,10 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Decision:** no fraud score on company pages (too weak to rank named companies); show SEC cases as facts.
 - **Bugs:** name splitter broke "Latch, Inc."; EDGAR "/OR/" state tags; relative litigation-release links; FCPA bribery and Rule 12b-25 releases were being counted as fraud -> filtered.
 - **Next:** quarterly 10-Q signals; or Stage 5 (alerts, newsletter, API).
+
+## 2026-11-27 (night, cont.): Quarterly 10-Q signals - RQ7
+- **Did:** `src/pipeline/quarterly.py` (10-Q facts from the cached companyfacts files, 22 s, 11.6M rows; one row per quarter, original 10-Q only; trailing twelve months = YTD now + last FY (original 10-K, public before the 10-Q) - same YTD last year (first-filed); balance sheet at quarter end; public float carried from the latest 10-K). `src/model/quarterly_test.py` (10-Q model vs last-10-K score at every 10-Q date, same label; by 10-K age; lead time; `live()` writes `risk_q`). Company pages show "Updated with the 10-Q filed ..." (6,712 pages). Track record + Methodology sections, paper RQ7, README, weekly update steps. `tests/test_quarterly.py` rebuilds Apple's TTM (27 tests pass).
+- **Spot-check:** Apple 10-Q (Jun 29, 2024): 9M revenue 296,105 / prior 293,787 match the filing; TTM revenue 385,603, TTM net income 101,956.
+- **Result:** 99,507 10-Q dates (2016-2023, 6,984 companies). AUC 0.81 (last 10-K) -> 0.83 (fresh 10-Q) -> 0.84 (both); riskiest 10% 46% -> 51%. Gain grows with 10-K age (0.807/0.812 under 4 months; 0.847/0.875 over 8). Bankrupt companies warned: 326 vs 270 of 464, median 517 vs 472 days before filing.
+- **Bugs:** results drifted between runs -> amended 10-Qs duplicated quarters, and DuckDB arg_min/arg_max ties + unsorted pandas merges picked arbitrary values. Fixed with original-only rows and explicit tie-breakers; two builds now hash identical. Date subtraction broke on TIMESTAMP columns (caught by the new test) -> date_diff.
+- **Next:** Stage 5 (alerts when a company's risk jumps, newsletter, API), or show the combined 10-K+10-Q score.

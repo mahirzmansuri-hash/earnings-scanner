@@ -83,6 +83,9 @@ def main(skip_download: bool = False):
                 return fn(con)
         return run
     step("annual values", with_con(build_annual))
+    from src.pipeline import quarterly
+    step("10-Q facts", with_con(quarterly.load_qfacts))
+    step("10-Q trailing twelve months", with_con(quarterly.build_quarterly))
     step("events", with_con(build_events))
     from src.pipeline.text_signals import build_text_signals
     step("10-K text signals", with_con(build_text_signals))
@@ -101,6 +104,9 @@ def main(skip_download: bool = False):
     step("live risk", live.main)
     from src.model import fraud
     step("fraud model test", fraud.main)
+    from src.model import quarterly_test
+    step("10-Q vs 10-K test", quarterly_test.main)
+    step("live 10-Q risk", quarterly_test.live)
     from src.backtest import returns
     step("stock outcomes", returns.main)
 

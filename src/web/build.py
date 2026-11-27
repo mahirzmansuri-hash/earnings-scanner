@@ -163,6 +163,19 @@ def chart(h: pd.DataFrame, evs: pd.DataFrame) -> str:
 
 
 WHY = {}
+RISK_Q = {}
+
+
+def q_stat(r) -> str:
+    """Bankruptcy risk from the latest 10-Q, shown when it is newer than the 10-K (src/model/quarterly_test.py)."""
+    q = RISK_Q.get(r.cik)
+    if q is None or pd.Timestamp(q.available_date) <= pd.Timestamp(r.available_date) or isnan(q.q_risk):
+        return ""
+    w, c = band(q.q_pctile)
+    return (f'<div class="stat"><span class="label">Updated with the 10-Q filed {pd.Timestamp(q.available_date).date()}</span>'
+            f'<span class="v">{q.q_risk*100:.1f}%</span><span class="read" style="--c:var({c})">{w}</span> '
+            f'<span class="dim">· bankruptcy risk, next 2 years · quarter ended {pd.Timestamp(q.period_end).date()} · '
+            f'riskier than {q.q_pctile*100:.0f}% of 10-Q filers that year</span></div>')
 AAER = {}
 
 
@@ -231,6 +244,7 @@ def company_page(r, h, evs, accn_map, as_of):
     <div class="grid3">
       <div class="stat"><span class="label">Bankruptcy risk, next 2 years</span><span class="v">{r.bankruptcy_risk*100:.1f}%</span>
         <span class="read" style="--c:var({bc})">{bw}</span> <span class="dim">· {pct_text(r.bankruptcy_pctile)}</span></div>
+      {q_stat(r)}
       <div class="stat"><span class="label">Restatement risk, next 2 years</span><span class="v">{"n/a" if isnan(r.restatement_risk) else f"{r.restatement_risk*100:.1f}%"}</span>
         <span class="read" style="--c:var({rc})">{rw}</span> <span class="dim">· {pct_text(r.restatement_pctile)}</span></div>
       <div class="stat"><span class="label">Size</span><span class="v">{money(r.revenue)}</span>
@@ -396,6 +410,7 @@ def screener():
 def track_record(results):
     c, a, rs, tr, de = results["composite"], results["ablation"], results["restatement"], results["classic"], results["distress"]
     fr = results["fraud"]
+    qr = results["quarterly"]
     rt = results["returns"]["main_dark_minus_50"]
     names = {"faultline_riskiest_10pct": "Faultline riskiest 10%", "faultline_10_to_20pct": "Faultline next 10%",
              "faultline_safest_50pct": "Faultline safest 50%", "altman_distress": "Altman distress zone", "altman_safe": "Altman safe zone"}
@@ -429,6 +444,14 @@ To catch as many as Altman, Faultline needed to flag {c['faultline_same_hit_rate
 <section><h2>The classic scores on their own</h2><p class="dim">Hit rate: share of events where the latest score before it was flagged. Alarm rate: share of all company-years flagged.</p>
 <div class="tbl"><table><thead><tr><th>Test</th><th class="n">Events (with a score)</th><th class="n">Hit rate</th><th class="n">Alarm rate</th><th class="n">Lift</th></tr></thead><tbody>{cl}</tbody></table></div></section>
 <section><h2>What happened to the stock</h2><p class="dim">Free prices for companies that no longer trade are not available, so this uses the market value of outside shareholders' stock reported on each 10-K cover page. The change is measured over a year that starts after the score was public. Bankruptcies count as -100%, companies that stopped filing without being bought as -50%, and buyouts are left out. Companies worth at least $10 million, filings from 2016 to 2022.</p><div class="tbl"><table><thead><tr><th>Group</th><th class="n">Company-years</th><th class="n">Median change</th><th class="n">Lost half or more</th><th class="n">Wiped out</th></tr></thead><tbody>{ret_rows}</tbody></table></div><p>The typical flagged company lost value, and flagged companies were about three times as likely to lose half of it. The average was not lower, because a few flagged stocks rose enormously and new share issues raise market value. This is an approximation, not a trading test.</p></section>
+<section><h2>Quarterly updates</h2><p>A 10-K comes once a year; a 10-Q comes every quarter. At each of {qr['rows']:,} 10-Q filing dates
+({qr['test_years']}), a model fed the 10-Q's balance sheet and trailing-twelve-month results ranked bankruptcies within two years with an
+AUC of {qr['fresh_10q']['auc']:.3f}, against {qr['last_10k']['auc']:.3f} for the score from the last 10-K. Its riskiest 10% held
+{qr['fresh_10q']['top10']*100:.0f}% of them, against {qr['last_10k']['top10']*100:.0f}%. The gain grows as the 10-K gets older
+({qr['by_10k_age']['over 8 months']['fresh_10q_auc']:.2f} vs {qr['by_10k_age']['over 8 months']['last_10k_auc']:.2f} when it is more than eight months old).
+Of {qr['lead_time']['companies_bankrupt']} companies that went bankrupt, the 10-Q model placed {qr['lead_time']['fresh_10q']['companies_warned']} in the riskiest
+10% at some point, against {qr['lead_time']['last_10k']['companies_warned']}, a median of {qr['lead_time']['fresh_10q']['median_days_before_bankruptcy']:.0f} days before
+the filing against {qr['lead_time']['last_10k']['median_days_before_bankruptcy']:.0f}. Company pages show the 10-Q update when it is newer than the 10-K.</p></section>
 <section><h2>Accounting fraud</h2><p>The SEC names companies in Accounting and Auditing Enforcement Releases,
 usually years after the fact (a median of six years after the first misstated year). The test covers {fr['real_time']['fraud_companies']} companies'
 cases, {fr['real_time']['fraud_company_years']} misstated company-years ({fr['test_fiscal_years']}). A model that only knew the cases
@@ -490,6 +513,10 @@ profitability, debt, growth, how long the 10-K took to file, recent auditor chan
 10-K uses five warning phrases (found with SEC's full-text search). The phrases did not improve the models, but they are shown on company pages. One predicts a
 bankruptcy filing (8-K Item 1.03) within two years, the other a restatement notice (8-K Item 4.02). For filings made in a given year,
 each model is trained only on companies whose two-year outcome was known before that year started.</p>
+<h2>Quarterly updates</h2><p>Between 10-Ks, each company's 10-Qs are scored too. A 10-Q's income statement covers only the year so far,
+so Faultline builds trailing twelve months: this year so far, plus the last full year, minus the same part of last year, using only
+numbers public on the 10-Q's filing date. Public float comes from the latest 10-K. A separate model is trained on 10-Q rows with the
+same walk-forward rule.</p>
 <h2 id="why">Why this score</h2><p>Each company page breaks its bankruptcy risk into ten areas: debt and financing, retained
 earnings, profits, cash flow, short-term cash, sales, company size, accounting patterns, the classic scores, and warning signs in
 filings. For each area, the same model that scored the filing scores it again with that area's values replaced by a typical
@@ -521,6 +548,8 @@ def build():
     with duckdb.connect(str(DB_PATH), read_only=True) as con:
         latest, hist, events, accn, as_of = load(con)
         why = con.execute("SELECT * FROM risk_why").df()
+        rq = con.execute("SELECT * FROM risk_q").df()
+    RISK_Q.update({r.cik: r for r in rq.itertuples()})
     cases = pd.read_csv(PROC / "aaer_cases.csv")
     cases = cases[(cases["kind"] == "accounting") & (cases["n_candidates"] == 1)]   # only unambiguous name matches
     AAER.update({k: g.sort_values("date") for k, g in cases.groupby("cik")})
@@ -529,7 +558,7 @@ def build():
         ("composite", "composite_results.json"), ("ablation", "composite_ablation.json"),
         ("restatement", "restatement_results.json"), ("classic", "track_record.json"),
         ("distress", "distress_exit_results.json"), ("returns", "returns_results.json"),
-        ("fraud", "fraud_results.json")]}
+        ("fraud", "fraud_results.json"), ("quarterly", "quarterly_results.json")]}
     if SITE.exists():
         shutil.rmtree(SITE)
     (SITE / "c").mkdir(parents=True)

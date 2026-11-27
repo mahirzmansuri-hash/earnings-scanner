@@ -168,3 +168,13 @@
 - It beats Beneish a little (0.63 vs 0.58), but it's too weak to accuse named companies.
 - So company pages list SEC cases as facts, with no fraud score.
 - Paper now has 6 research questions (7 pages).
+
+## Quarterly 10-Q updates (Nov 27, night)
+- Read every 10-Q from files we already had. No new downloads.
+- Built a full-year view at each 10-Q (trailing twelve months).
+- Checked Apple's numbers against the real 10-Q. Exact match.
+- Fresh 10-Q scores beat the old 10-K score (0.83 vs 0.81).
+- They warned 56 more bankrupt companies, about 45 days earlier.
+- Company pages now show the latest 10-Q update.
+- Fixed results that changed slightly between runs (random tie-breaks).
+- Paper now has 7 research questions.

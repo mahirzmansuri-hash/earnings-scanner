@@ -29,3 +29,9 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 
 ## Respondent names split on commas
 - **Symptom:** "Latch, Inc." became "Latch" + "Inc.". **Fix:** join ", Inc/LLC/Ltd/Corp" before splitting; strip EDGAR state tags like /DE/ from company names.
+
+## DuckDB arg_min/arg_max ties are random
+- **Symptom:** 10-Q results changed slightly between identical runs. **Cause:** ties in arg_min(value, filed) etc. are resolved by parallel scan order; pandas drop_duplicates on unsorted SQL output too. **Fix:** order key as a struct with tie-breakers, e.g. arg_min(value, (filed, accn)); sort before drop_duplicates; verify with an md5 of two builds.
+
+## 10-Q flows are year-to-date
+- **Fix:** TTM = YTD now + last full year - same YTD last year; Q4 is never in a 10-Q.

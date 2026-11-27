@@ -70,3 +70,7 @@ One entry per decision: what we chose, why, and what we gave up. Newest at the b
 - **Real-time test:** a case counts as known only after its release date. This is the honest setup; most papers use hindsight labels, which we report separately.
 - **Model:** logistic regression on quantile-ranked inputs, chosen among 3 variants fixed in advance (all reported); simpler models do better with ~100 positives.
 - **No fraud score on named companies:** AUC 0.63 would mislabel many honest companies. Company pages show SEC cases as facts with links.
+
+## 2026-11-27: Quarterly scores as an update, not a replacement
+- 10-Q rows get their own model (same 46 inputs from TTM numbers; days_to_file follows 10-Q deadlines). The page keeps the 10-K score and adds the 10-Q update when newer. Averaging both ranks best (0.84) but is harder to explain; left for later.
+- Public float is only on 10-K covers, so Altman's market value in a 10-Q row is up to a year old.
