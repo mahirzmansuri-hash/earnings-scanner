@@ -392,7 +392,7 @@ or restated. It is not a forecast for any single company and not investment advi
 
 def about():
     body = """<section><h1>About</h1>
-<p>Faultline is an independent research project by a high school student, built with AI-assisted development.
+<p>Faultline is an independent research project by Mahir, a high school student, built with AI-assisted development.
 It started as a question: do the famous accounting red-flag scores actually warn people before a company fails, when you test them
 honestly with the companies that disappeared?</p>
 <p>The data is public, the code is open, and the site costs nothing to run. It updates as companies file new reports.</p>

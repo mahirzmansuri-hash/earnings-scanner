@@ -75,6 +75,10 @@
 - Designed to not look AI-made: no flashy hero, no fake reviews, real numbers with sources.
 - Works on phones.
 
+## Publishing (Nov 27)
+- Put your first name (Mahir) on the About page. No last name, to keep a minor safer online.
+- Uploaded the finished site to GitHub (a branch called gh-pages, 7,700 files).
+- Last step is yours: turn on GitHub Pages in the repo settings.
+
 ## Next
-- Put the site online for free (GitHub Pages or Cloudflare). Needs your OK first.
 - Auto-update every week.
