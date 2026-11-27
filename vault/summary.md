@@ -117,10 +117,13 @@
 - It shows the biggest jumps in risk since each company's last report.
 - Gives people a reason to come back every week.
 
+## Fairer risk percentages (Nov 27)
+- The % shown on each company page was too low for middle-risk companies.
+- Fixed it using only past years, so no peeking. Now "10% risk" really means about 10% failed.
+- Rankings didn't change, so every result above stays the same.
+
 ## Next
-- The first automatic GitHub run did all the work (44 min) but failed at the last step: it used a Mac-only shell. Fixed.
-- Republished the site from your Mac with tonight's changes.
-- Sunday's automatic run will confirm the fix (or click Run workflow once to check sooner).
-- Pages for banks (classic scores only).
-- A share image so links look good when posted.
-- Auto-update every week.
+- Optional for you: click Run workflow once on GitHub to confirm the fixed weekly update (or wait for Sunday).
+- Optional for you: submit the sitemap to Google Search Console.
+- Possible next build: free 10-K text signals (e.g. "going concern" warnings). Needs downloading many 10-K documents, so I'll ask first.
+- Polish the paper; show it to a teacher.
