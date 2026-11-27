@@ -82,8 +82,13 @@
 - Checked it live: every page loads, search works (Sears, Apple), screener loads 3,911 active companies.
 - Added a "Loading" message so the screener doesn't look broken on slow phones.
 
+## Weekly auto-update (Nov 27)
+- Wrote one command that rebuilds everything: data, scores, models, website (4 minutes).
+- It only re-downloads companies that filed something new.
+- Set up GitHub to run it every Sunday for free, even when your Mac is off.
+- Waiting on you: allow your GitHub token to change workflows, and add your SEC name/email as a secret.
+
 ## Next
-- Auto-update every week (GitHub Actions, free).
 - Pages for banks (classic scores only).
 - A share image so links look good when posted.
 - Auto-update every week.

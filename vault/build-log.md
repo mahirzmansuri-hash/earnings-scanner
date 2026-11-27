@@ -67,3 +67,9 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Checked live:** all page types return 200; search works; screener loads (added a loading message); no console errors.
 - **Note:** URL contains the GitHub username; companies that died before 2016 (e.g. RadioShack) have no page because scores start in 2016.
 - **Next:** weekly auto-update (needs SEC data in CI or a local scheduled run), bank pages, share image, analytics.
+
+## 2026-11-27 (cont.): Weekly auto-update
+- **Did:** `src/pipeline/update.py` (incremental companyfacts refresh via `_manifest.json`, then full rebuild; 4 min locally with `--skip-download`); `.github/workflows/weekly-update.yml` (Sundays 12:00 UTC + manual button; caches company facts; publishes with GITHUB_TOKEN); `publish_site.sh` accepts `PUBLISH_REMOTE`.
+- **Blocked:** push rejected: the saved fine-grained token lacks the Workflows permission. Commit 6cc8ffb is local only.
+- **Mahir to do:** (1) token: Workflows = Read and write; (2) repo secret `SEC_USER_AGENT`; then push + first manual run (first run downloads everything, ~45 min).
+- **Note:** GitHub pauses scheduled workflows in public repos after 60 days with no repo activity; re-enable from the Actions tab if that happens.
