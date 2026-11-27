@@ -100,6 +100,23 @@
 - Made a **share image** so links look good on LinkedIn or in texts, plus a small tab icon.
 - Tests went from 16 to **24**, all passing.
 
+## Stage 2: stock outcomes, free (Nov 27, second night)
+- You picked option A. Built it: uses the market value printed on each 10-K cover page.
+- Measured what happened to each stock the year after its score came out. No peeking.
+- Bankrupt companies count as -100%. Buyouts are left out.
+- Only companies worth $10M+ (20,648 company-years, 2016-2022).
+- **Riskiest 10%: typical stock fell 14.8%.** Safest half: rose 2.8%.
+- **34% of the riskiest lost half their value or more.** Only 11% of the safest did.
+- **11% of the riskiest were wiped out**, vs 1% of the safest.
+- But the average wasn't lower: a few risky stocks shot up like lottery tickets.
+- Worse in 5 of 7 years. 2020's big rebound was the exception.
+- Added it to the website, paper and README. Stage 2 is done.
+
+## New filings page (Nov 27)
+- A new page lists every 10-K filed in the last 30 days with its fresh score.
+- It shows the biggest jumps in risk since each company's last report.
+- Gives people a reason to come back every week.
+
 ## Next
 - The first automatic GitHub run did all the work (44 min) but failed at the last step: it used a Mac-only shell. Fixed.
 - Republished the site from your Mac with tonight's changes.

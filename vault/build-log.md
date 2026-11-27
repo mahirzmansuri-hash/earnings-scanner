@@ -85,3 +85,9 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Result:** run #1 (43m 50s): all data, model and site steps succeeded on GitHub's servers; "Publish to GitHub Pages" failed (exit 126: zsh shebang on Linux). Cache not saved because the job failed.
 - **Fix:** bash shebang + `bash scripts/publish_site.sh`; cache restore/save split with `if: always()`. Pushed (2f399a1). Published tonight's site from the Mac with the bash script (works).
 - **Next:** Sunday's scheduled run will confirm the fix (it will re-download everything once, since no cache was saved). A manual "Run workflow" click would confirm sooner.
+
+## 2026-11-27 (second night, autonomous): Stage 2 + New filings
+- **Did:** `src/backtest/returns.py` (option A: public-float changes, window starts after the score is public; bankrupt -100%, stopped filing -50%/-100%/0%, buyouts excluded; >= $10M float); results on Track record page, paper, README; weekly pipeline runs it. `new.html` (last 30 days of 10-Ks + biggest percentile jumps), nav link, sitemap. Republished and verified.
+- **Findings:** riskiest 10% median -14.8% vs +2.8% for safest half; lost half+ 33.5% vs 11.1%; wiped out 10.9% vs 1.0%; mean not lower (lottery-like skew + share issuance). Median gap in 5 of 7 years.
+- **Data notes:** 3.4% of float pairs are identical (illiquid shells); 2.6% jump 10x+ (reverse mergers/IPOs/errors) -> medians as main measure, $10M floor.
+- **Next:** decide RQ5 (10-K text at $0), calibration fix, Search Console (Mahir).
