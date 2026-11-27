@@ -40,6 +40,8 @@ FEATURES = [
     "cash_burn",
     # filing behaviour and warning events in the 24 months BEFORE the filing
     "days_to_file", "ev_auditor_change", "ev_late_10k", "ev_amended_10k", "ev_non_reliance",
+    # wording in the 10-K itself (SEC full-text search; see src/pipeline/text_signals.py)
+    "tx_gc_doubt", "tx_gc_recurring", "tx_mw_identified", "tx_icfr_not_effective", "tx_restated",
 ]
 
 
@@ -85,12 +87,14 @@ def load(con, event: str = "bankruptcy", end: str = "2023-12-31") -> pd.DataFram
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'late_10k'       AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_late_10k,
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'amended_10k'    AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_amended_10k,
         (SELECT COUNT(*) FROM events e WHERE e.cik = b.cik AND e.event = 'non_reliance'   AND e.filed BETWEEN b.avail - {HORIZON} AND b.avail - 1) AS ev_non_reliance,
+        tx.tx_gc_doubt, tx.tx_gc_recurring, tx.tx_mw_identified, tx.tx_icfr_not_effective, tx.tx_restated,
         -- label: the event happens within 24 months AFTER the filing (not before it)
         {label_sql} AS label,
         (bk.first_bk <= b.avail) IS TRUE AS already_bankrupt
     FROM base b
     LEFT JOIN prev p ON p.cik = b.cik AND date_diff('day', p.period_end, b.period_end) BETWEEN 350 AND 380
     LEFT JOIN bk ON bk.cik = b.cik
+    LEFT JOIN text_signals tx ON tx.cik = b.cik AND tx.period_end = b.period_end
     JOIN companies co ON co.cik = b.cik
     -- a fiscal-year change can match two "prior years"; keep the closest one (no duplicate rows)
     QUALIFY ROW_NUMBER() OVER (PARTITION BY b.cik, b.period_end ORDER BY p.period_end DESC NULLS LAST) = 1

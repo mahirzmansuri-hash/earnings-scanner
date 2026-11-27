@@ -73,7 +73,9 @@ def load(con):
       SELECT r.*, s.z_score, s.z_zone, s.z2_score, s.f_score, s.m_score, s.dsri, s.tata, s.sgi,
              a.revenue, a.net_income, a.cfo, a.total_assets, a.equity, a.public_float,
              ROW_NUMBER() OVER (PARTITION BY r.cik ORDER BY r.available_date DESC) AS rn
+      , tx.tx_gc_doubt, tx.tx_mw_identified, tx.tx_icfr_not_effective, tx.tx_restated
       FROM risk r JOIN scores s USING (cik, period_end) JOIN annual_first a USING (cik, period_end)
+      LEFT JOIN text_signals tx USING (cik, period_end)
       WHERE r.bankruptcy_risk IS NOT NULL)
     SELECT r.* EXCLUDE (rn), c.name, c.former_names, c.tickers, c.sic, c.sic_description, c.status,
            c.last_10k, c.fiscal_year_end
@@ -113,6 +115,13 @@ def red_flags(r, ev_recent):
         out.append(("Beneish M", "--watch", f"Beneish M-Score is {r.m_score:.2f}, above the -1.78 manipulation threshold."))
     if not isnan(r.sgi) and r.sgi < 0.8:
         out.append(("Sales", "--watch", f"Revenue fell {(1 - r.sgi)*100:.0f}% from the year before."))
+    phrases = [("tx_gc_doubt", "Going concern", "--risk", "raise substantial doubt", "usually part of a going-concern warning"),
+               ("tx_mw_identified", "Controls", "--watch", "identified a material weakness", "a flaw found in internal controls"),
+               ("tx_icfr_not_effective", "Controls", "--watch", "internal control over financial reporting was not effective", ""),
+               ("tx_restated", "Restatement", "--watch", "have been restated", "past figures were changed")]
+    for col, label, c, phrase, why in phrases:
+        if getattr(r, col, 0) == 1:
+            out.append((label, c, f'The 10-K uses the phrase "{phrase}"' + (f" ({why})." if why else ".")))
     for ev in ev_recent:
         out.append(("Filing event", "--watch", f"{EVENT_WORDS[ev.event]} on {pd.Timestamp(ev.filed).date()}."))
     return out
@@ -251,7 +260,7 @@ def table_rows(df, cols_fn):
 def home(latest, events, results, as_of):
     tr = results["composite"]
     abl = results["ablation"]
-    top10 = abl["3. + filing behaviour & warning events (full)"]["caught_if_flag_top"]["top_10pct"]
+    top10 = abl["4. + 10-K text signals (full)"]["caught_if_flag_top"]["top_10pct"]
     alt10 = abl["altman_z (lowest first)"]["caught_if_flag_top"]["top_10pct"]
     recent = latest[pd.to_datetime(latest["available_date"]) >= pd.Timestamp(as_of) - pd.Timedelta(days=400)]
     top = recent.sort_values("bankruptcy_risk", ascending=False).head(40)
@@ -419,8 +428,9 @@ against their 10-Ks (Apple, Sears, General Mills, SVB, Conagra), and all matched
 <h2>Classic scores</h2><p>Altman Z-Score (1968) uses five ratios to measure bankruptcy risk; market value comes from the public float
 on the 10-K cover page. Z'' (1995) swaps market value for book equity. Piotroski F-Score (2000) counts nine pass/fail health tests.
 Beneish M-Score (1999) combines eight ratios that tend to move before earnings manipulation is found.</p>
-<h2>Faultline models</h2><p>Two gradient-boosted tree models read 41 values per company-year: every part of the classic scores, size,
-profitability, debt, growth, how long the 10-K took to file, and recent auditor changes, late filings and amendments. One predicts a
+<h2>Faultline models</h2><p>Two gradient-boosted tree models read 46 values per company-year: every part of the classic scores, size,
+profitability, debt, growth, how long the 10-K took to file, recent auditor changes, late filings and amendments, and whether the
+10-K uses five warning phrases (found with SEC's full-text search). The phrases did not improve the models, but they are shown on company pages. One predicts a
 bankruptcy filing (8-K Item 1.03) within two years, the other a restatement notice (8-K Item 4.02). For filings made in a given year,
 each model is trained only on companies whose two-year outcome was known before that year started.</p>
 <h2>What the scores are not</h2><p>A score is a ranking of how a company's filings compare with the filings of companies that later failed

@@ -84,6 +84,8 @@ def main(skip_download: bool = False):
         return run
     step("annual values", with_con(build_annual))
     step("events", with_con(build_events))
+    from src.pipeline.text_signals import build_text_signals
+    step("10-K text signals", with_con(build_text_signals))
     step("scores", with_con(build_scores))
 
     from src.backtest import track_record

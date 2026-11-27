@@ -17,12 +17,15 @@ OUT_JSON = ROOT / "data" / "processed" / "composite_ablation.json"
 
 SCORES = FEATURES[:27]                         # Altman, Piotroski, Beneish pieces
 FUNDAMENTALS = FEATURES[27:36]                 # size, profitability, leverage, growth
-FILING_EVENTS = FEATURES[36:]                  # filing delay + warning events
+FILING_EVENTS = FEATURES[36:41]                # filing delay + warning events
+TEXT = FEATURES[41:]                           # 10-K wording (full-text search flags)
 GROUPS = {
     "1. classic scores only": SCORES,
     "2. + size & fundamentals": SCORES + FUNDAMENTALS,
-    "3. + filing behaviour & warning events (full)": SCORES + FUNDAMENTALS + FILING_EVENTS,
+    "3. + filing behaviour & warning events": SCORES + FUNDAMENTALS + FILING_EVENTS,
+    "4. + 10-K text signals (full)": SCORES + FUNDAMENTALS + FILING_EVENTS + TEXT,
     "events & filing behaviour only": FILING_EVENTS,
+    "10-K text signals only": TEXT,
 }
 
 

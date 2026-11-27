@@ -16,11 +16,13 @@ Tested out of sample on filings from 2016 to 2023 (25,169 company-years, 539 ban
 |---|---|---|
 | Ranking accuracy (AUC; 0.5 = coin flip) | 0.71 | 0.84 |
 | Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 53% |
-| Share of companies flagged to catch 86% of bankruptcies | 50% | 36% |
+| Share of companies flagged to catch 86% of bankruptcies | 50% | 37% |
 
-Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -14.8% the following year against +2.9% for its safest half, and 34% of them lost half their value or more against 11%.
+Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -13.6% the following year against +2.9% for its safest half, and 34% of them lost half their value or more against 11%.
 
-Counting companies that stopped filing without being bought as failures too (a "distress exit"), Faultline's AUC is 0.83 against 0.75 for Altman.
+Counting companies that stopped filing without being bought as failures too (a "distress exit"), Faultline's AUC is 0.84 against 0.75 for Altman.
+
+Warning phrases in the 10-K text (going-concern doubt, material weaknesses, restatements; found with SEC full-text search) did not improve either model once the financial data was in.
 
 For restatements (8-K Item 4.02 notices), Faultline's AUC is 0.74 against 0.52 for the Beneish M-Score. Full tables, method and limits are in [`vault/research/results.md`](vault/research/results.md) and on the site's Track record page.
 
@@ -31,8 +33,9 @@ For restatements (8-K Item 4.02 notices), Faultline's AUC is 0.74 against 0.52 f
 3. **Point in time.** Every value keeps the date it was first filed. Tests use only the original 10-K's numbers, never later corrections. Corrections are kept separately and shown as revisions.
 4. **Cleaning.** A tag map turns 21 accounting items into consistent inputs. When one filing reports conflicting revenue figures, the one where revenue minus cost of goods equals gross profit wins. Five companies were checked by hand against their 10-Ks.
 5. **Events.** Bankruptcy filings, restatement notices, auditor changes, late filings and amendments come from the same SEC data.
-6. **Models.** Gradient-boosted trees (scikit-learn) on 41 point-in-time features, tested walk-forward by year.
-7. **Site.** A Python script writes a static site (one page per company) that GitHub Pages serves. A GitHub Actions job rebuilds everything every Sunday.
+6. **Text.** SEC full-text search flags 10-Ks containing five warning phrases, with no document downloads.
+7. **Models.** Gradient-boosted trees (scikit-learn) on 46 point-in-time features, tested walk-forward by year.
+8. **Site.** A Python script writes a static site (one page per company) that GitHub Pages serves. A GitHub Actions job rebuilds everything every Sunday.
 
 ## Run it yourself
 

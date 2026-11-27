@@ -105,7 +105,7 @@
 - Measured what happened to each stock the year after its score came out. No peeking.
 - Bankrupt companies count as -100%. Buyouts are left out.
 - Only companies worth $10M+ (20,648 company-years, 2016-2022).
-- **Riskiest 10%: typical stock fell 14.8%.** Safest half: rose 2.9%.
+- **Riskiest 10%: typical stock fell 13.6%.** Safest half: rose 2.9%.
 - **34% of the riskiest lost half their value or more.** Only 11% of the safest did.
 - **11% of the riskiest were wiped out**, vs 1% of the safest.
 - But the average wasn't lower: a few risky stocks shot up like lottery tickets.
@@ -122,8 +122,16 @@
 - Fixed it using only past years, so no peeking. Now "10% risk" really means about 10% failed.
 - Rankings didn't change, so every result above stays the same.
 
+## 10-K text signals (Nov 27)
+- Used SEC's free full-text search. No downloading of whole reports.
+- Found every 10-K with 5 warning phrases, like "substantial doubt" (going concern).
+- About 36,700 filings had the going-concern phrase.
+- Companies with it went bankrupt twice as often.
+- But adding the phrases to the model changed nothing. The numbers already say it.
+- That's a real research answer: simple warning phrases don't add early warning.
+- Paper, README and results updated.
+
 ## Next
 - Optional for you: click Run workflow once on GitHub to confirm the fixed weekly update (or wait for Sunday).
 - Optional for you: submit the sitemap to Google Search Console.
-- Possible next build: free 10-K text signals (e.g. "going concern" warnings). Needs downloading many 10-K documents, so I'll ask first.
 - Polish the paper; show it to a teacher.

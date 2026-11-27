@@ -20,7 +20,7 @@ PAPER, INK, INK2, RULE, BRAND, POP, POPFILL = "#FFFFFF", "#15191E", "#525A63", "
 
 abl = json.loads((ROOT / "data/processed/composite_ablation.json").read_text())
 comp = json.loads((ROOT / "data/processed/composite_results.json").read_text())
-top10 = abl["3. + filing behaviour & warning events (full)"]["caught_if_flag_top"]["top_10pct"]
+top10 = abl["4. + 10-K text signals (full)"]["caught_if_flag_top"]["top_10pct"]
 alt10 = abl["altman_z (lowest first)"]["caught_if_flag_top"]["top_10pct"]
 
 img = Image.new("RGB", (1200, 630), PAPER)

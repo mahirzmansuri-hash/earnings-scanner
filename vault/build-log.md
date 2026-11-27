@@ -91,3 +91,9 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Findings:** riskiest 10% median -14.8% vs +2.8% for safest half; lost half+ 33.5% vs 11.1%; wiped out 10.9% vs 1.0%; mean not lower (lottery-like skew + share issuance). Median gap in 5 of 7 years.
 - **Data notes:** 3.4% of float pairs are identical (illiquid shells); 2.6% jump 10x+ (reverse mergers/IPOs/errors) -> medians as main measure, $10M floor.
 - **Next:** decide RQ5 (10-K text at $0), calibration fix, Search Console (Mahir).
+
+## 2026-11-27 (day): RQ5 10-K text signals
+- **Did:** `src/pipeline/text_signals.py` (EDGAR full-text search, 5 phrases, monthly since 2009, cached in data/raw/fulltext, retries + skip-and-log on 500s); text flags as 5 model features; ablation groups 4 + text-only; weekly pipeline + CI cache include it; company pages show phrase flags (3,671 pages); methodology says 46 inputs.
+- **Result:** null for prediction (bankruptcy 0.847 unchanged; restatement 0.738 -> 0.737); phrase flags alone 0.63 / 0.61; going-concern phrase doubles the bankruptcy rate (3.2% vs 1.5%). See results.md.
+- **Bug:** SEC full-text search returned HTTP 500 on a page mid-run -> retries with backoff, incomplete months retried next run.
+- **State:** committed, pushed, site republished.

@@ -90,3 +90,12 @@ Fixes: model input had 194 duplicate rows (fiscal-year changes matched two prior
 - For each filing year, raw scores are mapped to observed rates with isotonic regression fitted only on earlier years' out-of-sample scores whose outcomes were known (no look-ahead). Percentiles still come from the raw scores (calibration creates ties).
 - Check, filings 2018-2023, deciles shown vs actual 2-year bankruptcy rate: top 10.78% vs 10.26%; 9th 4.11% vs 3.38%; 6th 1.77% vs 1.83% (before calibration the middle deciles read about 0.6x the actual rate).
 - Stock-outcome table after percentile recompute: safest half median +2.9% (was +2.8%); other rows unchanged.
+
+## 2026-11-27: RQ5 10-K wording (`src/pipeline/text_signals.py`)
+**Method:** SEC full-text search (efts.sec.gov), month by month 2009-2026, 10-K forms; a filing is flagged if any of its documents contains the exact phrase. No document downloads (~15 min, a few thousand requests; retries on server errors).
+- Filings with phrase / matched company-years: "raise substantial doubt" 36,713 / 28,157; "recurring losses from operations" 11,051 / 9,132; "identified a material weakness" 7,440 / 6,147; "internal control over financial reporting was not effective" 15,224 / 12,037; "have been restated" 7,840 / 5,071.
+- Going-concern phrase: 2-year bankruptcy rate 3.20% with vs 1.47% without (2012-2023, non-financial).
+- **Bankruptcy model:** + text 0.847 (unchanged); riskiest 5/10/20% 37/53/70%; text alone 0.629.
+- **Restatement model:** without text 0.738, with 0.737; text alone 0.608.
+- **Answer to RQ5:** simple phrase flags carry signal on their own but add nothing once the financials are in (crude matching: boilerplate, hypotheticals; overlap with numbers and past events).
+- **Re-synced numbers with text in the model:** alarm rate to catch 85.5% = 37.2%; distress exit AUC 0.838 vs 0.748; stock outcomes riskiest 10% median -13.6%, lost half 33.7%, wiped out 10.8% (safest half +2.9%, 11.2%, 1.0%).

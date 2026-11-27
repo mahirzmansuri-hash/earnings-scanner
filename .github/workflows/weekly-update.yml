@@ -33,7 +33,9 @@ jobs:
       - name: Restore cached SEC company facts
         uses: actions/cache/restore@v4
         with:
-          path: data/raw/companyfacts
+          path: |
+            data/raw/companyfacts
+            data/raw/fulltext
           key: companyfacts-${{ github.run_id }}
           restore-keys: companyfacts-
 
@@ -47,7 +49,9 @@ jobs:
         if: always()
         uses: actions/cache/save@v4
         with:
-          path: data/raw/companyfacts
+          path: |
+            data/raw/companyfacts
+            data/raw/fulltext
           key: companyfacts-${{ github.run_id }}
 
       - name: Publish to GitHub Pages
