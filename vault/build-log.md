@@ -138,3 +138,4 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Unverified:** Buttondown docs pages we fetched didn't show the status values or the embed form snippet; used the standard `embed-subscribe/<username>` + `email` field. Confirm against Buttondown's embed generator when the account exists.
 - **Waiting on Mahir:** create the Buttondown account, add repo secret `BUTTONDOWN_API_KEY`, tell Claude the username.
 - **Next:** turn on sign-up box, first draft email, then marketing plan.
+- **Update:** username `mahir`. Buttondown's own page (buttondown.com/mahir) uses `embed-subscribe/mahir` + `email` field, matching our form. Sign-up box now live on Alerts + digest pages (checked on a phone-size screen). Still needed: `BUTTONDOWN_API_KEY` repo secret for the weekly draft.

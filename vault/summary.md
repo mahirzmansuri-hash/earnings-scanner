@@ -196,3 +196,5 @@
 - Each company in the email links to its page.
 - A sign-up box appears once your account exists.
 - Needs you: make the account, add the API key to GitHub.
+- Your Buttondown username is set. The sign-up box is live.
+- Still needed: the API key in GitHub, so drafts get made.

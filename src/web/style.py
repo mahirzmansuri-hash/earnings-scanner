@@ -78,7 +78,7 @@ FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox
            "stroke='%231B3A5C' stroke-width='3' fill='none'/%3E%3Cpath d='M12 6L14 12' stroke='%230FB3C8' stroke-width='3'/%3E%3C/svg%3E")
 
 # Buttondown newsletter username (public, not a secret). Empty = no sign-up box anywhere on the site.
-NEWSLETTER_USER = ""
+NEWSLETTER_USER = "mahir"
 
 
 def subscribe_box() -> str:
