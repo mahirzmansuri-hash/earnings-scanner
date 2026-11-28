@@ -715,6 +715,8 @@ def build():
              "d": str(pd.Timestamp(r.available_date).date())} for r in latest.itertuples()]
     (SITE / "data" / "companies.json").write_text(json.dumps(comp, separators=(",", ":"), allow_nan=False))
     shutil.copy(Path(__file__).parent / "assets" / "og.png", SITE / "og.png")  # share image (scripts/make_share_image.py)
+    for f in (Path(__file__).parent / "assets").glob("google*.html"):          # Google Search Console verification file
+        shutil.copy(f, SITE / f.name)
     paper_pdf = ROOT / "docs" / "Faultline-paper.pdf"   # made by scripts/make_paper_pdf.py
     if paper_pdf.exists():
         shutil.copy(paper_pdf, SITE / "Faultline-paper.pdf")
