@@ -512,6 +512,11 @@ are kept separately and never used in tests. A number that first appeared in a l
 <h2>Cleaning</h2><p>Companies tag the same item in different ways. Faultline maps 21 items to their XBRL tags. When one filing reports two
 different revenue figures, it keeps the one where revenue minus cost of goods equals gross profit. Five companies were checked by hand
 against their 10-Ks (Apple, Sears, General Mills, SVB, Conagra), and all matched.</p>
+<h2>Checking the outcomes</h2><p>Bankruptcies come from 8-K filings tagged Item 1.03, but filers sometimes tag the wrong item. Faultline
+reads the text of every bankruptcy-tagged 8-K and drops the ones that never mention a bankruptcy: 17 of 2,139 since 2009 (for example,
+a 2011 Duke Energy 8-K). <a href="receipts.html">Receipts</a> lists every recent bankruptcy and what the score said before it.</p>
+<h2>Percentiles</h2><p>"Riskier than X% of filers" compares a filing only with the filings made in the 365 days before it, never with
+later ones, so the comparison uses only what was public at the time.</p>
 <h2>Classic scores</h2><p>Altman Z-Score (1968) uses five ratios to measure bankruptcy risk; market value comes from the public float
 on the 10-K cover page. Z'' (1995) swaps market value for book equity. Piotroski F-Score (2000) counts nine pass/fail health tests.
 Beneish M-Score (1999) combines eight ratios that tend to move before earnings manipulation is found.</p>
