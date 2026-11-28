@@ -78,9 +78,9 @@ def load(con):
       FROM risk r JOIN scores s USING (cik, period_end) JOIN annual_first a USING (cik, period_end)
       LEFT JOIN text_signals tx USING (cik, period_end)
       WHERE r.bankruptcy_risk IS NOT NULL)
-    SELECT r.* EXCLUDE (rn), c.name, c.former_names, c.tickers, c.sic, c.sic_description, c.status,
+    SELECT r.* EXCLUDE (rn), coalesce(d.display_name, c.name) AS name, c.former_names, c.tickers, c.sic, c.sic_description, c.status,
            c.last_10k, c.fiscal_year_end
-    FROM r JOIN companies c USING (cik) WHERE rn = 1""").df()
+    FROM r JOIN companies c USING (cik) LEFT JOIN display_names d USING (cik) WHERE rn = 1""").df()
     hist = con.execute("""
     SELECT r.cik, r.period_end, r.available_date, r.bankruptcy_risk, r.bankruptcy_pctile, r.restatement_risk,
            r.restatement_pctile, s.z_score, s.z_zone, s.f_score, s.m_score, a.revenue, a.net_income, a.cfo, a.total_assets
@@ -589,6 +589,86 @@ def write_alerts(alerts, timeline, latest, as_of):
     print(f"alerts: {len(alerts):,} since 2016, {int((alerts['date'] >= as_of - pd.Timedelta(days=90)).sum()):,} in the last 90 days")
 
 
+def receipts_rows(events, timeline, as_of, days=365, max_age=400, not_bankruptcy=frozenset()):
+    """Every company whose first bankruptcy filing in the window came after a Faultline score, with that last score.
+    Scores are walk-forward: each comes from a model trained only on outcomes known before that year."""
+    as_of = pd.Timestamp(as_of)
+    bk = events[(events["event"] == "bankruptcy") & ~events["accn"].isin(not_bankruptcy)].copy()   # src/pipeline/verify_bk.py
+    bk["filed"] = pd.to_datetime(bk["filed"])
+    bk = bk[(bk["filed"] > as_of - pd.Timedelta(days=days)) & (bk["filed"] <= as_of)]
+    bk = bk.sort_values(["cik", "filed", "accn"]).drop_duplicates("cik")
+    tl = {k: g for k, g in timeline.groupby("cik")}
+    out = []
+    for r in bk.itertuples():
+        g = tl.get(r.cik)
+        row = {"cik": r.cik, "filed": r.filed, "p": None, "score_date": None, "src": None, "first_top": None}
+        if g is not None:
+            d = pd.to_datetime(g["d"])
+            g = g[(d < r.filed) & (d >= r.filed - pd.Timedelta(days=max_age))]
+            if len(g):
+                last = g.iloc[-1]
+                top = g[g["p"] >= 0.9]
+                row.update(p=float(last["p"]), score_date=pd.Timestamp(last["d"]), src=last["src"],
+                           first_top=pd.Timestamp(top["d"].iloc[0]) if len(top) else None)
+        out.append(row)
+    return pd.DataFrame(out, columns=["cik", "filed", "p", "score_date", "src", "first_top"]).sort_values(["filed", "cik"], ascending=[False, True])
+
+
+def _floor_pct(p) -> str:
+    """Round down, so a score just under a cut-off never displays as being over it (89.7% -> 89%)."""
+    return f"{min(int(p * 100), 99)}%"
+
+
+def write_receipts(events, timeline, names_all, has_page, as_of, not_bankruptcy=frozenset()) -> str:
+    rows = receipts_rows(events, timeline, as_of, not_bankruptcy=not_bankruptcy)
+    nm = {r.cik: (r.name, (r.tickers or "").split(" | ")[0] if isinstance(r.tickers, str) else "") for r in names_all.itertuples()}
+    scored = rows[rows["p"].notna()]
+    top10, top25 = int((scored["p"] >= 0.9).sum()), int((scored["p"] >= 0.75).sum())
+    flagged = scored[scored["p"] >= 0.9]
+    lead = (flagged["filed"] - pd.to_datetime(flagged["first_top"])).dt.days
+    def verdict(p):
+        if p != p or p is None:
+            return '<span class="dim">No recent score</span>'
+        if p >= 0.9:
+            return '<b>Flagged: riskiest 10%</b>'
+        if p >= 0.75:
+            return 'Riskiest 25%'
+        return '<span class="dim">Missed</span>'
+    trs = []
+    for r in rows.itertuples():
+        name, tick = nm.get(r.cik, (str(r.cik), ""))
+        link = f'<a href="c/{r.cik}.html">{e(name)}</a>' if r.cik in has_page else e(name)
+        first = (f"; first in the riskiest 10% on {r.first_top.date()} ({(r.filed - r.first_top).days} days before)"
+                 if r.first_top is not None and r.first_top == r.first_top and r.first_top != r.score_date else "")
+        score = (f"Last score: riskier than {_floor_pct(r.p)} of filers ({r.src} filed {r.score_date.date()}, "
+                 f"{(r.filed - r.score_date).days} days before){first}") if r.p == r.p and r.p is not None else "No 10-K or 10-Q score in the 13 months before"
+        trs.append(f'<tr><td>{link}{f" <span class=mono>{e(tick)}</span>" if tick else ""}<span class=sub>Filed for bankruptcy {r.filed.date()}</span></td>'
+                   f'<td>{verdict(r.p)}<span class=sub>{score}</span></td></tr>')
+    n, m = len(rows), len(scored)
+    pct = f"{top10 / m * 100:.0f}%" if m else "-"
+    body = f"""<section><div class="label">Receipts</div><h1>What Faultline said before each bankruptcy</h1>
+<p>Every US public company that filed for bankruptcy (8-K Item 1.03) in the last 12 months, and Faultline's last
+bankruptcy-risk score before the filing. Misses included. Data as of {pd.Timestamp(as_of).date()}.</p>
+<div class="grid3"><div class="stat"><span class="label">Bankruptcy filings</span><span class="v">{n}</span></div>
+<div class="stat"><span class="label">Already in the riskiest 10%</span><span class="v">{top10} of {m}</span><span class="sub">{pct} of those with a score in the 13 months before</span></div>
+<div class="stat"><span class="label">Median warning for those</span><span class="v">{int(lead.median()) if len(lead) else "-"} days</span><span class="sub">from first entering the riskiest 10% (within 13 months) to the filing</span></div></div>
+<p class="dim">By chance, about 10% would be in the riskiest 10%. {top25} of {m} were in the riskiest 25%.</p>
+<div class="tbl"><table><thead><tr><th>Company</th><th>Before the filing</th></tr></thead>
+<tbody>{"".join(trs)}</tbody></table></div>
+<p class="note">How to read this: each score came from a model trained only on outcomes known before that year (walk-forward),
+using filings public at the time. The site itself launched in November 2026, so older scores are what the method would have
+shown then, not screenshots. Bankruptcy filings come from SEC's 8-K item tags; we read each one and left out
+{len(not_bankruptcy)} tagged filing(s) whose text was not about a bankruptcy. Companies with no score are mostly banks and insurers (not scored) or filers without XBRL financials.
+"Riskiest 10%" is among all filers scored that year. Research, not investment advice.
+See the <a href="track-record.html">full track record</a> for every year since 2016.</p></section>"""
+    (SITE / "receipts.html").write_text(page("Receipts: what Faultline said before each bankruptcy", body,
+        f"{top10} of {m} companies that filed for bankruptcy in the last 12 months were already in Faultline's riskiest 10%.", active="receipts.html",
+        image="og-receipts.png"))
+    from src.web.share import receipts_card
+    receipts_card(SITE / "og-receipts.png", top10, m, int(lead.median()) if len(lead) else None, pd.Timestamp(as_of).date())
+    return f"{top10}/{m} flagged (riskiest 10%), {n} filings"
+
+
 def build():
     with duckdb.connect(str(DB_PATH), read_only=True) as con:
         latest, hist, events, accn, as_of = load(con)
@@ -596,8 +676,11 @@ def build():
         rq = con.execute("SELECT * FROM risk_q QUALIFY ROW_NUMBER() OVER (PARTITION BY cik ORDER BY available_date DESC, accn DESC) = 1").df()
         cases_all = pd.read_csv(PROC / "aaer_cases.csv")
         alerts = build_alerts(con, cases_all, latest)
-        timeline = con.execute("""SELECT cik, available_date::DATE AS d, bankruptcy_pctile AS p FROM risk WHERE bankruptcy_pctile IS NOT NULL
-                                  UNION ALL SELECT cik, available_date::DATE, q_pctile FROM risk_q WHERE q_pctile IS NOT NULL ORDER BY cik, d""").df()
+        timeline = con.execute("""SELECT cik, available_date::DATE AS d, bankruptcy_pctile AS p, '10-K' AS src FROM risk WHERE bankruptcy_pctile IS NOT NULL
+                                  UNION ALL SELECT cik, available_date::DATE, q_pctile, '10-Q' FROM risk_q WHERE q_pctile IS NOT NULL ORDER BY cik, d, src""").df()
+        not_bankruptcy = frozenset(a for (a,) in con.execute("SELECT accn FROM bk_verified WHERE NOT verified").fetchall()) \
+            if con.execute("SELECT COUNT(*) FROM duckdb_tables() WHERE table_name = 'bk_verified'").fetchone()[0] else frozenset()
+        names_all = con.execute("SELECT d.cik, d.display_name AS name, c.tickers FROM display_names d JOIN companies c USING (cik)").df()
     RISK_Q.update({r.cik: r for r in rq.itertuples()})
     ALERT_COUNT.update(alerts["cik"].value_counts().to_dict())
     cases = cases_all[(cases_all["kind"] == "accounting") & (cases_all["n_candidates"] == 1)]   # only unambiguous name matches
@@ -621,6 +704,7 @@ def build():
         r = pd.Series(r._asdict())
         (SITE / "c" / f"{r.cik}.html").write_text(company_page(r, HIST[r.cik], ev_by.get(r.cik, empty_ev), accn_map, as_of))
     write_alerts(alerts, timeline, latest, as_of)
+    receipts_n = write_receipts(events, timeline, names_all, set(latest["cik"]), as_of, not_bankruptcy)
     comp = [{"c": int(r.cik), "n": r.name, "t": r.tickers if isinstance(r.tickers, str) else "",
              "f": r.former_names if isinstance(r.former_names, str) else "", "i": txt(r.sic_description), "s": r.status,
              "r": None if isnan(r.revenue) else float(r.revenue), "b": round(float(r.bankruptcy_risk), 4),
@@ -642,12 +726,12 @@ def build():
     (SITE / "about.html").write_text(about())
     # sitemap + robots.txt so search engines can find every company page
     from src.web.style import SITE_URL
-    urls = ["", "new.html", "alerts.html", "digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
+    urls = ["", "new.html", "alerts.html", "receipts.html", "digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
     (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
                                       + "".join(f"<url><loc>{SITE_URL}{u}</loc><lastmod>{as_of}</lastmod></url>" for u in urls) + "</urlset>")
     (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")
     size = sum(p.stat().st_size for p in SITE.rglob("*") if p.is_file())
-    print(f"site/: {len(latest):,} company pages, {size/1e6:.0f} MB")
+    print(f"site/: {len(latest):,} company pages, {size/1e6:.0f} MB; receipts: {receipts_n}")
 
 
 if __name__ == "__main__":

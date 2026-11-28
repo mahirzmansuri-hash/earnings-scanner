@@ -83,10 +83,14 @@ def main(skip_download: bool = False):
                 return fn(con)
         return run
     step("annual values", with_con(build_annual))
+    from src.pipeline import names
+    step("readable company names", with_con(names.build))
     from src.pipeline import quarterly
     step("10-Q facts", with_con(quarterly.load_qfacts))
     step("10-Q trailing twelve months", with_con(quarterly.build_quarterly))
     step("events", with_con(build_events))
+    from src.pipeline import verify_bk
+    step("check recent bankruptcy 8-Ks", verify_bk.main)
     from src.pipeline.text_signals import build_text_signals
     step("10-K text signals", with_con(build_text_signals))
     step("scores", with_con(build_scores))

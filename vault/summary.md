@@ -207,3 +207,12 @@
 - Then one channel a week: school club, Reddit, Show HN.
 - Skip LinkedIn and Product Hunt until you are 16.
 - Targets: 500 visitors a month by Jan 31.
+
+## Share-ready site (Nov 27, night)
+- Company names now look normal ("America's Car-Mart, Inc.").
+- New Receipts page: every bankruptcy this year and what we said before.
+- 30 of 39 were already in our riskiest 10%. Chance would be about 4.
+- Misses are shown too.
+- Found an SEC tagging error (Granite). Now we check each filing's text.
+- Each Receipts link shows a picture card with the result.
+- Visitor counting is ready. It needs your two accounts.

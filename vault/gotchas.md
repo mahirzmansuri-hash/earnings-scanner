@@ -35,3 +35,8 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 
 ## 10-Q flows are year-to-date
 - **Fix:** TTM = YTD now + last full year - same YTD last year; Q4 is never in a 10-Q.
+
+## SEC 8-K item tags can be wrong
+- **Symptom:** Granite Construction (healthy) appeared as a bankruptcy on Receipts.
+- **Cause:** our events come from the item tags in SEC's filing index; the filer tagged Item 1.03 on an 8-K about a note exchange. SEC's full-submission .txt header repeats the tag, so text checks must skip it.
+- **Fix:** `src/pipeline/verify_bk.py` reads recent bankruptcy 8-Ks (main document first) and drops ones that never mention bankruptcy. Older training labels are not checked yet (rare; would need ~1,000 fetches).

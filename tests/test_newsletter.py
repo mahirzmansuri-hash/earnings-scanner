@@ -22,3 +22,13 @@ def test_no_signup_box_until_configured(monkeypatch):
     monkeypatch.setattr(style, "NEWSLETTER_USER", "faultline")
     box = style.subscribe_box()
     assert "embed-subscribe/faultline" in box and 'name="email"' in box
+
+
+def test_analytics_off_until_configured(monkeypatch):
+    monkeypatch.setattr(style, "GOATCOUNTER_CODE", "")
+    monkeypatch.setattr(style, "GOOGLE_VERIFY", "")
+    assert "goatcounter" not in style.page("t", "b", "d")
+    monkeypatch.setattr(style, "GOATCOUNTER_CODE", "faultline")
+    monkeypatch.setattr(style, "GOOGLE_VERIFY", "abc")
+    html = style.page("t", "b", "d")
+    assert "faultline.goatcounter.com/count" in html and 'content="abc"' in html
