@@ -220,3 +220,9 @@
 - Google tag is on the site. Next: click Verify, then submit the sitemap.
 - Google verified the site. Sitemap sent. Google will index pages over the next weeks.
 - Marketing Phase 0 and 1 are done.
+
+## Launch kit (Nov 28)
+- You'd rather post online than pitch in person. Good: the plan is now online-first.
+- Week 1: send a short written message to a teacher asking for feedback.
+- Then Reddit, a chart post, and Hacker News. All drafts are written.
+- New chart: 70% of 475 bankruptcies were in our riskiest 10% before they happened.

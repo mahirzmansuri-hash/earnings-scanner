@@ -151,3 +151,8 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Next:** turn on analytics + submit sitemap; then launch week 1 (school club demo).
 - **Update:** GoatCounter on (code `earnings-scanner`), on every page; confirmed live: the page loads count.js and sends a hit to earnings-scanner.goatcounter.com/count. Search Console verification tag added by Mahir (commit 0656ab4), now on every page.
 - **Update:** Search Console verified by Mahir; sitemap.xml submitted (7,693 company pages + main pages). Phase 0+1 of the marketing plan done.
+
+## 2026-11-28: Launch kit (online-first)
+- **Did:** Mahir finds in-person pitching hard, so Phase 2 is online-first: written feedback request to a teacher, then r/SecurityAnalysis, r/dataisbeautiful [OC] chart, Show HN. `docs/marketing/launch-kit.md` (all drafts + numbers table + reply bank), `scripts/make_oc_chart.py` -> `docs/marketing/oc-bankruptcy-deciles.png`.
+- **Numbers:** 576 bankrupt companies since 2017; 475 had a score in the 13 months before; 331 (70%) in the riskiest 10%, 4% in the safer half; median 327 days from first entering the riskiest 10%.
+- **Next:** Mahir sends the teacher message (week 1).

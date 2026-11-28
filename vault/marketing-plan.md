@@ -35,15 +35,16 @@ discount, or keep email capped and point extra people to RSS).
   This is the page every post links to.
 - Fix anything that looks broken on phones. Most Reddit traffic is mobile.
 
-## Phase 2: launch posts (Dec 2026 - Jan 2027, one channel per week)
-Order matters: smaller, friendlier places first, so we fix problems before the big ones.
+## Phase 2: launch posts, online-first (from Dec 2026, one per week)
+Changed Nov 28: Mahir prefers writing to pitching in person, so the school step is a written message asking for feedback, not a talk.
+Drafts for every step: `docs/marketing/launch-kit.md`. Chart: `docs/marketing/oc-bankruptcy-deciles.png` (`scripts/make_oc_chart.py`).
 | Week | Channel | Post | Why |
 |---|---|---|---|
-| 1 | School investing club / finance teacher | 5-min demo, ask for blunt feedback | safe first test, real users |
-| 2 | r/SecurityAnalysis (Mahir posts) | "I backtested Altman Z vs a model on every 10-K since 2010, incl. dead companies. Results + what failed" | analysts like method + honesty |
-| 3 | r/dataisbeautiful (Mahir posts, [OC]) | one chart: "How early did the numbers warn before 464 bankruptcies?" | big audience, chart-only |
-| 4 | Hacker News "Show HN" (Mahir posts) | "Show HN: Free bankruptcy-risk scores for every US public company, with a public track record" | qualifies: people can use it with no signup |
-| 5 | r/ValueInvesting, r/accounting | case study: one bankruptcy, the warning signs in its 10-Ks | ongoing |
+| 1 | Finance/business teacher or club leader (written message) | ask for 10 minutes of honest feedback | expert eyes before strangers; no pitching |
+| 2 | r/SecurityAnalysis | method + results + what failed, ask for criticism | analysts like method + honesty |
+| 3 | r/dataisbeautiful ([OC]) | decile chart: 70% of 475 bankruptcies were in the riskiest 10% | big audience, chart-only |
+| 4 | Hacker News "Show HN" | the site, first comment explains how it's built | qualifies: usable with no signup |
+| 5+ | r/ValueInvesting, r/accounting | one case study each | ongoing |
 
 Rules to respect:
 - **Read each subreddit's sidebar rules before posting.** Many limit self-promotion (common rule of thumb: most of your
