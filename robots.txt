@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://mahirzmansuri-hash.github.io/earnings-scanner/sitemap.xml

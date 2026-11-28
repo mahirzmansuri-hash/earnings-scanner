@@ -1,0 +1,115 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Methodology · Faultline</title><meta name="description" content="How Faultline turns SEC filings into bankruptcy and accounting-risk scores.">
+<meta property="og:title" content="Methodology · Faultline"><meta property="og:description" content="How Faultline turns SEC filings into bankruptcy and accounting-risk scores.">
+<meta property="og:type" content="website"><meta property="og:image" content="https://mahirzmansuri-hash.github.io/earnings-scanner/og.png">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://mahirzmansuri-hash.github.io/earnings-scanner/og.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 26 18'%3E%3Cpath d='M1 6H12M14 12H25' stroke='%231B3A5C' stroke-width='3' fill='none'/%3E%3Cpath d='M12 6L14 12' stroke='%230FB3C8' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="alternate" type="application/atom+xml" title="Faultline alerts" href="https://mahirzmansuri-hash.github.io/earnings-scanner/feed.xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,600&family=Libre+Franklin:wght@400;500;600&family=IBM+Plex+Mono:wght@400&display=swap"><meta name="google-site-verification" content="0y-kCoVvvh4MC3Wdy95sWzlH9-NbOiAGvy2Z5zdPrm0"><script data-goatcounter="https://earnings-scanner.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script><style>
+:root{
+  --paper:#FFFFFF;--surface:#F4F5F3;--ink:#15191E;--ink-2:#525A63;--rule:#D9DCDF;
+  --brand:#1B3A5C;--pop:#0FB3C8;--pop-fill:#D5F4F8;
+  --safe:#2F6B4F;--watch:#9A6212;--risk:#A23B2C;--safe-bg:#E8F0EB;--watch-bg:#F6EEDF;--risk-bg:#F5E4E1;
+  --serif:"Source Serif 4",Georgia,serif;--sans:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root{
+  --paper:#121518;--surface:#191D21;--ink:#E7E9EA;--ink-2:#9AA2AA;--rule:#2B3137;--brand:#9DBCDD;
+  --pop:#3CCFE0;--pop-fill:#11373D;--safe:#79B394;--watch:#D6A452;--risk:#E2806F;
+  --safe-bg:#1B2A22;--watch-bg:#2C2416;--risk-bg:#2E1C19;color-scheme:dark}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans);font-variant-numeric:tabular-nums}
+.wrap{max-width:1040px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left))}
+a{color:var(--brand)} a:hover{text-decoration-thickness:2px}
+h1,h2,h3{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;line-height:1.15;text-wrap:balance}
+h1{font-size:clamp(1.8rem,4vw,2.6rem);margin:.2em 0 .3em}
+h2{font-size:1.35rem;margin:0 0 .5em}
+p{max-width:68ch}
+.dim{color:var(--ink-2)} .mono{font-family:var(--mono);font-size:.85em}
+.label{font:500 .72rem/1.2 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.mast{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.word{display:flex;align-items:center;gap:9px;font:600 1.35rem var(--serif);color:var(--ink);text-decoration:none}
+.nav{display:flex;flex-wrap:wrap;gap:20px;font-size:.92rem}
+.nav a{color:var(--ink-2);text-decoration:none} .nav a.on,.nav a:hover{color:var(--ink);box-shadow:inset 0 -2px 0 var(--brand)}
+section{border-top:1px solid var(--rule);padding:32px 0;display:grid;gap:14px}
+section:first-of-type{border-top:0}
+.hl{background:var(--pop-fill);box-shadow:inset 0 -2px 0 var(--pop);padding:0 .15em}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th{font:500 .7rem var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);text-align:left;padding:7px 8px;border-bottom:1px solid var(--ink);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+td.n,th.n{text-align:right} tr:hover td{background:var(--surface)}
+.read{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.read::before{content:"";width:8px;height:8px;background:var(--c,var(--ink-2));flex:none}
+td.why{width:38%;min-width:120px}td.why .read{white-space:normal}.sub{display:block;font-size:.82rem;color:var(--ink-2);margin-top:2px}.bar{display:block;height:6px;background:var(--rule);margin-top:6px;max-width:160px}.bar span{display:block;height:6px}
+.big{font-size:1.5rem;font-weight:600}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border-top:1px solid var(--rule)}
+.stat{padding:14px 16px 14px 0;border-bottom:1px solid var(--rule)}
+.stat .v{font:600 1.9rem var(--sans);display:block}
+.note{font-size:.8rem;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:8px}
+.banner{border-left:3px solid var(--risk);background:var(--risk-bg);padding:10px 14px}
+.flags{list-style:none;padding:0;margin:0;display:grid}
+.flags li{padding:9px 0;border-bottom:1px solid var(--rule);display:grid;grid-template-columns:130px minmax(0,1fr);gap:14px}
+@media (max-width:560px){.flags li{grid-template-columns:1fr;gap:2px}}
+.chip{font-size:.75rem;font-weight:500;padding:2px 7px;border-radius:2px;color:var(--c);background:var(--cb);justify-self:start}
+input,select{font:inherit;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:2px;padding:7px 9px}
+input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.search{position:relative;max-width:520px}
+.search input{width:100%;font-size:1rem;padding:10px 12px}
+.results{position:absolute;left:0;right:0;top:100%;background:var(--paper);border:1px solid var(--rule);border-top:0;z-index:5;max-height:320px;overflow:auto}
+.results a{display:flex;justify-content:space-between;gap:12px;padding:8px 12px;text-decoration:none;color:var(--ink);border-bottom:1px solid var(--rule)}
+.results a:hover,.results a:focus{background:var(--surface)}
+svg text{fill:var(--ink-2);font:11px var(--sans)}
+footer{border-top:1px solid var(--rule);margin-top:40px;padding:20px 0 40px;font-size:.82rem;color:var(--ink-2)}
+.filters{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:end}
+.filters label{display:grid;gap:4px;font-size:.78rem;color:var(--ink-2)}
+button{font:inherit;border:1px solid var(--brand);background:var(--brand);color:var(--paper);padding:7px 12px;border-radius:2px;cursor:pointer}
+.btn{font:500 .85rem var(--sans);color:var(--ink);background:var(--paper);border:1px solid var(--ink);border-radius:2px;padding:7px 12px;cursor:pointer}.btn:hover{background:var(--surface)}
+.watchbox{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:12px 0}
+td.ind{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} td.d{white-space:nowrap} .filters select{max-width:240px}
+.lede{font-size:1.15rem;line-height:1.5;color:var(--ink)}ul.cases{list-style:none;padding:0;margin:0}ul.cases li{padding:12px 0;border-bottom:1px solid var(--rule)}
+th.sort{cursor:pointer} th.sort:hover{color:var(--ink)}
+</style></head><body><div class="wrap">
+<header class="mast"><a class="word" href="index.html"><svg width="24" height="16" viewBox="0 0 26 18" aria-hidden="true"><path d="M1 6 H12 M14 12 H25" stroke="var(--brand)" stroke-width="2.4" fill="none"/><path d="M12 6 L14 12" stroke="var(--pop)" stroke-width="2.4" fill="none"/></svg>Faultline</a><nav class="nav" aria-label="Main"><a href="index.html">Home</a><a href="new.html">New filings</a><a href="alerts.html">Alerts</a><a href="receipts.html">Receipts</a><a href="screener.html">Screener</a><a href="track-record.html">Track record</a><a href="methodology.html" class=on>Methodology</a><a href="about.html">About</a></nav></header>
+<main><section><h1>Methodology</h1>
+<h2>Data</h2><p>All numbers come from the SEC's free EDGAR XBRL data: about 39 million reported values from 15,686 companies that filed an
+annual report since 2009, including 10,349 that later stopped filing. A list of only today's companies would hide every failure, which
+makes any warning score look worse than it is.</p>
+<h2>Point in time</h2><p>Each year's numbers are taken from that year's original 10-K, dated by the day it was filed. Later corrections
+are kept separately and never used in tests. A number that first appeared in a later filing is left out of that year.</p>
+<h2>Cleaning</h2><p>Companies tag the same item in different ways. Faultline maps 21 items to their XBRL tags. When one filing reports two
+different revenue figures, it keeps the one where revenue minus cost of goods equals gross profit. Five companies were checked by hand
+against their 10-Ks (Apple, Sears, General Mills, SVB, Conagra), and all matched.</p>
+<h2>Checking the outcomes</h2><p>Bankruptcies come from 8-K filings tagged Item 1.03, but filers sometimes tag the wrong item. Faultline
+reads the text of every bankruptcy-tagged 8-K and drops the ones that never mention a bankruptcy: 17 of 2,139 since 2009 (for example,
+a 2011 Duke Energy 8-K). <a href="receipts.html">Receipts</a> lists every recent bankruptcy and what the score said before it.</p>
+<h2>Percentiles</h2><p>"Riskier than X% of filers" compares a filing only with the filings made in the 365 days before it, never with
+later ones, so the comparison uses only what was public at the time.</p>
+<h2>Classic scores</h2><p>Altman Z-Score (1968) uses five ratios to measure bankruptcy risk; market value comes from the public float
+on the 10-K cover page. Z'' (1995) swaps market value for book equity. Piotroski F-Score (2000) counts nine pass/fail health tests.
+Beneish M-Score (1999) combines eight ratios that tend to move before earnings manipulation is found.</p>
+<h2>Faultline models</h2><p>Two gradient-boosted tree models read 46 values per company-year: every part of the classic scores, size,
+profitability, debt, growth, how long the 10-K took to file, recent auditor changes, late filings and amendments, and whether the
+10-K uses five warning phrases (found with SEC's full-text search). The phrases did not improve the models, but they are shown on company pages. One predicts a
+bankruptcy filing (8-K Item 1.03) within two years, the other a restatement notice (8-K Item 4.02). For filings made in a given year,
+each model is trained only on companies whose two-year outcome was known before that year started.</p>
+<h2>Quarterly updates</h2><p>Between 10-Ks, each company's 10-Qs are scored too. A 10-Q's income statement covers only the year so far,
+so Faultline builds trailing twelve months: this year so far, plus the last full year, minus the same part of last year, using only
+numbers public on the 10-Q's filing date. Public float comes from the latest 10-K. A separate model is trained on 10-Q rows with the
+same walk-forward rule.</p>
+<h2 id="why">Why this score</h2><p>Each company page breaks its bankruptcy risk into ten areas: debt and financing, retained
+earnings, profits, cash flow, short-term cash, sales, company size, accounting patterns, the classic scores, and warning signs in
+filings. For each area, the same model that scored the filing scores it again with that area's values replaced by a typical
+company's (the median of the years the model learned from). If the risk falls, the area was pushing it up. The areas overlap, so the
+effects do not add up exactly. One result can look odd: larger companies sometimes get a size effect that raises risk. That is because
+small companies in trouble usually stop filing instead of filing for bankruptcy, so most formal bankruptcy filings in the data come
+from larger companies.</p>
+<h2>What the scores are not</h2><p>A score is a ranking of how a company's filings compare with the filings of companies that later failed
+or restated. It is not a forecast for any single company and not investment advice. Financial companies are not scored.</p>
+<h2>Paper and code</h2><p>A write-up of the method and results is in the <a href="Faultline-paper.pdf">research paper (PDF)</a>. The full pipeline is open source on <a href="https://github.com/mahirzmansuri-hash/earnings-scanner">GitHub</a>.</p></section></main>
+<footer>Faultline is research, not investment advice. Data: SEC EDGAR filings (free public data).
+Scores use only information that was public on each filing date.
+<a href="methodology.html">How it works</a> · <a href="api/index.html">Free data API</a> · <a href="about.html">About</a></footer>
+</div></body></html>

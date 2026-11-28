@@ -1,0 +1,23 @@
+{
+ "version": "v1",
+ "as_of": "2026-11-25",
+ "fields": {
+  "cik": "SEC Central Index Key (company id)",
+  "name": "company name",
+  "ticker": "main ticker, if any",
+  "industry": "SEC industry (SIC) description",
+  "status": "active or inactive (no filings for over a year: delisted, acquired or bankrupt)",
+  "filed": "filing date of the 10-K behind the scores (the date the data became public)",
+  "period_end": "fiscal period end of that 10-K",
+  "bankruptcy_risk": "calibrated probability of a bankruptcy filing within 2 years (0-1)",
+  "bankruptcy_percentile": "share of 10-Ks filed in the previous 365 days with a lower risk (0-1)",
+  "restatement_risk": "calibrated probability of a restatement notice (8-K Item 4.02) within 2 years (0-1)",
+  "restatement_percentile": "share of 10-Ks filed in the previous 365 days with a lower restatement risk (0-1)",
+  "altman_z": "Altman Z-Score (1968); below 1.8 distress, above 3 safe",
+  "piotroski_f": "Piotroski F-Score (0-9); higher is stronger",
+  "beneish_m": "Beneish M-Score; above -1.78 flags possible earnings manipulation",
+  "latest_10q": "latest 10-Q update: filing date, bankruptcy risk and percentile among 10-Qs of the previous 365 days"
+ },
+ "source": "SEC EDGAR (XBRL company facts, filing index)",
+ "docs": "https://mahirzmansuri-hash.github.io/earnings-scanner/api/index.html"
+}
