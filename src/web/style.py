@@ -78,8 +78,8 @@ FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox
            "stroke='%231B3A5C' stroke-width='3' fill='none'/%3E%3Cpath d='M12 6L14 12' stroke='%230FB3C8' stroke-width='3'/%3E%3C/svg%3E")
 
 # Visitor counting (both public values, not secrets). Empty = nothing added to the pages.
-GOATCOUNTER_CODE = ""      # the "code" from your GoatCounter site, e.g. "faultline" for faultline.goatcounter.com
-GOOGLE_VERIFY = ""         # Search Console "HTML tag" method: just the content="..." value
+GOATCOUNTER_CODE = "earnings-scanner"      # the "code" from your GoatCounter site, e.g. "faultline" for faultline.goatcounter.com
+GOOGLE_VERIFY = "0y-kCoVvvh4MC3Wdy95sWzlH9-NbOiAGvy2Z5zdPrm0"         # Search Console "HTML tag" method: just the content="..." value
 
 
 def head_extras() -> str:
