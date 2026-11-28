@@ -36,10 +36,11 @@ For restatements (8-K Item 4.02 notices), Faultline's AUC is 0.74 against 0.52 f
 2. **Facts.** Each company's XBRL facts come from SEC's companyfacts API (polite: under 8 requests per second, User-Agent from a private `.env`). About 39 million annual-report values go into DuckDB.
 3. **Point in time.** Every value keeps the date it was first filed. Tests use only the original 10-K's numbers, never later corrections. Corrections are kept separately and shown as revisions.
 4. **Cleaning.** A tag map turns 21 accounting items into consistent inputs. When one filing reports conflicting revenue figures, the one where revenue minus cost of goods equals gross profit wins. Five companies were checked by hand against their 10-Ks.
-5. **Events.** Bankruptcy filings, restatement notices, auditor changes, late filings and amendments come from the same SEC data.
+5. **Events.** Bankruptcy filings, restatement notices, auditor changes, late filings and amendments come from the same SEC data. Filer item tags can be wrong, so every bankruptcy 8-K's text is read to confirm it is about a bankruptcy.
 6. **Text.** SEC full-text search flags 10-Ks containing five warning phrases, with no document downloads.
-7. **Models.** Gradient-boosted trees (scikit-learn) on 46 point-in-time features, tested walk-forward by year.
+7. **Models.** Gradient-boosted trees (scikit-learn) on 46 point-in-time features, tested walk-forward by year. Percentiles ("riskier than X% of filers") compare each filing only with filings from the 365 days before it.
 8. **Site.** A Python script writes a static site (one page per company) that GitHub Pages serves. A GitHub Actions job rebuilds everything every Sunday.
+9. **Extras.** Alerts with RSS feeds for every company, a weekly email digest, a Receipts page (every recent bankruptcy and the score before it), five case studies (Sears, Bed Bath & Beyond, GE, Kraft Heinz, SVB) and a [free JSON API](https://mahirzmansuri-hash.github.io/earnings-scanner/api/index.html) with every score, no key needed.
 
 ## Run it yourself
 

@@ -125,5 +125,5 @@ def page(title: str, body: str, description: str, root: str = "", active: str = 
 <main>{body}</main>
 <footer>Faultline is research, not investment advice. Data: SEC EDGAR filings (free public data).
 Scores use only information that was public on each filing date.
-<a href="{root}methodology.html">How it works</a> · <a href="{root}about.html">About</a></footer>
+<a href="{root}methodology.html">How it works</a> · <a href="{root}api/index.html">Free data API</a> · <a href="{root}about.html">About</a></footer>
 </div></body></html>"""

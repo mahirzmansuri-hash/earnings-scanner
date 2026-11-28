@@ -39,7 +39,7 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 ## SEC 8-K item tags can be wrong
 - **Symptom:** Granite Construction (healthy) appeared as a bankruptcy on Receipts.
 - **Cause:** our events come from the item tags in SEC's filing index; the filer tagged Item 1.03 on an 8-K about a note exchange. SEC's full-submission .txt header repeats the tag, so text checks must skip it.
-- **Fix:** `src/pipeline/verify_bk.py` reads recent bankruptcy 8-Ks (main document first) and drops ones that never mention bankruptcy. Older training labels are not checked yet (rare; would need ~1,000 fetches).
+- **Fix:** `src/pipeline/verify_bk.py` reads every bankruptcy 8-K (main document first) and deletes ones that never mention bankruptcy from `events`. Full history checked Nov 28: 17 of 2,139 were mis-tagged (e.g. Duke Energy 2011, Ping Identity 2022, Innophos 2010, A. M. Castle 2013); 11 couldn't be read and stay counted. Results live in `data/reference/bk_check.json` (committed) so the weekly run has the full history.
 
 ## Percentiles ranked within a calendar year peek ahead
 - **Symptom:** none visible; found while writing answers to likely criticism.

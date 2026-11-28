@@ -5,9 +5,10 @@ Run:  python -m src.pipeline.verify_bk     (after events)
 Our bankruptcy events come from SEC's filing index, which lists the 8-K items the filer tagged. Tags can be
 wrong: Granite Construction's 8-K of Feb 18, 2026 is tagged Item 1.03 (bankruptcy) but is about a note exchange.
 For the public Receipts page we read every bankruptcy 8-K from the last 2 years and keep it only if the text
-mentions Item 1.03, chapter 11/7, a bankruptcy court or receivership.
+mentions Item 1.03, chapter 11/7, a bankruptcy court or receivership. Filings that fail are deleted from the events
+table, so model labels, backtests, alerts and the site never count them.
 
-Results are cached in data/raw/bk_check.json (each filing is read once). Table bk_verified(accn, verified).
+Results are kept in data/reference/bk_check.json, committed to the repo (each filing is read once, ever). Table bk_verified(accn, verified).
 """
 import html
 import json
@@ -17,9 +18,9 @@ import time
 import duckdb
 import requests
 
-from src.config import DB_PATH, RAW_DIR, sec_user_agent
+from src.config import DB_PATH, ROOT, sec_user_agent
 
-CACHE = RAW_DIR / "bk_check.json"
+CACHE = ROOT / "data" / "reference" / "bk_check.json"   # committed to the repo: every run starts with the full history
 WORDS = re.compile(r"item\s*1\.03|chapter\s*(11|7)\b|bankruptcy\s+court|receiver(ship)?\b", re.I)
 
 
@@ -59,6 +60,11 @@ def main(all_years: bool = False):
     with duckdb.connect(str(DB_PATH)) as con:
         con.execute("CREATE OR REPLACE TABLE bk_verified (accn VARCHAR, verified BOOLEAN)")
         con.executemany("INSERT INTO bk_verified VALUES (?, ?)", [(a, v) for a, v in cache.items() if v is not None])
+        # drop mis-tagged "bankruptcies" from events, so labels, backtests, alerts and the site all agree
+        n = con.execute("""SELECT COUNT(*) FROM events WHERE event = 'bankruptcy'
+                           AND accn IN (SELECT accn FROM bk_verified WHERE NOT verified)""").fetchone()[0]
+        con.execute("DELETE FROM events WHERE event = 'bankruptcy' AND accn IN (SELECT accn FROM bk_verified WHERE NOT verified)")
+        print(f"  removed {n} mis-tagged bankruptcy events")
     bad = [a for a, v in cache.items() if v is False]
     print(f"bk_verified: {len(ev)} bankruptcy 8-Ks checked, {len(bad)} not about bankruptcy: {bad}")
 

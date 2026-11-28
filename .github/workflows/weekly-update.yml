@@ -38,7 +38,6 @@ jobs:
             data/raw/companyfacts
             data/raw/fulltext
             data/raw/aaer
-            data/raw/bk_check.json
           key: companyfacts-${{ github.run_id }}
           restore-keys: companyfacts-
 
@@ -56,7 +55,6 @@ jobs:
             data/raw/companyfacts
             data/raw/fulltext
             data/raw/aaer
-            data/raw/bk_check.json
           key: companyfacts-${{ github.run_id }}
 
       - name: Publish to GitHub Pages

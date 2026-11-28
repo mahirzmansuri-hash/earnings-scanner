@@ -681,6 +681,7 @@ def build():
                                   UNION ALL SELECT cik, available_date::DATE, q_pctile, '10-Q' FROM risk_q WHERE q_pctile IS NOT NULL ORDER BY cik, d, src""").df()
         not_bankruptcy = frozenset(a for (a,) in con.execute("SELECT accn FROM bk_verified WHERE NOT verified").fetchall()) \
             if con.execute("SELECT COUNT(*) FROM duckdb_tables() WHERE table_name = 'bk_verified'").fetchone()[0] else frozenset()
+        rq_all = con.execute("SELECT * FROM risk_q ORDER BY cik, available_date, accn").df()
         names_all = con.execute("SELECT d.cik, d.display_name AS name, c.tickers FROM display_names d JOIN companies c USING (cik)").df()
     RISK_Q.update({r.cik: r for r in rq.itertuples()})
     ALERT_COUNT.update(alerts["cik"].value_counts().to_dict())
@@ -708,6 +709,9 @@ def build():
     receipts_n = write_receipts(events, timeline, names_all, set(latest["cik"]), as_of, not_bankruptcy)
     from src.web.cases import CASES, write_cases
     write_cases(SITE, timeline, HIST, events, chart, set(latest["cik"]))
+    from src.web.api import write_api
+    n_api = write_api(SITE, latest, HIST, rq_all, ev_by, WHY, AAER,
+                      receipts_rows(events, timeline, as_of, not_bankruptcy=not_bankruptcy), pd.Timestamp(as_of).date())
     comp = [{"c": int(r.cik), "n": r.name, "t": r.tickers if isinstance(r.tickers, str) else "",
              "f": r.former_names if isinstance(r.former_names, str) else "", "i": txt(r.sic_description), "s": r.status,
              "r": None if isnan(r.revenue) else float(r.revenue), "b": round(float(r.bankruptcy_risk), 4),
@@ -731,12 +735,12 @@ def build():
     (SITE / "about.html").write_text(about())
     # sitemap + robots.txt so search engines can find every company page
     from src.web.style import SITE_URL
-    urls = ["", "new.html", "alerts.html", "receipts.html", "research/index.html"] + [f"research/{c['slug']}.html" for c in CASES] + ["digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
+    urls = ["", "new.html", "alerts.html", "receipts.html", "research/index.html"] + [f"research/{c['slug']}.html" for c in CASES] + ["digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html", "api/index.html"] + [f"c/{c}.html" for c in latest["cik"]]
     (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
                                       + "".join(f"<url><loc>{SITE_URL}{u}</loc><lastmod>{as_of}</lastmod></url>" for u in urls) + "</urlset>")
     (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")
     size = sum(p.stat().st_size for p in SITE.rglob("*") if p.is_file())
-    print(f"site/: {len(latest):,} company pages, {size/1e6:.0f} MB; receipts: {receipts_n}")
+    print(f"site/: {len(latest):,} company pages, {size/1e6:.0f} MB; receipts: {receipts_n}; API: {n_api:,} companies")
 
 
 if __name__ == "__main__":
