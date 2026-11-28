@@ -41,21 +41,28 @@ def check(cik: int, accn: str, head: dict) -> bool | None:
         return None                             # couldn't read it: try again next run
 
 
-def main():
+def main(all_years: bool = False):
+    """Default: bankruptcy 8-Ks from the last 2 years (weekly run). all_years=True: every one since 2009 (one-off)."""
     cache = json.loads(CACHE.read_text()) if CACHE.exists() else {}
     head = {"User-Agent": sec_user_agent()}
+    since = "" if all_years else "AND filed >= (SELECT MAX(filed) FROM events) - INTERVAL 730 DAY"
+    with duckdb.connect(str(DB_PATH), read_only=True) as con:     # open only briefly: other steps can read meanwhile
+        ev = con.execute(f"""SELECT DISTINCT cik, accn, filed FROM events WHERE event = 'bankruptcy' {since} ORDER BY filed, accn""").fetchall()
+    ev = [(c, a) for c, a, _ in ev]
+    for i, (cik, accn) in enumerate(ev, 1):
+        if i % 200 == 0:
+            print(f"  {i:,}/{len(ev):,}", flush=True)
+            CACHE.write_text(json.dumps(cache, indent=0, sort_keys=True))     # save progress
+        if not cache.get(accn):           # unread or failed: (re)check, so a fix to check() applies to old misses
+            cache[accn] = check(cik, accn, head)
+    CACHE.write_text(json.dumps(cache, indent=0, sort_keys=True))
     with duckdb.connect(str(DB_PATH)) as con:
-        ev = con.execute("""SELECT cik, accn FROM events WHERE event = 'bankruptcy'
-                            AND filed >= (SELECT MAX(filed) FROM events) - INTERVAL 730 DAY ORDER BY filed""").fetchall()
-        for cik, accn in ev:
-            if not cache.get(accn):           # unread or failed: (re)check, so a fix to check() applies to old misses
-                cache[accn] = check(cik, accn, head)
-        CACHE.write_text(json.dumps(cache, indent=0, sort_keys=True))
         con.execute("CREATE OR REPLACE TABLE bk_verified (accn VARCHAR, verified BOOLEAN)")
         con.executemany("INSERT INTO bk_verified VALUES (?, ?)", [(a, v) for a, v in cache.items() if v is not None])
     bad = [a for a, v in cache.items() if v is False]
-    print(f"bk_verified: {len(ev)} recent bankruptcy 8-Ks checked, {len(bad)} not about bankruptcy: {bad}")
+    print(f"bk_verified: {len(ev)} bankruptcy 8-Ks checked, {len(bad)} not about bankruptcy: {bad}")
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(all_years="--all" in sys.argv)

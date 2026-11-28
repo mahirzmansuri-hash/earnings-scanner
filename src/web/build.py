@@ -429,7 +429,8 @@ def track_record(results):
     cl = "".join(f'<tr><td>{e(k.replace("__", ", ").replace("_", " "))}</td><td class="n">{v["events_in_period"]:,} ({v["events_with_score"]:,})</td>'
                  f'<td class="n">{v["hit_rate"]*100:.1f}%</td><td class="n">{v["alarm_rate"]*100:.1f}%</td><td class="n">{v["lift"]:.1f}x</td></tr>'
                  for k, v in tr.items())
-    body = f"""<section><h1>Track record</h1><p class="dim">Full write-up: <a href="Faultline-paper.pdf">research paper (PDF)</a>.</p><p>Every number here comes from a test where the model was trained only on years whose
+    body = f"""<section><h1>Track record</h1><p class="dim">Full write-up: <a href="Faultline-paper.pdf">research paper (PDF)</a>. Stories behind the numbers:
+<a href="research/index.html">case studies</a> (Sears, Bed Bath &amp; Beyond, GE, Kraft Heinz, SVB) and <a href="receipts.html">Receipts</a>.</p><p>Every number here comes from a test where the model was trained only on years whose
 outcomes were already known, then scored years it had never seen ({c['test_years']}). Companies that later failed or stopped filing
 are included. Banks, insurers and other financial companies are left out because these scores were not built for them.</p></section>
 <section><h2>Bankruptcy within two years</h2><p class="dim">{c['company_years']:,} company-years with an Altman score, {c['bankruptcies']} followed by a bankruptcy filing.</p>
@@ -705,6 +706,8 @@ def build():
         (SITE / "c" / f"{r.cik}.html").write_text(company_page(r, HIST[r.cik], ev_by.get(r.cik, empty_ev), accn_map, as_of))
     write_alerts(alerts, timeline, latest, as_of)
     receipts_n = write_receipts(events, timeline, names_all, set(latest["cik"]), as_of, not_bankruptcy)
+    from src.web.cases import CASES, write_cases
+    write_cases(SITE, timeline, HIST, events, chart, set(latest["cik"]))
     comp = [{"c": int(r.cik), "n": r.name, "t": r.tickers if isinstance(r.tickers, str) else "",
              "f": r.former_names if isinstance(r.former_names, str) else "", "i": txt(r.sic_description), "s": r.status,
              "r": None if isnan(r.revenue) else float(r.revenue), "b": round(float(r.bankruptcy_risk), 4),
@@ -728,7 +731,7 @@ def build():
     (SITE / "about.html").write_text(about())
     # sitemap + robots.txt so search engines can find every company page
     from src.web.style import SITE_URL
-    urls = ["", "new.html", "alerts.html", "receipts.html", "digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
+    urls = ["", "new.html", "alerts.html", "receipts.html", "research/index.html"] + [f"research/{c['slug']}.html" for c in CASES] + ["digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html"] + [f"c/{c}.html" for c in latest["cik"]]
     (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
                                       + "".join(f"<url><loc>{SITE_URL}{u}</loc><lastmod>{as_of}</lastmod></url>" for u in urls) + "</urlset>")
     (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")

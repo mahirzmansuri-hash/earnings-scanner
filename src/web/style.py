@@ -63,6 +63,7 @@ button{font:inherit;border:1px solid var(--brand);background:var(--brand);color:
 .btn{font:500 .85rem var(--sans);color:var(--ink);background:var(--paper);border:1px solid var(--ink);border-radius:2px;padding:7px 12px;cursor:pointer}.btn:hover{background:var(--surface)}
 .watchbox{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.controls{display:flex;flex-wrap:wrap;gap:16px;align-items:center;margin:12px 0}
 td.ind{max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} td.d{white-space:nowrap} .filters select{max-width:240px}
+.lede{font-size:1.15rem;line-height:1.5;color:var(--ink)}ul.cases{list-style:none;padding:0;margin:0}ul.cases li{padding:12px 0;border-bottom:1px solid var(--rule)}
 th.sort{cursor:pointer} th.sort:hover{color:var(--ink)}
 """
 
