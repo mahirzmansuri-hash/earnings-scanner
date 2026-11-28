@@ -110,3 +110,15 @@ Fixes: model input had 194 duplicate rows (fiscal-year changes matched two prior
 | Zmijewski | 0.743 | 5 / 13 / 47% |
 | Faultline | 0.847 | 37 / 53 / 70% |
 | v2 test (+ trends, industry, O, Zmijewski as inputs) | 0.847 | 35 / 52 / 71% |
+
+## Nov 28, 2026: corrected bankruptcy labels + point-in-time percentiles (current numbers)
+- Read all 2,139 bankruptcy-tagged 8-Ks; 17 were mis-tagged and removed (11 unreadable kept). Bankrupt companies: 1,134.
+- **Bankruptcy, 2016-2023:** 25,195 company-years, 539 bankruptcies. AUC 0.848 vs Altman 0.708, Ohlson 0.720, Zmijewski 0.745. Riskiest 5/10/20%: 36/52/71% (Altman 5/13/38%). At Altman's 50% alarm rate: 92.4% vs 85.9%; alarm rate to match Altman's hits: 34.8%.
+- **Ablation:** classic parts 0.831; + size & fundamentals 0.848; + events 0.850; + text 0.848; v2 0.850; events only 0.639; text only 0.638.
+- **Classic (12-24 months ahead):** Altman distress 83.7% of 418 bankruptcies at 49.2% alarm rate (2.38% vs 0.43%, 5.5x); Piotroski weak 40.1% at 17.9%.
+- **Quarterly (99,584 10-Q dates):** AUC 0.808 (last 10-K) / 0.825 (fresh 10-Q) / 0.836 (both); riskiest 10% 43% / 51% / 49%; 10-K over 8 months old 0.846 vs 0.864; warned 263 vs 324 of 464, median 507 vs 512 days (the old "45 days earlier" no longer holds).
+- **By year:** 2016 0.84/0.72, 2017 0.84/0.78, 2018 0.80/0.72, 2019 0.87/0.70, 2020 0.91/0.71, 2021 0.88/0.74, 2022 0.83/0.67, 2023 0.87/0.71. **Size:** <$100M 0.77/0.62, $100M-1B 0.89/0.81, >$1B 0.90/0.78.
+- **Calibration:** top decile 11.2% predicted vs 9.3% actual; ninth 2.7% vs 3.5%.
+- **Distress exit:** 0.835 vs 0.748. **Restatement:** 0.737 vs Beneish 0.521. **Fraud real time:** 0.632.
+- **Stocks:** riskiest 10% median -12.4% vs safest half +2.4%; lost half 32.0% vs 11.2%; wiped out 10.1% vs 1.0%; gap held 5 of 7 years.
+- **Receipts (after retrain):** since 2017, 328 of 475 (69%) in the riskiest 10% at the last score, 3.6% in the safer half; last 12 months 28 of 39. Before the label fix: 338 (71%) and 30 of 39; companies sitting right at the 90% line flip with small model changes.

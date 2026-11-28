@@ -11,7 +11,7 @@ and publishes how often its warnings came true, dead companies included."
 ## What makes it worth talking about (our hooks)
 1. **Receipts.** Car-Mart filed for bankruptcy this month; Faultline had it riskier than 90% of filers beforehand.
    Every week's digest produces new receipts automatically.
-2. **Beats the textbook.** AUC 0.85 vs Altman Z 0.71; the riskiest 10% caught 53% of bankruptcies vs 13%.
+2. **Beats the textbook.** AUC 0.85 vs Altman Z 0.71; the riskiest 10% caught 52% of bankruptcies vs 13%.
 3. **Honest failures.** Fraud model is weak (AUC 0.63), so we don't publish a fraud score. SVB is a "where scores fail" case.
    Honesty is rare and people share it.
 4. **Built by a high-school sophomore with AI-assisted development.** True, and a story on its own. Always say "AI-assisted."
@@ -42,7 +42,7 @@ Drafts for every step: `docs/marketing/launch-kit.md`. Chart: `docs/marketing/oc
 |---|---|---|---|
 | 1 | Finance/business teacher or club leader (written message) | ask for 10 minutes of honest feedback | expert eyes before strangers; no pitching |
 | 2 | r/SecurityAnalysis | method + results + what failed, ask for criticism | analysts like method + honesty |
-| 3 | r/dataisbeautiful ([OC]) | decile chart: 71% of 475 bankruptcies were in the riskiest 10% | big audience, chart-only |
+| 3 | r/dataisbeautiful ([OC]) | decile chart: 69% of 475 bankruptcies were in the riskiest 10% | big audience, chart-only |
 | 4 | Hacker News "Show HN" | the site, first comment explains how it's built | qualifies: usable with no signup |
 | 5+ | r/ValueInvesting, r/accounting | one case study each | ongoing |
 

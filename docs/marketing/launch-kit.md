@@ -1,7 +1,7 @@
 # Faultline launch kit (online-first)
 
-Drafts for Mahir to edit and post in his own words. Claude never posts. Numbers are from the data as of 2026-11-25;
-re-run `scripts/make_oc_chart.py` before posting so the chart and numbers are current.
+Drafts for Mahir to edit and post in his own words. Claude never posts. Numbers are from the data as of 2026-11-25 and move a
+little every week (and moved after the Nov 28 label fix); check the Receipts page and re-run `scripts/make_oc_chart.py` before posting.
 
 **Order:** 1 teacher message → 2 r/SecurityAnalysis → 3 r/dataisbeautiful → 4 Show HN. One per week.
 After each post, reply to comments for the first 2 hours, then paste the useful criticism into the build log.
@@ -9,14 +9,14 @@ After each post, reply to comments for the first 2 hours, then paste the useful 
 **Numbers you can quote (and where they come from):**
 | Claim | Number | Source |
 |---|---|---|
-| Recent receipts | 30 of 39 companies that filed for bankruptcy in the last 12 months were already in the riskiest 10% | Receipts page |
-| Full history | 338 of 475 (71%) bankruptcies since 2017 were in the riskiest 10% at their last score; 4% were in the safer half | `oc-bankruptcy-deciles.png` |
+| Recent receipts | 28 of 39 companies that filed for bankruptcy in the last 12 months were already in the riskiest 10% | Receipts page |
+| Full history | 328 of 475 (69%) bankruptcies since 2017 were in the riskiest 10% at their last score; 4% were in the safer half | `oc-bankruptcy-deciles.png` |
 | Warning time | median 327 days from first entering the riskiest 10% to the filing (looks back at most 13 months) | same |
 | Vs. textbook | AUC 0.85 vs Altman Z 0.71, Ohlson 0.72, Zmijewski 0.74 (bankruptcy within 2 years of each 10-K, 2016-2023 test years) | Track record page |
 | Honest failure | fraud prediction only AUC 0.63, so the site shows SEC cases as facts, no fraud score | Track record page |
 
-Two different "riskiest 10%" numbers exist, so don't mix them up: **53%** = of all bankruptcies within 2 years of a 10-K, how many
-that 10-K's score put in the riskiest 10% (the formal test). **71%** = the *last* score before each bankruptcy (closer to the event, so higher).
+Two different "riskiest 10%" numbers exist, so don't mix them up: **52%** = of all bankruptcies within 2 years of a 10-K, how many
+that 10-K's score put in the riskiest 10% (the formal test). **69%** = the *last* score before each bankruptcy (closer to the event, so higher).
 
 ---
 
@@ -27,7 +27,7 @@ that 10-K's score put in the riskiest 10% (the formal test). **71%** = the *last
 > Hi [name],
 >
 > I've been building a website called Faultline that scores every US public company for bankruptcy risk using SEC filings,
-> then checks how often the warnings came true. For example, 30 of the 39 companies that went bankrupt this year were already
+> then checks how often the warnings came true. For example, 28 of the 39 companies that went bankrupt this year were already
 > in its riskiest 10% beforehand.
 >
 > I built it with AI-assisted development, and I want honest feedback from someone who knows finance. Would you be willing to spend
@@ -56,18 +56,19 @@ that 10-K's score put in the riskiest 10% (the formal test). **71%** = the *last
 >
 > **Results (test years 2016-2023, ~25,000 company-years, 539 bankruptcies within 2 years of a 10-K):**
 > - Ranking accuracy (AUC): 0.85, vs 0.71 for Altman Z, 0.72 Ohlson O, 0.74 Zmijewski on the same rows.
-> - The riskiest 10% of filers contained 53% of later bankruptcies (Altman Z's riskiest 10%: 13%).
-> - At the last score before the filing, 338 of 475 bankruptcies since 2017 (71%) were in the riskiest 10%.
-> - Fresh 10-Q numbers (trailing twelve months) help, most when the last 10-K is old: AUC 0.85 → 0.88 when the 10-K is 8+ months old.
+> - The riskiest 10% of filers contained 52% of later bankruptcies (Altman Z's riskiest 10%: 13%).
+> - At the last score before the filing, 328 of 475 bankruptcies since 2017 (69%) were in the riskiest 10%.
+> - Fresh 10-Q numbers (trailing twelve months) help, most when the last 10-K is old: AUC 0.85 → 0.86 when the 10-K is 8+ months old, and 324 vs 263 of 464 later-bankrupt companies flagged.
 >
 > **What didn't work:**
 > - Fraud. Using SEC enforcement cases (AAERs) as labels, the best model got AUC 0.63 in real time (Beneish M-Score: 0.58).
 >   The SEC takes a median of ~6 years to announce a case, so there's little to learn from. I don't publish a fraud score.
 > - Banks and insurers aren't scored (balance sheets don't fit these models). SVB is on the site as a "where scores fail" case.
-> - Adding trend and industry features gave no gain (0.847 both ways).
+> - Adding trend and industry features barely helped (AUC 0.850 vs 0.848).
 >
 > **Biggest data lesson:** SEC's 8-K item tags are sometimes wrong. A healthy company's note exchange was tagged as a bankruptcy
-> filing, so the pipeline now reads the actual text of each bankruptcy 8-K.
+> filing, so I read the text of all 2,139 bankruptcy-tagged 8-Ks since 2009: 17 weren't about bankruptcy (Duke Energy in 2011,
+> for one). Removing them and retraining moved the AUC from 0.847 to 0.848.
 >
 > Every company has a page with the score and a breakdown of what drives it, and there's a list of every recent bankruptcy
 > with what the model said before (misses included): [link to receipts page]
@@ -113,7 +114,7 @@ It usually gets a kinder reception, but it's your call.
 > measuring the change.
 >
 > Track record (2016-2023 test years): AUC 0.85 vs 0.71 for the Altman Z-Score. The Receipts page lists every bankruptcy in the
-> last 12 months and what the model said before; 30 of 39 were already in the riskiest 10%. What didn't work is on the site too:
+> last 12 months and what the model said before; 28 of 39 were already in the riskiest 10%. What didn't work is on the site too:
 > fraud prediction (AUC 0.63) wasn't good enough to publish.
 >
 > I built this with AI-assisted development as a student project and would love criticism, especially on the methodology.
@@ -128,9 +129,9 @@ It usually gets a kinder reception, but it's your call.
 - **"Isn't this look-ahead bias?"** Every number is the first-filed value, dated by the filing date, and each year's model is
   trained only on outcomes known before that year. Percentiles compare each score only with scores filed in the 365 days before it.
   (An earlier version ranked within the calendar year, which peeked at later filings; fixing it moved scores ~2 points on average
-  and changed the headline from 70% to 71%.)
-- **"71% sounds too good."** It's the *last* score before the filing, often a few weeks before, when trouble is visible.
-  The stricter test (bankruptcy within 2 years of each 10-K) is 53% in the riskiest 10%. Most companies in the riskiest 10%
+  and changed the headline by about a point.)
+- **"69% sounds too good."** It's the *last* score before the filing, often a few weeks before, when trouble is visible.
+  The stricter test (bankruptcy within 2 years of each 10-K) is 52% in the riskiest 10%. Most companies in the riskiest 10%
   do *not* go bankrupt: it's a ranking, not a prediction for any one company.
 - **"Can I trade on this?"** It's research, not investment advice. The stock-outcome test is on the Track record page;
   distressed stocks are hard to short and often delisted.

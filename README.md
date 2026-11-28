@@ -6,23 +6,23 @@ Bankruptcy and accounting-risk scores for US public companies, built from free S
 
 ## What it does
 
-Faultline reads every annual report (10-K) filed with the SEC since 2009, including the reports of companies that later went bankrupt or stopped filing. For each company and year it computes the three classic forensic accounting scores (Altman Z, Piotroski F, Beneish M) and two machine-learning risk scores: the chance of a bankruptcy filing within two years, and the chance of a restatement notice within two years. Then it checks those scores against real outcomes. Each company page also explains its score: which areas (debt, cash flow, profits, warning signs and so on) push its bankruptcy risk up or down, measured by re-scoring the filing with each area set to typical values.
+Faultline reads every annual report (10-K) filed with the SEC since 2009, including the reports of companies that later went bankrupt or stopped filing. For each company and year it computes the three classic forensic accounting scores (Altman Z, Piotroski F, Beneish M) and two machine-learning risk scores: the chance of a bankruptcy filing within two years, and the chance of a restatement notice within two years. Then it checks those scores against real outcomes. Since 2017, 69% of companies that went bankrupt were in its riskiest 10% at their last score before the filing. Each company page also explains its score: which areas (debt, cash flow, profits, warning signs and so on) push its bankruptcy risk up or down, measured by re-scoring the filing with each area set to typical values.
 
 ## Main results
 
-Tested out of sample on filings from 2016 to 2023 (25,169 company-years, 539 bankruptcies). For each test year, the model was trained only on companies whose outcome was already known before that year began.
+Tested out of sample on filings from 2016 to 2023 (25,195 company-years, 539 bankruptcies). For each test year, the model was trained only on companies whose outcome was already known before that year began.
 
 | | Altman Z (1968) | Ohlson O (1980) | Zmijewski (1984) | Faultline |
 |---|---|---|---|---|
 | Ranking accuracy (AUC; 0.5 = coin flip) | 0.71 | 0.72 | 0.74 | 0.85 |
-| Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 11% | 13% | 53% |
-| Share of companies flagged to catch 86% of bankruptcies | 50% | | | 37% |
+| Bankruptcies caught by flagging the riskiest 10% of companies | 13% | 11% | 13% | 52% |
+| Share of companies flagged to catch 86% of bankruptcies | 50% | | | 35% |
 
-Quarterly updates (10-Qs, 2016-2023, 99,507 filing dates): scoring each 10-Q with trailing-twelve-month numbers raised the AUC from 0.81 (score from the last 10-K) to 0.83, caught 51% of bankruptcies in the riskiest 10% instead of 46%, and warned 326 of 464 later-bankrupt companies instead of 270, a median of 45 days earlier.
+Quarterly updates (10-Qs, 2016-2023, 99,584 filing dates): scoring each 10-Q with trailing-twelve-month numbers raised the AUC from 0.81 (score from the last 10-K) to 0.82, caught 51% of bankruptcies in the riskiest 10% instead of 43%, and warned 324 of 464 later-bankrupt companies instead of 263, with about the same lead time (median 512 vs 507 days before the filing).
 
 Accounting fraud (SEC enforcement releases, fiscal 2013-2019, 266 misstated company-years): much harder. Trained only on cases the SEC had already announced, the model reached an AUC of 0.63 against 0.58 for the Beneish M-Score (0.69 with hindsight). Company pages list SEC cases as facts; there is no fraud score.
 
-Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -13.6% the following year against +2.9% for its safest half, and 34% of them lost half their value or more against 11%.
+Stock outcomes (free approximation from 10-K cover-page market values, companies worth $10M+, 2016-2022): Faultline's riskiest 10% had a median change of -12.4% the following year against +2.4% for its safest half, and 32% of them lost half their value or more against 11%.
 
 Counting companies that stopped filing without being bought as failures too (a "distress exit"), Faultline's AUC is 0.84 against 0.75 for Altman.
 

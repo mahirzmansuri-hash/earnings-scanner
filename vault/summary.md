@@ -232,3 +232,12 @@
 - Now it only compares with filings from the year before it.
 - The effect was small. Headline went from 70% to 71%.
 - Now we can honestly say: only data public at the time.
+
+## Case studies, free API, label check (Nov 28)
+- Five case studies: Sears, Bed Bath & Beyond, GE, Kraft Heinz, SVB.
+- Bed Bath: Altman said "safe" a year before bankruptcy. We had it riskier than 98%.
+- New free data API: every score as JSON files. No key needed.
+- Read all 2,139 old bankruptcy filings. 17 were wrong tags. Removed them.
+- Retrained. Results barely moved: AUC still 0.85.
+- Receipts is now 28 of 39 (was 30). The full-history number is 69%.
+- One old claim dropped: 10-Qs don't warn earlier, they warn more companies.

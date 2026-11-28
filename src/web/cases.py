@@ -111,7 +111,7 @@ goodwill and brand value. That makes sales look tiny next to assets (about 25-30
 reset retained earnings to near zero. Both push the Z-Score down even though the company earns billions and pays its bills.</p>
 <h2>The lesson</h2>
 <p>A score that flags everyone big and acquisitive isn't useful. Testing against real outcomes is how you find out: in Faultline's
-test, the Altman Z-Score's riskiest 10% caught 13% of bankruptcies; Faultline's caught 53%.</p>"""
+test, the Altman Z-Score's riskiest 10% caught 13% of bankruptcies; Faultline's caught 52%.</p>"""
     if slug == "svb":
         return """
 <h2>What happened</h2>
