@@ -140,3 +140,4 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Next:** turn on sign-up box, first draft email, then marketing plan.
 - **Update:** username `mahir`. Buttondown's own page (buttondown.com/mahir) uses `embed-subscribe/mahir` + `email` field, matching our form. Sign-up box now live on Alerts + digest pages (checked on a phone-size screen). Still needed: `BUTTONDOWN_API_KEY` repo secret for the weekly draft.
 - **Test:** new workflow `digest-email-test.yml` (draft only, fails without a key) ran on GitHub: success, so the secret works and Buttondown accepted the API calls. Draft for 2026-11-19 to 2026-11-25 created.
+- Marketing plan v1 written (`vault/marketing-plan.md`): measure first (GoatCounter, Search Console), share-ready site + Receipts page, then one channel a week (school club, r/SecurityAnalysis, r/dataisbeautiful, Show HN). Reddit blocked automated rule checks; LinkedIn needs age 16.

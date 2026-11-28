@@ -199,3 +199,11 @@
 - Your Buttondown username is set. The sign-up box is live.
 - Still needed: the API key in GitHub, so drafts get made.
 - API key tested on GitHub: it works. A draft email is waiting in Buttondown.
+
+## Marketing plan (Nov 27, night)
+- Wrote vault/marketing-plan.md. $0, real results only.
+- First: count visitors (GoatCounter, Google Search Console).
+- Then: make the site share-ready (clean names, Receipts page).
+- Then one channel a week: school club, Reddit, Show HN.
+- Skip LinkedIn and Product Hunt until you are 16.
+- Targets: 500 visitors a month by Jan 31.
