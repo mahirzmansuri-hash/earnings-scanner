@@ -171,3 +171,4 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Bugs:** case-study draft had 3 wrong facts (SVB long bonds 86% -> 94%, GE "riskiest 15% for years", "a few percent" -> 1 in 9); verifier held the DuckDB write lock while fetching (blocked other work) -> opens DB only at start and end.
 - **Needs Mahir:** a license for the API data (now just "please link back").
 - **Next:** wait for mentor feedback; Reddit post (week 2).
+- **Industry pages:** `src/web/industries.py`: 121 pages (`industry/<slug>.html`, SEC industries with 8+ active scored companies) ranking every company by bankruptcy risk, with the share in the riskiest 10%, the median, and bankruptcies since 2016; index sorted by share at risk (radio broadcasting tops it: 6 of 9 in the riskiest 10%). 6,222 company pages link to their industry. Screener links to industries and the API; Dataset schema (JSON-LD) on the API page for Google Dataset Search.

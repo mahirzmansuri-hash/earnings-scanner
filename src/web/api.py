@@ -126,6 +126,14 @@ print(apple["bankruptcy_percentile"], apple["history_10k"][-1])</pre>
 <p class="note">Point in time: each score uses only filings public on its date, from a model trained only on earlier outcomes. Companies
 are looked up by SEC CIK (find it on any company page). Banks and insurers are not scored. Research data, not investment advice;
 if you use it, please link back to Faultline.</p></section>"""
+    ld = {"@context": "https://schema.org", "@type": "Dataset", "name": "Faultline bankruptcy and accounting-risk scores",
+          "description": "Point-in-time bankruptcy and restatement risk scores, Altman Z, Piotroski F and Beneish M scores for US public "
+                         "companies, computed from SEC EDGAR XBRL filings and updated weekly.",
+          "url": f"{SITE_URL}api/index.html", "isAccessibleForFree": True, "dateModified": str(as_of),
+          "creator": {"@type": "Person", "name": "Mahir"}, "temporalCoverage": "2016/..",
+          "spatialCoverage": "United States", "keywords": ["bankruptcy prediction", "Altman Z-Score", "SEC EDGAR", "forensic accounting"],
+          "distribution": [{"@type": "DataDownload", "encodingFormat": "application/json", "contentUrl": f"{SITE_URL}api/{VERSION}/companies.json"}]}
+    body += f'<script type="application/ld+json">{json.dumps(ld)}</script>'
     (site / "api" / "index.html").write_text(page("Free data API · Faultline", body,
         "Free JSON API with bankruptcy and accounting-risk scores for every US public company. No key, no sign-up.", root="../"))
     return len(rows)

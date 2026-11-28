@@ -241,3 +241,4 @@
 - Retrained. Results barely moved: AUC still 0.85.
 - Receipts is now 28 of 39 (was 30). The full-history number is 69%.
 - One old claim dropped: 10-Qs don't warn earlier, they warn more companies.
+- New industry pages: each industry's companies ranked by risk (121 pages). Good for Google searches.

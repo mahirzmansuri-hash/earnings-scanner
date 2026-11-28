@@ -231,7 +231,9 @@ def company_page(r, h, evs, accn_map, as_of):
     flags = red_flags(r, recent)
     later = evs[(pd.to_datetime(evs["filed"]) > pd.Timestamp(r.available_date)) & evs["event"].isin(["bankruptcy", "non_reliance"])]
     accn = accn_map.get((r.cik, pd.Timestamp(r.period_end)), "")
-    parts = [f'<section><div class="label">{e(r.sic_description or "")} · CIK {r.cik}'
+    ind = r.sic_description if isinstance(r.sic_description, str) else ""
+    ind_html = f'<a href="../industry/{IND_SLUGS[ind]}.html">{e(ind)}</a>' if ind in IND_SLUGS else e(ind)
+    parts = [f'<section><div class="label">{ind_html} · CIK {r.cik}'
              f'{" · " + e(r.tickers) if isinstance(r.tickers, str) else ""}</div><h1>{e(r["name"])}</h1>']
     if isinstance(r.former_names, str) and r.former_names:
         parts.append(f'<p class="dim">Formerly: {e(r.former_names)}</p>')
@@ -397,7 +399,8 @@ draw()})();</script>"""
 
 
 def screener():
-    body = """<section><h1>Screener</h1><p class="dim">Every scored company, using each one's latest 10-K. Click a column to sort. Shows the first 300 matches.</p>
+    body = """<section><h1>Screener</h1><p class="dim">Every scored company, using each one's latest 10-K. Click a column to sort. Shows the first 300 matches.
+Or <a href="industry/index.html">browse by industry</a>, or download everything from the <a href="api/index.html">free data API</a>.</p>
 <div class="filters"><label>Name or ticker<input id="f" type="search"></label>
 <label>Industry<select id="sector"><option value="">All</option></select></label>
 <label>Status<select id="status"><option value="">All</option><option value="active" selected>Still filing</option><option value="inactive">Stopped filing</option></select></label>
@@ -546,6 +549,7 @@ honestly with the companies that disappeared?</p>
 
 HIST: dict = {}
 NAMES: dict = {}
+IND_SLUGS: dict = {}   # SEC industry name -> industry page slug (src/web/industries.py)
 
 
 def write_alerts(alerts, timeline, latest, as_of):
@@ -702,6 +706,8 @@ def build():
     ev_by = {k: g for k, g in events.groupby("cik")}
     empty_ev = events.iloc[0:0]
     accn_map = {(r.cik, pd.Timestamp(r.period_end)): r.accn_first for r in accn.itertuples()}
+    from src.web.industries import industry_slugs, write_industries
+    IND_SLUGS.update(industry_slugs(latest))
     for r in latest.itertuples():
         r = pd.Series(r._asdict())
         (SITE / "c" / f"{r.cik}.html").write_text(company_page(r, HIST[r.cik], ev_by.get(r.cik, empty_ev), accn_map, as_of))
@@ -709,6 +715,7 @@ def build():
     receipts_n = write_receipts(events, timeline, names_all, set(latest["cik"]), as_of, not_bankruptcy)
     from src.web.cases import CASES, write_cases
     write_cases(SITE, timeline, HIST, events, chart, set(latest["cik"]))
+    n_ind = write_industries(SITE, latest, events, IND_SLUGS, pd.Timestamp(as_of).date())
     from src.web.api import write_api
     n_api = write_api(SITE, latest, HIST, rq_all, ev_by, WHY, AAER,
                       receipts_rows(events, timeline, as_of, not_bankruptcy=not_bankruptcy), pd.Timestamp(as_of).date())
@@ -735,12 +742,12 @@ def build():
     (SITE / "about.html").write_text(about())
     # sitemap + robots.txt so search engines can find every company page
     from src.web.style import SITE_URL
-    urls = ["", "new.html", "alerts.html", "receipts.html", "research/index.html"] + [f"research/{c['slug']}.html" for c in CASES] + ["digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html", "api/index.html"] + [f"c/{c}.html" for c in latest["cik"]]
+    urls = ["", "new.html", "alerts.html", "receipts.html", "research/index.html"] + [f"research/{c['slug']}.html" for c in CASES] + ["digest/index.html", "screener.html", "track-record.html", "methodology.html", "about.html", "api/index.html", "industry/index.html"] + [f"industry/{v}.html" for v in IND_SLUGS.values()] + [f"c/{c}.html" for c in latest["cik"]]
     (SITE / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
                                       + "".join(f"<url><loc>{SITE_URL}{u}</loc><lastmod>{as_of}</lastmod></url>" for u in urls) + "</urlset>")
     (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}sitemap.xml\n")
     size = sum(p.stat().st_size for p in SITE.rglob("*") if p.is_file())
-    print(f"site/: {len(latest):,} company pages, {size/1e6:.0f} MB; receipts: {receipts_n}; API: {n_api:,} companies")
+    print(f"site/: {len(latest):,} company pages, {size/1e6:.0f} MB; receipts: {receipts_n}; API: {n_api:,} companies; {n_ind} industry pages")
 
 
 if __name__ == "__main__":
