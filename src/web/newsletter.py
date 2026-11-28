@@ -1,6 +1,6 @@
 """Email the weekly digest through Buttondown (free for the first 100 subscribers).
 
-Run:  python -m src.web.newsletter      (after src.web.build, which writes data/processed/digest_latest.md)
+Run:  python -m src.web.newsletter [digest.md]   (default file: data/processed/digest_latest.md, written by src.web.build)
 
 Settings (environment variables; in GitHub they are repository secrets/variables, locally in .env):
   BUTTONDOWN_API_KEY   the key from buttondown.com/requests. Missing -> this step does nothing.
@@ -12,6 +12,7 @@ The API key is never printed.
 """
 import os
 import sys
+from pathlib import Path
 
 import requests
 
@@ -32,17 +33,18 @@ def email_from_digest(md: str) -> tuple[str, str]:
     return subject, rest.strip() + "\n" + FOOTER
 
 
-def main() -> int:
+def main(path=None) -> int:
+    digest = Path(path) if path else DIGEST
     key = os.getenv("BUTTONDOWN_API_KEY", "").strip()
     if not key:
         print("newsletter: BUTTONDOWN_API_KEY not set, skipped")
-        return 0
-    if not DIGEST.exists():
+        return 1 if os.getenv("FL_REQUIRE_KEY") else 0     # the test workflow must fail loudly without a key
+    if not digest.exists():
         print("newsletter: no digest file, run src.web.build first")
         return 1
     mode = os.getenv("FL_DIGEST_MODE", "draft").strip().lower()
     status = "about_to_send" if mode == "send" else "draft"
-    subject, body = email_from_digest(DIGEST.read_text())
+    subject, body = email_from_digest(digest.read_text())
     head = {"Authorization": f"Token {key}"}
     try:
         r = requests.get(API, headers=head, params={"ordering": "-creation_date"}, timeout=30)
@@ -62,4 +64,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1] if len(sys.argv) > 1 else None))

@@ -1,0 +1,25 @@
+# Test the Buttondown connection without running the full weekly update.
+# Creates this week's digest as a DRAFT in Buttondown (never sends). Fails if the key is missing or wrong.
+name: Digest email test
+
+on:
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/digest-email-test.yml"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install requests==2.34.2 python-dotenv==1.2.4
+      - name: Create digest draft in Buttondown
+        env:
+          BUTTONDOWN_API_KEY: ${{ secrets.BUTTONDOWN_API_KEY }}
+          FL_DIGEST_MODE: draft
+          FL_REQUIRE_KEY: "1"
+        run: python -m src.web.newsletter tests/fixtures/digest_latest.md
