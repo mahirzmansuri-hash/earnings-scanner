@@ -198,3 +198,4 @@
 - Needs you: make the account, add the API key to GitHub.
 - Your Buttondown username is set. The sign-up box is live.
 - Still needed: the API key in GitHub, so drafts get made.
+- API key tested on GitHub: it works. A draft email is waiting in Buttondown.
