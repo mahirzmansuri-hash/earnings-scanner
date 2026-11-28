@@ -149,3 +149,4 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Display fix:** percentiles round down on Receipts (89.7% showed as "90%" while labelled "riskiest 25%").
 - **Waiting on Mahir:** GoatCounter account (site code), Google Search Console (HTML-tag verification value).
 - **Next:** turn on analytics + submit sitemap; then launch week 1 (school club demo).
+- **Update:** GoatCounter on (code `earnings-scanner`), on every page; confirmed live: the page loads count.js and sends a hit to earnings-scanner.goatcounter.com/count. Search Console verification tag added by Mahir (commit 0656ab4), now on every page.

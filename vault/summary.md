@@ -216,3 +216,5 @@
 - Found an SEC tagging error (Granite). Now we check each filing's text.
 - Each Receipts link shows a picture card with the result.
 - Visitor counting is ready. It needs your two accounts.
+- Visitor counting is on (GoatCounter). Tested: visits get counted.
+- Google tag is on the site. Next: click Verify, then submit the sitemap.
