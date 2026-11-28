@@ -40,3 +40,8 @@ Traps that cost time once. Format: **symptom** → cause → fix.
 - **Symptom:** Granite Construction (healthy) appeared as a bankruptcy on Receipts.
 - **Cause:** our events come from the item tags in SEC's filing index; the filer tagged Item 1.03 on an 8-K about a note exchange. SEC's full-submission .txt header repeats the tag, so text checks must skip it.
 - **Fix:** `src/pipeline/verify_bk.py` reads recent bankruptcy 8-Ks (main document first) and drops ones that never mention bankruptcy. Older training labels are not checked yet (rare; would need ~1,000 fetches).
+
+## Percentiles ranked within a calendar year peek ahead
+- **Symptom:** none visible; found while writing answers to likely criticism.
+- **Cause:** `groupby("year").rank(pct=True)` compares a January filing with filings made later that year.
+- **Fix:** `trailing_pctile` (365 days up to the filing). Effect was small (~2 points), but claims of "only data public at the time" must be literally true.

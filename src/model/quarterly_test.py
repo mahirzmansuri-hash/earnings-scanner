@@ -103,14 +103,15 @@ def lead_times(rows: pd.DataFrame) -> dict:
 
 def live():
     """Site scores: every 10-Q since 2016 scored out of sample, calibrated like the annual model (src/model/live.py).
-    Table risk_q keeps every scored 10-Q, with its percentile among 10-Qs filed that year."""
+    Table risk_q keeps every scored 10-Q, with its percentile among 10-Qs filed in the 365 days up to it."""
     from src.model.live import calibrate
     with duckdb.connect(str(DB_PATH)) as con:
         as_of = pd.Timestamp(con.execute("SELECT MAX(available_date) FROM quarterly").fetchone()[0])
         q = quarterly_features(con, end=str(as_of.date()))
         wf = walk_forward(q, years=range(2016, as_of.year + 1), verbose=False)
         wf["q_risk"] = calibrate(wf)
-        wf["q_pctile"] = wf.groupby("year")["composite"].rank(pct=True)
+        from src.model.pctile import trailing_pctile
+        wf["q_pctile"] = trailing_pctile(wf["available_date"], wf["composite"])   # vs 10-Qs of the previous 365 days
         # every 10-Q since 2016 (alerts compare each one with the company's previous filing); pages use the latest
         out = wf[["cik", "accn", "period_end", "available_date", "q_risk", "composite", "q_pctile"]].rename(columns={"composite": "q_risk_raw"})
         con.register("rq_df", out)

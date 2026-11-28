@@ -14,6 +14,8 @@ percentages get closer to how often companies really failed. 2016 (no earlier ye
 """
 import duckdb
 import pandas as pd
+
+from src.model.pctile import trailing_pctile
 from sklearn.isotonic import IsotonicRegression
 
 from src.config import DB_PATH
@@ -59,11 +61,11 @@ def main():
             part = part.rename(columns={"calibrated": col, "composite": col + "_raw"})
             out = part if out is None else out.merge(part.drop(columns=["available_date"]), on=["cik", "period_end"], how="outer")
             print(f"  {event}: scored {len(part):,} company-years")
-        out["year"] = pd.to_datetime(out["available_date"]).dt.year
         for col in ["bankruptcy_risk", "restatement_risk"]:
-            # rank by the raw score: calibration groups scores into steps, raw keeps the fine order
-            out[col.replace("_risk", "_pctile")] = out.groupby("year")[col + "_raw"].rank(pct=True)
-        con.register("risk_df", out.drop(columns=["year"]))
+            # rank by the raw score (calibration groups scores into steps, raw keeps the fine order), only against
+            # filings public in the 365 days up to this one: no peeking at filings made later (src/model/pctile.py)
+            out[col.replace("_risk", "_pctile")] = trailing_pctile(out["available_date"], out[col + "_raw"])
+        con.register("risk_df", out)
         con.execute("CREATE OR REPLACE TABLE risk AS SELECT * FROM risk_df")
         con.unregister("risk_df")
         print(f"risk table: {len(out):,} company-years (filed 2016-{as_of.year}), data as of {as_of.date()}")

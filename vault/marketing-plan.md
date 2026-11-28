@@ -42,7 +42,7 @@ Drafts for every step: `docs/marketing/launch-kit.md`. Chart: `docs/marketing/oc
 |---|---|---|---|
 | 1 | Finance/business teacher or club leader (written message) | ask for 10 minutes of honest feedback | expert eyes before strangers; no pitching |
 | 2 | r/SecurityAnalysis | method + results + what failed, ask for criticism | analysts like method + honesty |
-| 3 | r/dataisbeautiful ([OC]) | decile chart: 70% of 475 bankruptcies were in the riskiest 10% | big audience, chart-only |
+| 3 | r/dataisbeautiful ([OC]) | decile chart: 71% of 475 bankruptcies were in the riskiest 10% | big audience, chart-only |
 | 4 | Hacker News "Show HN" | the site, first comment explains how it's built | qualifies: usable with no signup |
 | 5+ | r/ValueInvesting, r/accounting | one case study each | ongoing |
 

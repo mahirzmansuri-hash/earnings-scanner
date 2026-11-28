@@ -4,7 +4,7 @@ Run:  PYTHONPATH=. .venv/bin/python scripts/make_oc_chart.py
 Writes docs/marketing/oc-bankruptcy-deciles.png (1600x1000) and prints the numbers used, for the post text.
 
 Each bar = companies whose last Faultline score (10-K or 10-Q, within 13 months before the bankruptcy 8-K)
-fell in that tenth of all filers scored that year. With no skill, every bar would be the dashed line (10%).
+fell in that tenth of all filings made in the 365 days up to it. With no skill, every bar would be the dashed line (10%).
 Scores are walk-forward: each year's model was trained only on outcomes known before that year.
 """
 import duckdb
@@ -39,7 +39,7 @@ def main():
     img = Image.new("RGB", (W, H), PAPER)
     d = ImageDraw.Draw(img)
     d.text((80, 60), f"Where the model ranked {len(s)} companies before they went bankrupt", font=font("serif", 40), fill=INK)
-    d.text((80, 125), f"Last bankruptcy-risk score before each filing, by tenth of all companies scored that year  ·  2017 to {as_of}",
+    d.text((80, 125), f"Last bankruptcy-risk score before each filing, ranked against all filings of the year before it  ·  2017 to {as_of}",
            font=font("sans", 26), fill=INK2)
     x0, x1, y0, y1 = 140, W - 80, 230, 820          # plot area
     top = 0.75

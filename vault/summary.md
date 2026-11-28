@@ -226,3 +226,9 @@
 - Week 1: send a short written message to a teacher asking for feedback.
 - Then Reddit, a chart post, and Hacker News. All drafts are written.
 - New chart: 70% of 475 bankruptcies were in our riskiest 10% before they happened.
+
+## Fixed a small peek into the future (Nov 28)
+- "Riskier than X%" used to compare with the whole year, even later filings.
+- Now it only compares with filings from the year before it.
+- The effect was small. Headline went from 70% to 71%.
+- Now we can honestly say: only data public at the time.

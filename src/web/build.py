@@ -44,7 +44,7 @@ def num(x, d=2):
 
 
 def band(p):
-    """Percentile among companies filing that year -> (word, css color)."""
+    """Percentile among filings of the past 365 days -> (word, css color)."""
     if p is None or (isinstance(p, float) and math.isnan(p)):
         return ("Not scored", "--ink-2")
     if p >= 0.95:
@@ -55,7 +55,7 @@ def band(p):
 
 
 def pct_text(p):
-    return "n/a" if p is None or (isinstance(p, float) and math.isnan(p)) else f"riskier than {p*100:.0f}% of filers that year"
+    return "n/a" if p is None or (isinstance(p, float) and math.isnan(p)) else f"riskier than {p*100:.0f}% of filers in the past year"
 
 
 def reading(p):
@@ -158,7 +158,7 @@ def chart(h: pd.DataFrame, evs: pd.DataFrame) -> str:
                      f'<text x="{X(t)+4:.1f}" y="{ly}" style="fill:var({c})">{word}</text>')
     return (f'<div class="tbl"><svg viewBox="0 0 {W} {H}" width="100%" style="min-width:420px" role="img" '
             f'aria-label="Bankruptcy risk percentile by filing date">{"".join(s)}</svg></div>'
-            '<p class="note">Percentile of bankruptcy risk among all companies that filed a 10-K the same year. '
+            '<p class="note">Percentile of bankruptcy risk among all 10-Ks filed in the 365 days up to that filing (never later ones). '
             'Shaded bands: top 5% (high) and top 20% (elevated). Each point is scored by a model that had only seen '
             'outcomes known before that year.</p>')
 
@@ -177,7 +177,7 @@ def q_stat(r) -> str:
     return (f'<div class="stat"><span class="label">Updated with the 10-Q filed {pd.Timestamp(q.available_date).date()}</span>'
             f'<span class="v">{q.q_risk*100:.1f}%</span><span class="read" style="--c:var({c})">{w}</span> '
             f'<span class="dim">· bankruptcy risk, next 2 years · quarter ended {pd.Timestamp(q.period_end).date()} · '
-            f'riskier than {q.q_pctile*100:.0f}% of 10-Q filers that year</span></div>')
+            f'riskier than {q.q_pctile*100:.0f}% of 10-Qs filed in the past year</span></div>')
 AAER = {}
 
 
@@ -490,7 +490,7 @@ def new_filings(latest, as_of):
     jumps = recent.dropna(subset=["jump"]).sort_values("jump", ascending=False).head(15)
     allrows = recent.sort_values(["available_date", "bankruptcy_pctile"], ascending=[False, False])
     body = f"""<section><h1>New filings</h1><p class="dim">Every annual report filed in the 30 days before {as_of}, scored the day the data
-was updated. Risk percentile compares each company with all companies that filed in the same year; change is in percentile points
+was updated. Risk percentile compares each company with all 10-Ks filed in the 365 days up to it; change is in percentile points
 against the company's previous 10-K.</p></section>
 <section><h2>Biggest increases in risk</h2>{'<div class="tbl"><table>' + head + '<tbody>' + "".join(row(r) for r in jumps.itertuples()) + '</tbody></table></div>' if len(jumps) else '<p class="dim">No company with an earlier report filed in this window.</p>'}</section>
 <section><h2>All {len(allrows):,} filings</h2><div class="tbl"><table>{head}<tbody>{"".join(row(r) for r in allrows.itertuples())}</tbody></table></div>
@@ -659,7 +659,7 @@ bankruptcy-risk score before the filing. Misses included. Data as of {pd.Timesta
 using filings public at the time. The site itself launched in November 2026, so older scores are what the method would have
 shown then, not screenshots. Bankruptcy filings come from SEC's 8-K item tags; we read each one and left out
 {len(not_bankruptcy)} tagged filing(s) whose text was not about a bankruptcy. Companies with no score are mostly banks and insurers (not scored) or filers without XBRL financials.
-"Riskiest 10%" is among all filers scored that year. Research, not investment advice.
+"Riskiest 10%" compares each score with all scores filed in the 365 days up to it, never later ones. Research, not investment advice.
 See the <a href="track-record.html">full track record</a> for every year since 2016.</p></section>"""
     (SITE / "receipts.html").write_text(page("Receipts: what Faultline said before each bankruptcy", body,
         f"{top10} of {m} companies that filed for bankruptcy in the last 12 months were already in Faultline's riskiest 10%.", active="receipts.html",

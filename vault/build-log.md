@@ -156,3 +156,9 @@ One entry per session, newest at the bottom. Each entry must be enough to resume
 - **Did:** Mahir finds in-person pitching hard, so Phase 2 is online-first: written feedback request to a teacher, then r/SecurityAnalysis, r/dataisbeautiful [OC] chart, Show HN. `docs/marketing/launch-kit.md` (all drafts + numbers table + reply bank), `scripts/make_oc_chart.py` -> `docs/marketing/oc-bankruptcy-deciles.png`.
 - **Numbers:** 576 bankrupt companies since 2017; 475 had a score in the 13 months before; 331 (70%) in the riskiest 10%, 4% in the safer half; median 327 days from first entering the riskiest 10%.
 - **Next:** Mahir sends the teacher message (week 1).
+
+## 2026-11-28: Point-in-time percentiles (look-ahead fix)
+- **Bug:** every "riskier than X%" ranked a filing against all filings of its calendar year, including ones filed later that year: a small look-ahead that HN/Reddit readers would catch.
+- **Fix:** `src/model/pctile.py` `trailing_pctile`: rank only against scores filed in the 365 days up to each filing (ties count half). Used in `live.py` (10-K) and `quarterly_test.live` (10-Q); stored tables recomputed from raw scores (no retraining needed). Undated rows get no percentile, as before. Site wording now says "in the past year". Test added (39 pass).
+- **Size of the leak:** mean change 2 percentile points (10-K), 1.5 (10-Q); 99% of filings stay on the same side of the riskiest-10% line. Since-2017 receipts: 331 -> 338 of 475 (70% -> 71%); last 12 months unchanged (30/39). Model AUCs unaffected (they use raw scores).
+- **Next:** week 1 of the launch (Mahir asks a finance mentor for written feedback), then the r/SecurityAnalysis post.

@@ -17,3 +17,12 @@ def test_receipts_uses_only_earlier_scores_and_skips_bad_tags():
 
 def test_floor_pct():
     assert _floor_pct(0.897) == "89%" and _floor_pct(1.0) == "99%"
+
+
+def test_trailing_pctile_ignores_later_and_old_filings():
+    from src.model.pctile import trailing_pctile
+    d = pd.to_datetime(["2024-01-01", "2025-03-01", "2025-03-02", "2025-12-31"])
+    p = trailing_pctile(d, [9.0, 1.0, 2.0, 0.5])
+    assert p[0] == 1.0                      # alone in its window
+    assert p[1] == 1.0                      # the 2024 filing is >365 days earlier; the later ones don't count yet
+    assert p[2] == 1.0 and p[3] == 1 / 3    # lowest of the three filed in the year to Dec 31

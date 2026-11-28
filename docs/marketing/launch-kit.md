@@ -10,13 +10,13 @@ After each post, reply to comments for the first 2 hours, then paste the useful 
 | Claim | Number | Source |
 |---|---|---|
 | Recent receipts | 30 of 39 companies that filed for bankruptcy in the last 12 months were already in the riskiest 10% | Receipts page |
-| Full history | 331 of 475 (70%) bankruptcies since 2017 were in the riskiest 10% at their last score; 4% were in the safer half | `oc-bankruptcy-deciles.png` |
+| Full history | 338 of 475 (71%) bankruptcies since 2017 were in the riskiest 10% at their last score; 4% were in the safer half | `oc-bankruptcy-deciles.png` |
 | Warning time | median 327 days from first entering the riskiest 10% to the filing (looks back at most 13 months) | same |
 | Vs. textbook | AUC 0.85 vs Altman Z 0.71, Ohlson 0.72, Zmijewski 0.74 (bankruptcy within 2 years of each 10-K, 2016-2023 test years) | Track record page |
 | Honest failure | fraud prediction only AUC 0.63, so the site shows SEC cases as facts, no fraud score | Track record page |
 
 Two different "riskiest 10%" numbers exist, so don't mix them up: **53%** = of all bankruptcies within 2 years of a 10-K, how many
-that 10-K's score put in the riskiest 10% (the formal test). **70%** = the *last* score before each bankruptcy (closer to the event, so higher).
+that 10-K's score put in the riskiest 10% (the formal test). **71%** = the *last* score before each bankruptcy (closer to the event, so higher).
 
 ---
 
@@ -57,7 +57,7 @@ that 10-K's score put in the riskiest 10% (the formal test). **70%** = the *last
 > **Results (test years 2016-2023, ~25,000 company-years, 539 bankruptcies within 2 years of a 10-K):**
 > - Ranking accuracy (AUC): 0.85, vs 0.71 for Altman Z, 0.72 Ohlson O, 0.74 Zmijewski on the same rows.
 > - The riskiest 10% of filers contained 53% of later bankruptcies (Altman Z's riskiest 10%: 13%).
-> - At the last score before the filing, 331 of 475 bankruptcies since 2017 (70%) were in the riskiest 10%.
+> - At the last score before the filing, 338 of 475 bankruptcies since 2017 (71%) were in the riskiest 10%.
 > - Fresh 10-Q numbers (trailing twelve months) help, most when the last 10-K is old: AUC 0.85 → 0.88 when the 10-K is 8+ months old.
 >
 > **What didn't work:**
@@ -89,7 +89,7 @@ It usually gets a kinder reception, but it's your call.
 > **Tool:** Python (pandas, DuckDB, scikit-learn), chart drawn with Pillow.
 >
 > Each bar is the share of bankrupt companies whose last risk score (within 13 months before the filing) fell in that tenth of
-> all companies scored that year. If the score were random, every bar would be 10%. The model is walk-forward: each year's model
+> all filings made in the 365 days up to it (never later ones). If the score were random, every bar would be 10%. The model is walk-forward: each year's model
 > only learned from bankruptcies known before that year. 101 more bankrupt companies had no score in the 13 months before (mostly
 > banks and insurers, which aren't scored, or companies without XBRL data).
 >
@@ -126,9 +126,10 @@ It usually gets a kinder reception, but it's your call.
 ## Reply bank (honest answers to the likely criticism)
 
 - **"Isn't this look-ahead bias?"** Every number is the first-filed value, dated by the filing date, and each year's model is
-  trained only on outcomes known before that year. One small leak to admit: a score's percentile is ranked among all filings
-  in its calendar year, including ones filed later that year.
-- **"70% sounds too good."** It's the *last* score before the filing, often a few weeks before, when trouble is visible.
+  trained only on outcomes known before that year. Percentiles compare each score only with scores filed in the 365 days before it.
+  (An earlier version ranked within the calendar year, which peeked at later filings; fixing it moved scores ~2 points on average
+  and changed the headline from 70% to 71%.)
+- **"71% sounds too good."** It's the *last* score before the filing, often a few weeks before, when trouble is visible.
   The stricter test (bankruptcy within 2 years of each 10-K) is 53% in the riskiest 10%. Most companies in the riskiest 10%
   do *not* go bankrupt: it's a ranking, not a prediction for any one company.
 - **"Can I trade on this?"** It's research, not investment advice. The stock-outcome test is on the Track record page;
