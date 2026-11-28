@@ -218,3 +218,5 @@
 - Visitor counting is ready. It needs your two accounts.
 - Visitor counting is on (GoatCounter). Tested: visits get counted.
 - Google tag is on the site. Next: click Verify, then submit the sitemap.
+- Google verified the site. Sitemap sent. Google will index pages over the next weeks.
+- Marketing Phase 0 and 1 are done.

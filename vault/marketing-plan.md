@@ -16,7 +16,7 @@ and publishes how often its warnings came true, dead companies included."
    Honesty is rare and people share it.
 4. **Built by a high-school sophomore with AI-assisted development.** True, and a story on its own. Always say "AI-assisted."
 
-## Phase 0: measure first (this week, ~1 hour of Mahir's time)
+## Phase 0: measure first - DONE Nov 28 (GoatCounter live, Search Console verified, sitemap submitted)
 Without numbers we can't tell what works, and "quantifiable outcomes" is the whole point.
 | Tool | What it counts | Cost | Who |
 |---|---|---|---|
@@ -28,7 +28,7 @@ Without numbers we can't tell what works, and "quantifiable outcomes" is the who
 Watch-out: Buttondown's free plan ends at 100 subscribers. Decide at ~80 (options: ask about a student/non-profit
 discount, or keep email capped and point extra people to RSS).
 
-## Phase 1: make the site "share-ready" (Claude, ~1 session)
+## Phase 1: make the site "share-ready" - DONE Nov 28 (readable names, Receipts page + share card, phone check)
 - Company names in titles in normal case ("America's Car-Mart", not "AMERICAS CARMART INC") so Google results look clean.
 - A share image per case study (chart + one sentence), made from our own data, not AI art.
 - A "Receipts" page: every company that went bankrupt in the last 12 months and what Faultline said before.
